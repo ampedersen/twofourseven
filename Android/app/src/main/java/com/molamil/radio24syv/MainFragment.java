@@ -44,6 +44,8 @@ public class MainFragment extends Fragment {
             }
         });
 
+        mTabHost.setCurrentTab(0);
+
         return v;
     }
 

@@ -11,8 +11,8 @@ public class SidePageTransformer implements ViewPager.PageTransformer {
         FLOW,
         DEPTH,
         ZOOM,
+        STACK,
         SLIDE_OVER,
-        INSTANT,
     }
     private static final float MIN_SCALE_DEPTH = 0.75f;
     private static final float MIN_SCALE_ZOOM = 0.85f;
@@ -40,7 +40,7 @@ public class SidePageTransformer implements ViewPager.PageTransformer {
                 page.setRotationY(position * -30f);
                 return;
 
-            case SLIDE_OVER:
+            case STACK:
                 if (position < 0 && position > -1) {
                     // this is the page to the left
                     scale = Math.abs(Math.abs(position) - 1) * (1.0f - SCALE_FACTOR_SLIDE) + SCALE_FACTOR_SLIDE;
@@ -92,21 +92,9 @@ public class SidePageTransformer implements ViewPager.PageTransformer {
                 }
                 break;
 
-            case INSTANT:
-                // TODO Broken crap
-                if (position < 0) {
-//                    translationX = (int) ((float) (page.getWidth()) * position);
-                    translationX = -page.getWidth();
-                } else if (position > 0) {
-//                    translationX = -(int) ((float) (page.getWidth()) * -position);
-                    translationX = page.getWidth();
-                } else {
-                    translationX = 0;
-                }
-                page.setScrollX((int)translationX); // Snap to position
-                alpha = 1;
-                scale = 1;
-                break;
+            case SLIDE_OVER:
+                //TODO
+                return;
 
             default:
                 return;

@@ -3,6 +3,7 @@ package com.molamil.radio24syv;
 import android.content.Context;
 import android.support.v4.view.ViewPager;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.MotionEvent;
 
 /**
@@ -33,4 +34,5 @@ public class RadioViewPager extends ViewPager {
     public void setPagingEnabled(boolean b) {
         this.isPagingEnabled = b;
     }
+
 }
