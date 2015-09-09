@@ -93,7 +93,7 @@ public class LiveFragment extends PageFragment implements View.OnClickListener {
         switch (v.getId()) {
             case R.id.schedule_button:
                 if (mListener != null) {
-                    mListener.onShowSidePageInteraction(OnFragmentInteractionListener.Side.RIGHT, LiveScheduleFragment.class);
+                    mListener.onShowSidePageInteraction(OnFragmentInteractionListener.Side.SHOW_RIGHT);
                 }
                 break;
         }
@@ -110,8 +110,8 @@ public class LiveFragment extends PageFragment implements View.OnClickListener {
      * >Communicating with Other Fragments</a> for more information.
      */
     public interface OnFragmentInteractionListener {
-        public enum Side { RIGHT, LEFT };
-        public void onShowSidePageInteraction(Side side, Class<?> fragment);
+        public enum Side { HIDE, SHOW_LEFT, SHOW_RIGHT };
+        public void onShowSidePageInteraction(Side side);
     }
 
 }

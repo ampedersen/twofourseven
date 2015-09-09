@@ -38,17 +38,32 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    protected void onStart() {
-        super.onStart();
-    }
-
-    @Override
     public void onBackPressed() {
         boolean isViewingMainPage = (pager.getCurrentItem() == mainPagePosition);
         if (isViewingMainPage) {
             super.onBackPressed(); // Return to system
         } else {
             pager.setCurrentItem(mainPagePosition); // Back to main page
+        }
+    }
+
+    public void onFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onShowSidePageInteraction(Side side) {
+        Log.d("JJJ", "Show side page on the " + side);
+        switch (side) {
+            case HIDE:
+                pager.setCurrentItem(mainPagePosition);
+                break;
+            case SHOW_LEFT:
+                pager.setCurrentItem(mainPagePosition + 1);
+                break;
+            case SHOW_RIGHT:
+                pager.setCurrentItem(mainPagePosition + 1);
+                break;
         }
     }
 
@@ -61,6 +76,7 @@ public class MainActivity extends FragmentActivity implements
 
         selectedTabTag = tabTag;
 
+        // Change page contents depending on the selected tab
         switch (selectedTabTag) {
             case MainFragment.TAG_TAB_LIVE:
                 pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager()));
@@ -83,15 +99,10 @@ public class MainActivity extends FragmentActivity implements
         pager.setCurrentItem(mainPagePosition, false);
     }
 
-    public void onFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onShowSidePageInteraction(Side side, Class<?> fragment) {
-        Log.d("JJJ", "Show side page " + fragment + " on the " + side);
-    }
-
+    /*
+    Custom page adaptors - one for each tab on the main screen.
+    This is the best way to change contents of ViewPager on the fly.
+     */
     private class LiveTabPagerAdapter extends FragmentStatePagerAdapter {
         public LiveTabPagerAdapter(FragmentManager fm) {
             super(fm);
