@@ -17,7 +17,7 @@ public class MainActivity extends FragmentActivity implements
         NewsFragment.OnFragmentInteractionListener,
         OfflineFragment.OnFragmentInteractionListener {
 
-    RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access previous and next wizard steps
+    ViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access previous and next wizard steps
     SidePageTransformer pageTransformer;
     MainFragment mainFragment; // Keep the same main fragment across different page adaptors
     String selectedTabTag;
@@ -28,13 +28,29 @@ public class MainActivity extends FragmentActivity implements
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        pager = (RadioViewPager) findViewById(R.id.pager);
         mainFragment = new MainFragment();
-        pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
         pageTransformer = new SidePageTransformer(SidePageTransformer.TransformType.SLIDE_OVER);
+        pager = (ViewPager) findViewById(R.id.pager);
+        pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
         pager.setPageTransformer(false, pageTransformer);
-        pager.setCurrentItem(0); // Start on the first page
-        pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page
+        pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
+
+            // However, if we're being restored from a previous state,
+            // then we don't need to do anything and should return or else
+            // we could end up with overlapping fragments.
+            if (savedInstanceState == null) {
+                // Create a new Fragment to be placed in the activity layout
+                PlayerFragment playerFragment = new PlayerFragment();
+
+                // In case this activity was started with special instructions from an
+                // Intent, pass the Intent's extras to the fragment as arguments
+                playerFragment.setArguments(getIntent().getExtras());
+
+                // Add the fragment to the 'fragment_container' FrameLayout
+                getSupportFragmentManager().beginTransaction()
+                        .add(R.id.player_fragment_container, playerFragment).commit();
+                Log.d("JJJ", "stuff");
+            }
     }
 
     @Override

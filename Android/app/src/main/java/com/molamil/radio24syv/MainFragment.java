@@ -13,7 +13,9 @@ import android.widget.TabHost;
 import android.widget.TextView;
 
 
-public class MainFragment extends Fragment {
+public class MainFragment extends Fragment implements
+    PlayerFragment.OnMyFragmentInteractionListener {
+
     OnMainFragmentInteractionListener mListener;
     FragmentTabHost mTabHost;
 
@@ -72,6 +74,11 @@ public class MainFragment extends Fragment {
         ((TextView) indicator.findViewById(R.id.tab_indicator_text)).setText(getResources().getText(textId));
 
         mTabHost.addTab(mTabHost.newTabSpec(tag).setIndicator(indicator), fragment, null);
+    }
+
+    @Override
+    public void onPlayerFragmentInteraction(Uri uri) {
+
     }
 
     public interface OnMainFragmentInteractionListener {
