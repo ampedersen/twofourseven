@@ -13,6 +13,9 @@
     <string name="title_fragment_news">NewsFragment</string>
     <string name="title_fragment_offline">OfflineFragment</string>
     <string name="title_fragment_player">PlayerFragment</string>
+    <string name="title_fragment_categories">CategoriesFragment</string>
+    <string name="title_fragment_search">SearchFragment</string>
+    <string name="title_fragment_schedule">ScheduleFragment</string>
 
     <string name="intro_next">Videre</string>
 

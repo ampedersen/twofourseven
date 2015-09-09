@@ -109,9 +109,6 @@ public class LiveFragment extends PageFragment implements View.OnClickListener {
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.
      */
-    public interface OnFragmentInteractionListener {
-        public enum Side { HIDE, SHOW_LEFT, SHOW_RIGHT };
-        public void onShowSidePageInteraction(Side side);
-    }
+
 
 }

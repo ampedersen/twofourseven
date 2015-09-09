@@ -11,8 +11,8 @@ import android.util.Log;
 
 public class MainActivity extends FragmentActivity implements
         MainFragment.OnMainFragmentInteractionListener,
-        LiveFragment.OnFragmentInteractionListener,
-        LiveScheduleFragment.OnFragmentInteractionListener,
+        PageFragment.OnFragmentInteractionListener,
+        ScheduleFragment.OnFragmentInteractionListener,
         ProgramsFragment.OnFragmentInteractionListener,
         NewsFragment.OnFragmentInteractionListener,
         OfflineFragment.OnFragmentInteractionListener {
@@ -114,7 +114,7 @@ public class MainActivity extends FragmentActivity implements
                 case 0:
                     return mainFragment;
                 case 1:
-                    return new LiveScheduleFragment();
+                    return new ScheduleFragment();
             }
             Log.e("JJJ", "Unable to determine a fragment for " + selectedTabTag + " page " + position + " - returning null");
             return null;
@@ -135,11 +135,11 @@ public class MainActivity extends FragmentActivity implements
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new LiveScheduleFragment(); //TODO
+                    return new CategoriesFragment();
                 case 1:
                     return mainFragment;
                 case 2:
-                    return new LiveScheduleFragment(); //TODO
+                    return new SearchFragment();
             }
             Log.e("JJJ", "Unable to determine a fragment for " + selectedTabTag + " page " + position + " - returning null");
             return null;
