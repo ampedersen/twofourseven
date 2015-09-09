@@ -1,0 +1,25 @@
+<resources>
+    <string name="app_name">Radio24syv</string>
+
+    <string name="hello_world">Hello world!</string>
+    <string name="action_settings">Settings</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <string name="title_activity_intro">IntroActivity</string>
+    <string name="title_activity_main">MainActivity</string>
+    <string name="title_fragment_live">LiveFragment</string>
+    <string name="title_fragment_programs">ProgramsFragment</string>
+    <string name="title_fragment_news">NewsFragment</string>
+    <string name="title_fragment_offline">OfflineFragment</string>
+    <string name="title_fragment_player">PlayerFragment</string>
+
+    <string name="intro_next">Videre</string>
+
+    <string name="tab_live">Live Radio</string>
+    <string name="tab_programs">Programs</string>
+    <string name="tab_news">Sidste nyt</string>
+    <string name="tab_offline">Lyt offline</string>
+
+    <string name="live_schedule_button">Se sendeplan</string>
+</resources>

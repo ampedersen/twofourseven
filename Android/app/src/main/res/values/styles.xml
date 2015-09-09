@@ -1,0 +1,23 @@
+<resources>
+
+    <!-- Base application theme. -->
+    <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
+        <!-- Customize your theme here. -->
+    </style>
+
+    <style name="PageTitleText" >
+        <item name="android:textColor">@color/radio_black</item>
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/page_title_text_size</item>
+        <item name="android:gravity">center</item>
+    </style>
+
+    <style name="PageBackButton" >
+        <item name="android:textColor">@color/radio_gray_light</item>
+        <!-- TODO use image instead of text for back symbol -->
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">30dp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@color/transparent</item>
+    </style>
+</resources>

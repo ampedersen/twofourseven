@@ -1,0 +1,41 @@
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.molamil.radio24syv.PageSubFragment"
+    android:background="@color/radio_white"
+    >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        >
+
+        <Button
+            android:id="@+id/back_button"
+            android:layout_width="@dimen/page_sub_back_button_width"
+            android:layout_height="match_parent"
+            android:text="\u276e"
+            />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            >
+
+            <TextView
+                android:id="@+id/page_title"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Sendeplan"
+                style="@style/PageTitleText"
+                />
+
+        </LinearLayout>
+
+    </LinearLayout>
+
+</FrameLayout>
