@@ -5,6 +5,7 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +14,7 @@ import android.widget.TabHost;
 import android.widget.TextView;
 
 
-public class MainFragment extends Fragment implements
-    PlayerFragment.OnMyFragmentInteractionListener {
+public class MainFragment extends Fragment {
 
     OnMainFragmentInteractionListener mListener;
     FragmentTabHost mTabHost;
@@ -48,6 +48,19 @@ public class MainFragment extends Fragment implements
 
         mTabHost.setCurrentTab(0);
 
+        // However, if we're being restored from a previous state,
+        // then we don't need to do anything and should return or else
+        // we could end up with overlapping fragments.
+        if (savedInstanceState == null) {
+            // Create a new Fragment to be placed in the activity layout
+            PlayerFragment playerFragment = new PlayerFragment();
+
+            // Add the fragment to the container
+            getChildFragmentManager().beginTransaction()
+                    .add(R.id.player_fragment_container, playerFragment)
+                    .commit();
+        }
+
         return v;
     }
 
@@ -74,11 +87,6 @@ public class MainFragment extends Fragment implements
         ((TextView) indicator.findViewById(R.id.tab_indicator_text)).setText(getResources().getText(textId));
 
         mTabHost.addTab(mTabHost.newTabSpec(tag).setIndicator(indicator), fragment, null);
-    }
-
-    @Override
-    public void onPlayerFragmentInteraction(Uri uri) {
-
     }
 
     public interface OnMainFragmentInteractionListener {

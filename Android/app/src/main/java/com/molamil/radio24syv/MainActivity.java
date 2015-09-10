@@ -15,7 +15,8 @@ public class MainActivity extends FragmentActivity implements
         ScheduleFragment.OnFragmentInteractionListener,
         ProgramsFragment.OnFragmentInteractionListener,
         NewsFragment.OnFragmentInteractionListener,
-        OfflineFragment.OnFragmentInteractionListener {
+        OfflineFragment.OnFragmentInteractionListener,
+        PlayerFragment.OnMyFragmentInteractionListener {
 
     ViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access previous and next wizard steps
     SidePageTransformer pageTransformer;
@@ -34,23 +35,6 @@ public class MainActivity extends FragmentActivity implements
         pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
         pager.setPageTransformer(false, pageTransformer);
         pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
-
-            // However, if we're being restored from a previous state,
-            // then we don't need to do anything and should return or else
-            // we could end up with overlapping fragments.
-            if (savedInstanceState == null) {
-                // Create a new Fragment to be placed in the activity layout
-                PlayerFragment playerFragment = new PlayerFragment();
-
-                // In case this activity was started with special instructions from an
-                // Intent, pass the Intent's extras to the fragment as arguments
-                playerFragment.setArguments(getIntent().getExtras());
-
-                // Add the fragment to the 'fragment_container' FrameLayout
-                getSupportFragmentManager().beginTransaction()
-                        .add(R.id.player_fragment_container, playerFragment).commit();
-                Log.d("JJJ", "stuff");
-            }
     }
 
     @Override
@@ -81,6 +65,10 @@ public class MainActivity extends FragmentActivity implements
                 pager.setCurrentItem(mainPagePosition + 1);
                 break;
         }
+    }
+
+    public void onPlayerFragmentInteraction(Uri uri) {
+
     }
 
     @Override
