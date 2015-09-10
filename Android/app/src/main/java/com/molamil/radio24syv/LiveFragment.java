@@ -19,7 +19,7 @@ import android.widget.Button;
  * Use the {@link LiveFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LiveFragment extends PageFragment implements View.OnClickListener {
+public class LiveFragment extends PageFragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
     private static final String ARG_PARAM1 = "param1";
@@ -30,6 +30,7 @@ public class LiveFragment extends PageFragment implements View.OnClickListener {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+    private PlayerFragment.OnFragmentInteractionListener playerListener;
 
     /**
      * Use this factory method to create a new instance of
@@ -66,8 +67,26 @@ public class LiveFragment extends PageFragment implements View.OnClickListener {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_live, container, false);
+
         Button scheduleButton = (Button)v.findViewById(R.id.schedule_button);
-        scheduleButton.setOnClickListener(this);
+        scheduleButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    mListener.onShowSidePageInteraction(OnFragmentInteractionListener.Side.SHOW_RIGHT);
+                }
+            }
+        });
+
+        Button playButton = (Button)v.findViewById(R.id.play_button);
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (playerListener != null) {
+                    playerListener.onPlayerControl(PlayerFragment.PlayerAction.PLAY); // TODO custom play button taking care of its own state (compund control)
+                }
+            }
+        });
         return v;
     }
 
@@ -80,23 +99,18 @@ public class LiveFragment extends PageFragment implements View.OnClickListener {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
         }
+        try {
+            playerListener = (PlayerFragment.OnFragmentInteractionListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement PlayerFragment.OnFragmentInteractionListener");
+        }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
-    }
-
-    @Override
-    public void onClick(View v) {
-        switch (v.getId()) {
-            case R.id.schedule_button:
-                if (mListener != null) {
-                    mListener.onShowSidePageInteraction(OnFragmentInteractionListener.Side.SHOW_RIGHT);
-                }
-                break;
-        }
     }
 
 

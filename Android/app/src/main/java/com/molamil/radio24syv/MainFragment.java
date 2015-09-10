@@ -1,7 +1,6 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
@@ -25,32 +24,32 @@ public class MainFragment extends Fragment {
     static final long DIMMING_DURATION_MS = 500;
     Dimming dimming;
 
-    OnMainFragmentInteractionListener mListener;
-    FragmentTabHost mTabHost;
+    OnMainFragmentInteractionListener listener;
+    FragmentTabHost tabHost;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
 
-        mTabHost = (FragmentTabHost)v.findViewById(android.R.id.tabhost);
-        mTabHost.setup(inflater.getContext(), getChildFragmentManager(), android.R.id.tabcontent);
+        tabHost = (FragmentTabHost)v.findViewById(android.R.id.tabhost);
+        tabHost.setup(inflater.getContext(), getChildFragmentManager(), android.R.id.tabcontent);
 
         addTab(inflater, TAG_TAB_LIVE, R.string.tab_live, android.R.drawable.btn_star, LiveFragment.class);
         addTab(inflater, TAG_TAB_PROGRAMS, R.string.tab_programs, android.R.drawable.btn_star, ProgramsFragment.class);
         addTab(inflater, TAG_TAB_NEWS, R.string.tab_news, android.R.drawable.btn_star, NewsFragment.class);
         addTab(inflater, TAG_TAB_OFFLINE, R.string.tab_offline, android.R.drawable.btn_star, OfflineFragment.class);
 
-        mTabHost.getTabWidget().setDividerDrawable(null);
-        mTabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
+        tabHost.getTabWidget().setDividerDrawable(null);
+        tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             @Override
             public void onTabChanged(String tabId) {
-            if (mListener != null) {
-                mListener.onMainTabChanged(tabId);
-            }
+                if (listener != null) {
+                    listener.onMainTabChanged(tabId);
+                }
             }
         });
 
-        mTabHost.setCurrentTab(0);
+        tabHost.setCurrentTab(0);
 
         // However, if we're being restored from a previous state,
         // then we don't need to do anything and should return or else
@@ -74,7 +73,7 @@ public class MainFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnMainFragmentInteractionListener) activity;
+            listener = (OnMainFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnMainFragmentInteractionListener");
@@ -84,15 +83,15 @@ public class MainFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     private void addTab(LayoutInflater inflater, String tag, int textId, int iconId, Class<?> fragment) {
-        View indicator = inflater.inflate(R.layout.tab_indicator, mTabHost.getTabWidget(), false);
+        View indicator = inflater.inflate(R.layout.tab_indicator, tabHost.getTabWidget(), false);
         ((ImageView) indicator.findViewById(R.id.tab_indicator_icon)).setImageResource(android.R.drawable.btn_star);
         ((TextView) indicator.findViewById(R.id.tab_indicator_text)).setText(getResources().getText(textId));
 
-        mTabHost.addTab(mTabHost.newTabSpec(tag).setIndicator(indicator), fragment, null);
+        tabHost.addTab(tabHost.newTabSpec(tag).setIndicator(indicator), fragment, null);
     }
 
     public void setDimming(Dimming dimming) {

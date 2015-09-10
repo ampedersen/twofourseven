@@ -21,6 +21,7 @@ import android.widget.Button;
  */
 public class PlayerFragment extends Fragment {
     public enum PlayerSize { NONE, SMALL, BIG };
+    public enum PlayerAction { PLAY, STOP };
 
     // Fragment parameters
     static final String ARG_TITLE = "title";
@@ -28,7 +29,7 @@ public class PlayerFragment extends Fragment {
 
     OnFragmentInteractionListener mListener;
 
-    PlayerSize size = PlayerSize.NONE;
+    PlayerSize size;
 
     /**
      * Use this factory method to create a new instance of
@@ -55,7 +56,16 @@ public class PlayerFragment extends Fragment {
         if (getArguments() != null) {
             title = getArguments().getString(ARG_TITLE);
         }
+//        if (savedInstanceState != null) {
+//            size = PlayerSize.valueOf(savedInstanceState.getString("size"));
+//        }
     }
+
+//    @Override
+//    public void onSaveInstanceState(Bundle savedInstanceState) {
+//        savedInstanceState.putString("size", size.toString());
+//        super.onSaveInstanceState(savedInstanceState);
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -73,37 +83,23 @@ public class PlayerFragment extends Fragment {
             }
         });
 
-        setSize(PlayerSize.SMALL, v);
+        Button playButton = (Button)v.findViewById(R.id.play_button);
+        playButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (mListener != null) {
+                    if (isPlaying) {
+                        mListener.onPlayerControl(PlayerAction.STOP);
+                    } else {
+                        mListener.onPlayerControl(PlayerAction.PLAY);
+                    }
+                }
+            }
+        });
+
+        setSize(PlayerSize.NONE, v);
 
         return v;
-    }
-
-    private void setSize(PlayerSize size, View parentView) {
-        if (size == this.size) {
-            return; // Return, already sized like that
-        }
-
-        PlayerSize oldSize = this.size;
-        this.size = size;
-
-
-        View bigThingy = parentView.findViewById(R.id.big_thingy);
-        Button expandButton = (Button)parentView.findViewById(R.id.size_button);
-        int targetColor;
-        if (size == PlayerSize.BIG) {
-            bigThingy.setVisibility(View.VISIBLE);
-            expandButton.setText("\\/");
-            targetColor = getResources().getColor(R.color.radio_gray_dark);
-        } else {
-            bigThingy.setVisibility(View.GONE);
-            expandButton.setText("/\\");
-            targetColor = getResources().getColor(R.color.radio_gray_darker);
-        }
-        parentView.setBackgroundColor(targetColor);
-
-        if (mListener != null) {
-            mListener.onPlayerSizeChanged(size, oldSize);
-        }
     }
 
     @Override
@@ -123,6 +119,69 @@ public class PlayerFragment extends Fragment {
         mListener = null;
     }
 
+    boolean isOffline;
+    boolean isPlaying;
+
+    public void setOffline(boolean isOffline) {
+        this.isOffline = isOffline;
+        updatePlayButton();
+    }
+
+    public void setPlaying(boolean isPlaying) {
+        if (size == PlayerSize.NONE) {
+            setSize(PlayerSize.SMALL, getView());
+        }
+        this.isPlaying = isPlaying;
+        updatePlayButton();
+    }
+
+    private void updatePlayButton() {
+        Button playButton = (Button)getView().findViewById(R.id.play_button);
+        if (isPlaying) {
+            if (isOffline) {
+                playButton.setText("Pause");
+            } else {
+                playButton.setText("Stop");
+            }
+        } else {
+            playButton.setText("Play");
+        }
+    }
+
+    private void setSize(PlayerSize size, View parentView) {
+        Log.d("JJJ", "setsize " + size + " was " + this.size);
+        if (size == this.size) {
+            return; // Return, already sized like that
+        }
+
+        PlayerSize oldSize = this.size;
+        this.size = size;
+
+        if (size == PlayerSize.NONE) {
+            parentView.setVisibility(View.GONE);
+        } else {
+            parentView.setVisibility(View.VISIBLE);
+            View bigThingy = parentView.findViewById(R.id.big_thingy);
+            Button expandButton = (Button) parentView.findViewById(R.id.size_button);
+            int targetColorId;
+            if (size == PlayerSize.BIG) {
+                bigThingy.setVisibility(View.VISIBLE);
+                expandButton.setText("Small");
+                targetColorId = R.color.radio_gray_dark;
+            } else {
+                bigThingy.setVisibility(View.GONE);
+                expandButton.setText("Big");
+                targetColorId = R.color.radio_gray_darker;
+            }
+            parentView.setBackgroundColor(getResources().getColor(targetColorId));
+        }
+
+        if (mListener != null) {
+            mListener.onPlayerSizeChanged(size, oldSize);
+        }
+    }
+
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated
@@ -135,6 +194,7 @@ public class PlayerFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         public void onPlayerSizeChanged(PlayerSize newSize, PlayerSize oldSize);
+        public void onPlayerControl(PlayerAction action);
     }
 
 }

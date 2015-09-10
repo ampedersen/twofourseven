@@ -12,11 +12,37 @@
         android:layout_height="wrap_content"
         android:text="@string/title_fragment_player" />
 
-    <Button
-        android:id="@+id/size_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="/\\" />
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        >
+
+        <Button
+            android:id="@+id/size_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="size"
+            android:layout_alignParentLeft="true"
+            />
+
+        <TextView
+            android:id="@+id/title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="title"
+            android:gravity="center"
+            android:layout_centerInParent="true"
+            />
+
+        <Button
+            android:id="@+id/play_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="play"
+            android:layout_alignParentRight="true"
+            />
+
+    </RelativeLayout>
 
     <View
         android:id="@+id/big_thingy"

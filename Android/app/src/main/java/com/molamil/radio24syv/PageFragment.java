@@ -18,7 +18,7 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public abstract class PageFragment extends Fragment {
-//    private OnFragmentInteractionListener mListener;
+//    private OnFragmentInteractionListener listener;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -36,7 +36,7 @@ public abstract class PageFragment extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
 //        try {
-//            mListener = (OnFragmentInteractionListener) activity;
+//            listener = (OnFragmentInteractionListener) activity;
 //        } catch (ClassCastException e) {
 //            throw new ClassCastException(activity.toString()
 //                    + " must implement OnFragmentInteractionListener");
@@ -46,7 +46,7 @@ public abstract class PageFragment extends Fragment {
     @Override
     public void onDetach() {
         super.onDetach();
-//        mListener = null;
+//        listener = null;
     }
 
     /**

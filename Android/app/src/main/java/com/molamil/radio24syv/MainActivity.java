@@ -29,6 +29,7 @@ public class MainActivity extends FragmentActivity implements
         setContentView(R.layout.activity_main);
 
         mainFragment = new MainFragment();
+
         pageTransformer = new SidePageTransformer(SidePageTransformer.TransformType.SLIDE_OVER);
         pager = (ViewPager) findViewById(R.id.pager);
         pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
@@ -71,6 +72,17 @@ public class MainActivity extends FragmentActivity implements
             mainFragment.setDimming(MainFragment.Dimming.DIM);
         } else {
             mainFragment.setDimming(MainFragment.Dimming.NONE);
+        }
+    }
+
+    @Override
+    public void onPlayerControl(PlayerFragment.PlayerAction action) {
+        Log.d("JJJ", "onPlayerControl " + action);
+        PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentById(R.id.player_fragment_container);
+        if (action == PlayerFragment.PlayerAction.PLAY) {
+            playerFragment.setPlaying(true);
+        } else {
+            playerFragment.setPlaying(false);
         }
     }
 
