@@ -16,7 +16,7 @@ public class MainActivity extends FragmentActivity implements
         ProgramsFragment.OnFragmentInteractionListener,
         NewsFragment.OnFragmentInteractionListener,
         OfflineFragment.OnFragmentInteractionListener,
-        PlayerFragment.OnMyFragmentInteractionListener {
+        PlayerFragment.OnFragmentInteractionListener {
 
     ViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access previous and next wizard steps
     SidePageTransformer pageTransformer;
@@ -48,7 +48,6 @@ public class MainActivity extends FragmentActivity implements
     }
 
     public void onFragmentInteraction(Uri uri) {
-
     }
 
     @Override
@@ -67,8 +66,13 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    public void onPlayerFragmentInteraction(Uri uri) {
-
+    @Override
+    public void onPlayerSizeChanged(PlayerFragment.PlayerSize newSize, PlayerFragment.PlayerSize oldSize) {
+        if (newSize == PlayerFragment.PlayerSize.BIG) {
+            mainFragment.setDimming(MainFragment.Dimming.DIM);
+        } else {
+            mainFragment.setDimming(MainFragment.Dimming.NONE);
+        }
     }
 
     @Override

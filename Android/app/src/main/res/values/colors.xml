@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="transparent">#00000000</color>
+    <color name="transparent_black">#77000000</color>
     <color name="radio_red">#ff0000</color>
     <color name="radio_black">#000000</color>
     <color name="radio_gray">#888888</color>

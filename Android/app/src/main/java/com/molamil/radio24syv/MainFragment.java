@@ -16,13 +16,17 @@ import android.widget.TextView;
 
 public class MainFragment extends Fragment {
 
-    OnMainFragmentInteractionListener mListener;
-    FragmentTabHost mTabHost;
-
     public static final String TAG_TAB_LIVE = "LiveTab";
     public static final String TAG_TAB_PROGRAMS = "ProgramsTab";
     public static final String TAG_TAB_NEWS = "NewsTab";
     public static final String TAG_TAB_OFFLINE = "OfflineTab";
+
+    public enum Dimming { NONE, DIM }
+    static final long DIMMING_DURATION_MS = 500;
+    Dimming dimming;
+
+    OnMainFragmentInteractionListener mListener;
+    FragmentTabHost mTabHost;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -40,9 +44,9 @@ public class MainFragment extends Fragment {
         mTabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             @Override
             public void onTabChanged(String tabId) {
-                if (mListener != null) {
-                    mListener.onMainTabChanged(tabId);
-                }
+            if (mListener != null) {
+                mListener.onMainTabChanged(tabId);
+            }
             }
         });
 
@@ -60,6 +64,8 @@ public class MainFragment extends Fragment {
                     .add(R.id.player_fragment_container, playerFragment)
                     .commit();
         }
+
+        setDimming(Dimming.NONE, v); // No dimming
 
         return v;
     }
@@ -87,6 +93,40 @@ public class MainFragment extends Fragment {
         ((TextView) indicator.findViewById(R.id.tab_indicator_text)).setText(getResources().getText(textId));
 
         mTabHost.addTab(mTabHost.newTabSpec(tag).setIndicator(indicator), fragment, null);
+    }
+
+    public void setDimming(Dimming dimming) {
+        View parentView = getView();
+        if (parentView == null) {
+            Log.w("JJJ", "Unable to set dimming " + dimming + " because view is null (probably has not been created yet)");
+            return;
+        }
+        setDimming(dimming, parentView);
+    }
+
+    private void setDimming(Dimming dimming, View parentView) {
+        if (dimming == this.dimming) {
+            return; // Return, already dimmed like that
+        }
+
+        View dimmer = parentView.findViewById(R.id.dimmer);
+        dimmer.setVisibility(View.VISIBLE);
+
+        long targetAlpha;
+        if (dimming == Dimming.NONE) {
+            targetAlpha = 0; // No dimming
+        } else {
+            targetAlpha = 1; // Full dimming
+        }
+
+        boolean isAnimated = (this.dimming != null); // Animate if dimming has been assigned before
+        if (isAnimated) {
+            dimmer.animate().alpha(targetAlpha).setDuration(DIMMING_DURATION_MS);
+        } else {
+            dimmer.setAlpha(targetAlpha);
+        }
+
+        this.dimming = dimming;
     }
 
     public interface OnMainFragmentInteractionListener {
