@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context="com.molamil.radio24syv.PlayerFragment"
-    android:background="#0000ff"
+    android:background="@color/radio_gray_dark"
     >
 
     <TextView
@@ -21,7 +21,7 @@
     <View
         android:id="@+id/big_thingy"
         android:layout_width="match_parent"
-        android:layout_height="200dp"
+        android:layout_height="300dp"
         android:visibility="gone" />
 
 </FrameLayout>

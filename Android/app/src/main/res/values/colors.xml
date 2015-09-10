@@ -7,5 +7,6 @@
     <color name="radio_gray">#888888</color>
     <color name="radio_gray_light">#cccccc</color>
     <color name="radio_gray_dark">#555555</color>
+    <color name="radio_gray_darker">#444444</color>
     <color name="radio_white">#eeeeee</color>
 </resources>

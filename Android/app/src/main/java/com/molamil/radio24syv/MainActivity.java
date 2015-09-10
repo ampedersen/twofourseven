@@ -13,7 +13,6 @@ public class MainActivity extends FragmentActivity implements
         MainFragment.OnMainFragmentInteractionListener,
         PageFragment.OnFragmentInteractionListener,
         ScheduleFragment.OnFragmentInteractionListener,
-        ProgramsFragment.OnFragmentInteractionListener,
         NewsFragment.OnFragmentInteractionListener,
         OfflineFragment.OnFragmentInteractionListener,
         PlayerFragment.OnFragmentInteractionListener {
@@ -52,13 +51,13 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onShowSidePageInteraction(Side side) {
-        Log.d("JJJ", "Show side page on the " + side);
+        Log.d("JJJ", "Show side page " + side);
         switch (side) {
             case HIDE:
                 pager.setCurrentItem(mainPagePosition);
                 break;
             case SHOW_LEFT:
-                pager.setCurrentItem(mainPagePosition + 1);
+                pager.setCurrentItem(mainPagePosition - 1);
                 break;
             case SHOW_RIGHT:
                 pager.setCurrentItem(mainPagePosition + 1);

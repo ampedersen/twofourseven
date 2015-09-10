@@ -16,6 +16,7 @@
     <string name="title_fragment_categories">CategoriesFragment</string>
     <string name="title_fragment_search">SearchFragment</string>
     <string name="title_fragment_schedule">ScheduleFragment</string>
+    <string name="title_fragment_program">ProgramFragment</string>
 
     <string name="intro_next">Videre</string>
 

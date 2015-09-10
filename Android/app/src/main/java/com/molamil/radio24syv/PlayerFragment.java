@@ -66,17 +66,19 @@ public class PlayerFragment extends Fragment {
             @Override
             public void onClick(View v) {
                 if (size == PlayerSize.BIG) {
-                    setSize(PlayerSize.SMALL);
+                    setSize(PlayerSize.SMALL, getView());
                 } else {
-                    setSize(PlayerSize.BIG);
+                    setSize(PlayerSize.BIG, getView());
                 }
             }
         });
 
+        setSize(PlayerSize.SMALL, v);
+
         return v;
     }
 
-    private void setSize(PlayerSize size) {
+    private void setSize(PlayerSize size, View parentView) {
         if (size == this.size) {
             return; // Return, already sized like that
         }
@@ -84,15 +86,21 @@ public class PlayerFragment extends Fragment {
         PlayerSize oldSize = this.size;
         this.size = size;
 
-        View bigThingy = getView().findViewById(R.id.big_thingy);
-        Button expandButton = (Button)getView().findViewById(R.id.size_button);
+
+        View bigThingy = parentView.findViewById(R.id.big_thingy);
+        Button expandButton = (Button)parentView.findViewById(R.id.size_button);
+        int targetColor;
         if (size == PlayerSize.BIG) {
             bigThingy.setVisibility(View.VISIBLE);
             expandButton.setText("\\/");
+            targetColor = getResources().getColor(R.color.radio_gray_dark);
         } else {
             bigThingy.setVisibility(View.GONE);
             expandButton.setText("/\\");
+            targetColor = getResources().getColor(R.color.radio_gray_darker);
         }
+        parentView.setBackgroundColor(targetColor);
+
         if (mListener != null) {
             mListener.onPlayerSizeChanged(size, oldSize);
         }

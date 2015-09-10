@@ -5,7 +5,7 @@
     <!--<item android:state_pressed="true" android:drawable="@drawable/tab_background_pressed" />-->
     <!--<item android:drawable="@drawable/tab_backgound_unselected" />-->
     <item android:state_pressed="true" android:drawable="@color/radio_gray_dark" />
-    <item android:state_selected="true" android:drawable="@color/radio_black" />
-    <item android:state_focused="true" android:drawable="@color/radio_black" />
-    <item android:drawable="@color/radio_black" />
+    <item android:state_selected="true" android:drawable="@color/radio_gray_darker" />
+    <item android:state_focused="true" android:drawable="@color/radio_gray_darker" />
+    <item android:drawable="@color/radio_gray_darker" />
 </selector>
