@@ -19,7 +19,7 @@ public class MainActivity extends FragmentActivity implements
 
     ViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access previous and next wizard steps
     SidePageTransformer pageTransformer;
-    MainFragment mainFragment; // Keep the same main fragment across different page adaptors
+    MainFragment mainFragment; // Keep the same main fragment across different page adapters
     String selectedTabTag;
     int mainPagePosition; // The position of the main page changes depending on the selected tab
 
@@ -78,7 +78,7 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onPlayerControl(PlayerFragment.PlayerAction action) {
         Log.d("JJJ", "onPlayerControl " + action);
-        PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentById(R.id.player_fragment_container);
+        PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
         if (action == PlayerFragment.PlayerAction.PLAY) {
             playerFragment.setPlaying(true);
         } else {

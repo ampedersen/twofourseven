@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TextView;
 
-
 public class MainFragment extends Fragment {
 
     public static final String TAG_TAB_LIVE = "LiveTab";
@@ -22,10 +21,11 @@ public class MainFragment extends Fragment {
 
     public enum Dimming { NONE, DIM }
     static final long DIMMING_DURATION_MS = 500;
-    Dimming dimming;
+    Dimming dimming = Dimming.NONE;
 
     OnMainFragmentInteractionListener listener;
     FragmentTabHost tabHost;
+    PlayerFragment playerFragment;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -51,23 +51,54 @@ public class MainFragment extends Fragment {
 
         tabHost.setCurrentTab(0);
 
+//        if (playerFragment == null) {
+//            playerFragment = new PlayerFragment();
+//        }
+
         // However, if we're being restored from a previous state,
         // then we don't need to do anything and should return or else
         // we could end up with overlapping fragments.
-        if (savedInstanceState == null) {
+//        if (savedInstanceState == null) {
             // Create a new Fragment to be placed in the activity layout
-            PlayerFragment playerFragment = new PlayerFragment();
+//            PlayerFragment playerFragment = new PlayerFragment();
 
             // Add the fragment to the container
-            getChildFragmentManager().beginTransaction()
-                    .add(R.id.player_fragment_container, playerFragment)
-                    .commit();
-        }
+//            getChildFragmentManager().beginTransaction()
+//                    .add(R.id.player_fragment_container, playerFragment)
+//                    .commit();
+//        }
 
-        setDimming(Dimming.NONE, v); // No dimming
+        if (savedInstanceState != null) {
+            playerFragment = (PlayerFragment) getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
+        } else {
+            if (playerFragment == null) {
+                playerFragment = new PlayerFragment();
+            }
+        }
+        getChildFragmentManager().beginTransaction().replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
+
+        // create fragments to use
+//        if (savedInstanceState != null) {
+//            playerFragment = (PlayerFragment) getChildFragmentManager().getFragment(
+//                    savedInstanceState, PlayerFragment.class.getName());
+//        }
+//        if (playerFragment == null)
+//            playerFragment = new PlayerFragment();
+//
+//        getChildFragmentManager().beginTransaction().replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
+
+        updateDimming(v, false);
 
         return v;
     }
+
+//    @Override
+//    public void onSaveInstanceState(Bundle savedInstanceState) {
+//
+//        super.onSaveInstanceState(savedInstanceState);
+//        getChildFragmentManager()
+//                .putFragment(savedInstanceState, PlayerFragment.class.getName(), playerFragment);
+//    }
 
     @Override
     public void onAttach(Activity activity) {
@@ -95,21 +126,18 @@ public class MainFragment extends Fragment {
     }
 
     public void setDimming(Dimming dimming) {
-        View parentView = getView();
-        if (parentView == null) {
-            Log.w("JJJ", "Unable to set dimming " + dimming + " because view is null (probably has not been created yet)");
-            return;
-        }
-        setDimming(dimming, parentView);
-    }
-
-    private void setDimming(Dimming dimming, View parentView) {
+        Log.d("JJJ", "setdim " + dimming + " was " + this.dimming);
         if (dimming == this.dimming) {
             return; // Return, already dimmed like that
         }
 
+        this.dimming = dimming;
+
+        updateDimming(getView(), true);
+    }
+
+    private void updateDimming(View parentView, boolean isAnimated) {
         View dimmer = parentView.findViewById(R.id.dimmer);
-        dimmer.setVisibility(View.VISIBLE);
 
         long targetAlpha;
         if (dimming == Dimming.NONE) {
@@ -118,14 +146,13 @@ public class MainFragment extends Fragment {
             targetAlpha = 1; // Full dimming
         }
 
-        boolean isAnimated = (this.dimming != null); // Animate if dimming has been assigned before
+        Log.d("JJJ", "dim from " + dimmer.getAlpha() + " to " + targetAlpha);
+//        boolean isAnimated = (this.dimming != null); // Animate if dimming has been assigned before
         if (isAnimated) {
             dimmer.animate().alpha(targetAlpha).setDuration(DIMMING_DURATION_MS);
         } else {
             dimmer.setAlpha(targetAlpha);
         }
-
-        this.dimming = dimming;
     }
 
     public interface OnMainFragmentInteractionListener {
