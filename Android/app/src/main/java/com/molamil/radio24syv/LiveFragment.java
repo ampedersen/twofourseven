@@ -29,6 +29,7 @@ public class LiveFragment extends PageFragment {
 
     private OnFragmentInteractionListener mListener;
     private PlayerFragment.OnFragmentInteractionListener playerListener;
+    private PlayerFragment.MediaPlayerProvider mediaPlayerProvider;
 
     /**
      * Use this factory method to create a new instance of
@@ -76,15 +77,17 @@ public class LiveFragment extends PageFragment {
             }
         });
 
-        Button playButton = (Button)v.findViewById(R.id.play_button);
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (playerListener != null) {
-                    playerListener.onPlayerControl(PlayerFragment.PlayerAction.PLAY); // TODO custom play button taking care of its own state (compund control)
-                }
-            }
-        });
+        MediaPlayerButton playButton = (MediaPlayerButton)v.findViewById(R.id.play_button);
+//        playButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (playerListener != null) {
+//                    playerListener.onPlayerControl(PlayerFragment.PlayerAction.PLAY); // TODO custom play button taking care of its own state
+//                }
+//            }
+//        });
+        playButton.setMediaPlayer(mediaPlayerProvider.getMediaPlayer());
+
         return v;
     }
 
@@ -102,6 +105,12 @@ public class LiveFragment extends PageFragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement PlayerFragment.OnFragmentInteractionListener");
+        }
+        try {
+            mediaPlayerProvider = (PlayerFragment.MediaPlayerProvider) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement PlayerFragment.MediaPlayerProvider");
         }
     }
 

@@ -1,6 +1,7 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -28,6 +29,7 @@ public class PlayerFragment extends Fragment {
     String title;
 
     OnFragmentInteractionListener mListener;
+    MediaPlayerProvider mediaPlayerProvider;
 
     PlayerSize size = PlayerSize.NONE;
 
@@ -116,6 +118,14 @@ public class PlayerFragment extends Fragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
+        }
+        try {
+            mediaPlayerProvider = (PlayerFragment.MediaPlayerProvider) activity;
+            "todo make event in MediaPlauerProvider telling when Mediapluer state has changed (play/stop/title/duraciton/picture"
+            "todo subscirbe and show player when playing starts and hide when stops (no hide when paused)"
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement PlayerFragment.MediaPlayerProvider");
         }
     }
 
@@ -208,6 +218,10 @@ public class PlayerFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         public void onPlayerSizeChanged(PlayerSize newSize, PlayerSize oldSize);
         public void onPlayerControl(PlayerAction action);
+    }
+
+    public interface MediaPlayerProvider {
+        public MediaPlayer getMediaPlayer();
     }
 
 }

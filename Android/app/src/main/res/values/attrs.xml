@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <declare-styleable name="MediaPlayerButton">
+        <attr name="action" format="enum">
+            <enum name="play" value="0"/>
+            <enum name="stop" value="1"/>
+            <enum name="pause" value="2"/>
+            <enum name="next" value="3"/>
+            <enum name="previous" value="4"/>
+        </attr>
+    </declare-styleable>
+</resources>

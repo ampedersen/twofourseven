@@ -1,6 +1,7 @@
 package com.molamil.radio24syv;
 
 import android.content.Context;
+import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -11,6 +12,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 public class MainActivity extends FragmentActivity implements
+        PlayerFragment.MediaPlayerProvider,
         MainFragment.OnMainFragmentInteractionListener,
         PageFragment.OnFragmentInteractionListener,
         ScheduleFragment.OnFragmentInteractionListener,
@@ -26,6 +28,7 @@ public class MainActivity extends FragmentActivity implements
     MainFragment mainFragment; // Keep the same main fragment across different page adapters
     String selectedTabTag;
     int mainPagePosition; // The position of the main page changes depending on the selected tab
+    MediaPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -121,12 +124,23 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onPlayerControl(PlayerFragment.PlayerAction action) {
         Log.d("JJJ", "onPlayerControl " + action);
-        PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
+//        PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
+//        if (action == PlayerFragment.PlayerAction.PLAY) {
+//            playerFragment.setPlaying(true);
+//        } else {
+//            playerFragment.setPlaying(false);
+//        }
         if (action == PlayerFragment.PlayerAction.PLAY) {
-            playerFragment.setPlaying(true);
-        } else {
-            playerFragment.setPlaying(false);
+            if (mediaPlayer == null) {
+                mediaPlayer = MediaPlayer.create(this, R.raw.test);
+            }
+            mediaPlayer.start();
+        } else if (action == PlayerFragment.PlayerAction.STOP) {
+            if (mediaPlayer != null) {
+                mediaPlayer.stop();
+            }
         }
+
     }
 
     @Override
@@ -176,6 +190,11 @@ public class MainActivity extends FragmentActivity implements
         if (playerFragment.getSize() == PlayerFragment.PlayerSize.BIG) {
             playerFragment.setSize(PlayerFragment.PlayerSize.SMALL);
         }
+    }
+
+    @Override
+    public MediaPlayer getMediaPlayer() {
+        return mediaPlayer;
     }
 
     /*
@@ -271,5 +290,6 @@ public class MainActivity extends FragmentActivity implements
             return 1;
         }
     }
+
 }
 
