@@ -1,5 +1,6 @@
 package com.molamil.radio24syv;
 
+import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -57,8 +58,9 @@ public class MainActivity extends FragmentActivity implements
                 super.onBackPressed(); // Return to system
                 return;
             }
+
             if (f.isShowingDetails()) {
-                f.showList();
+                f.showList(); // Back to list page
             } else {
                 super.onBackPressed(); // Return to system
             }

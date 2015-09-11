@@ -2,6 +2,7 @@ package com.molamil.radio24syv;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
@@ -43,16 +44,13 @@ public class ProgramsFragment extends PageFragment {
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
+                Log.d("JJJ", "position " + position + " offset " + positionOffset);
             }
 
             @Override
             public void onPageSelected(int position) {
                 switch (position) {
                     case 0:
-                        if (pager.getAdapter().getCount() > 0) {
-                            pager.setAdapter(new ListPagerAdapter(getChildFragmentManager())); // TODO animate and then change page adapter, this has no animation
-                        }
                         if (mListener != null) {
                             mListener.onEnableSidePageInteraction(true);
                         }
@@ -67,7 +65,17 @@ public class ProgramsFragment extends PageFragment {
 
             @Override
             public void onPageScrollStateChanged(int state) {
-
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
+                    switch (pager.getCurrentItem()) {
+                        case 0:
+                            if (pager.getAdapter().getCount() > 0) {
+                                pager.setAdapter(new ListPagerAdapter(getChildFragmentManager())); // TODO animate and then change page adapter, this has no animation
+                            }
+                            break;
+                        case 1:
+                            break;
+                    }
+                }
             }
         });
 
@@ -103,10 +111,16 @@ public class ProgramsFragment extends PageFragment {
 
     public void showDetails(String programId) {
         pager.setAdapter(new DetailsPagerAdapter(getChildFragmentManager(), programId));
-        pager.setCurrentItem(1, true); // Show page two
+        //pager.setCurrentItem(1, true); // This changes page instantly even though told otherwise. It happens when setCurrentItem() is called straight after changing adapter.
+        new Handler().post(new Runnable() {
+            @Override
+            public void run() {
+                pager.setCurrentItem(1, true); // This animates the page as expected. It is executed a jiffy after the adapter is changed, and probably works because the ViewPager has had time to instantiate the fragment's views.
+            }
+        });
     }
 
-    // Shows program list page only
+    // Adapter for program list page only
     private class ListPagerAdapter extends FragmentStatePagerAdapter {
         public ListPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -128,7 +142,7 @@ public class ProgramsFragment extends PageFragment {
         }
     }
 
-    // Shows program list page and program details page
+    // Adapter for shows program list page and program details page
     private class DetailsPagerAdapter extends FragmentStatePagerAdapter {
         final String programId;
 

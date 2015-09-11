@@ -2,6 +2,7 @@ package com.molamil.radio24syv;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -31,6 +32,7 @@ public class ProgramDetailsFragment extends PageFragment {
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         programId = getArguments().getString(ARGUMENT_PROGRAM_ID);
+        Log.d("JJJ", "my id " + getId() + " Rid " + R.layout.fragment_program_details);
     }
 
     @Override
