@@ -1,8 +1,6 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
-import android.graphics.Path;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -73,7 +71,7 @@ public class LiveFragment extends PageFragment {
             @Override
             public void onClick(View v) {
                 if (mListener != null) {
-                    mListener.onShowSidePageInteraction(OnFragmentInteractionListener.Side.SHOW_RIGHT);
+                    mListener.onShowSidePage(OnFragmentInteractionListener.Side.SHOW_RIGHT);
                 }
             }
         });

@@ -9,14 +9,14 @@
     <string name="title_activity_intro">IntroActivity</string>
     <string name="title_activity_main">MainActivity</string>
     <string name="title_fragment_live">LiveFragment</string>
-    <string name="title_fragment_programs">ProgramsFragment</string>
+    <string name="title_fragment_program_list">ProgramListFragment</string>
     <string name="title_fragment_news">NewsFragment</string>
     <string name="title_fragment_offline">OfflineFragment</string>
     <string name="title_fragment_player">PlayerFragment</string>
     <string name="title_fragment_categories">CategoriesFragment</string>
     <string name="title_fragment_search">SearchFragment</string>
     <string name="title_fragment_schedule">ScheduleFragment</string>
-    <string name="title_fragment_program">ProgramFragment</string>
+    <string name="title_fragment_program_details">ProgramDetailsFragment</string>
 
     <string name="intro_next">Videre</string>
 

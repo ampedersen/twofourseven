@@ -3,50 +3,22 @@ package com.molamil.radio24syv;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentStatePagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link ProgramsFragment.OnFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link ProgramsFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class ProgramsFragment extends PageFragment {
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
+    OnFragmentInteractionListener mListener;
 
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
-
-    private OnFragmentInteractionListener mListener;
-
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment ProgramsFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static ProgramsFragment newInstance(String param1, String param2) {
-        ProgramsFragment fragment = new ProgramsFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
+    SidePageTransformer pageTransformer;
+    ProgramListFragment programListFragment;
 
     public ProgramsFragment() {
         // Required empty public constructor
@@ -55,42 +27,50 @@ public class ProgramsFragment extends PageFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_programs, container, false);
-        Button categoriesButton = (Button)v.findViewById(R.id.categories_button);
-        categoriesButton.setOnClickListener(new View.OnClickListener() {
+
+        programListFragment = new ProgramListFragment();
+
+        pageTransformer = new SidePageTransformer(SidePageTransformer.TransformType.SLIDE_OVER);
+        pager = (RadioViewPager) v.findViewById(R.id.pager);
+        pager.setAdapter(new ListPagerAdapter(getChildFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
+        pager.setPageTransformer(false, pageTransformer);
+        pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onShowSidePageInteraction(PageFragment.OnFragmentInteractionListener.Side.SHOW_LEFT);
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                switch (position) {
+                    case 0:
+                        if (pager.getAdapter().getCount() > 0) {
+                            pager.setAdapter(new ListPagerAdapter(getChildFragmentManager())); // TODO animate and then change page adapter, this has no animation
+                        }
+                        if (mListener != null) {
+                            mListener.onEnableSidePageInteraction(true);
+                        }
+                        break;
+                    case 1:
+                        if (mListener != null) {
+                            mListener.onEnableSidePageInteraction(false);
+                        }
+                        break;
                 }
             }
-        });
-        Button searchButton = (Button) v.findViewById(R.id.search_button);
-        searchButton.setOnClickListener(new View.OnClickListener() {
+
             @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onShowSidePageInteraction(PageFragment.OnFragmentInteractionListener.Side.SHOW_RIGHT);
-                }
+            public void onPageScrollStateChanged(int state) {
+
             }
         });
-        Button someProgramButton = (Button)v.findViewById(R.id.some_program_button);
-        searchButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onShowSidePageInteraction(PageFragment.OnFragmentInteractionListener.Side.SHOW_RIGHT);
-                }
-            }
-        });
+
         return v;
     }
 
@@ -111,6 +91,73 @@ public class ProgramsFragment extends PageFragment {
         mListener = null;
     }
 
+    public boolean isShowingDetails() {
+        return (pager.getCurrentItem() == 1);
+    }
+
+    public void showList() {
+        if (isShowingDetails()) {
+            pager.setCurrentItem(0, true); // Back to list
+        }
+    }
+
+    public void showDetails(String programId) {
+        pager.setAdapter(new DetailsPagerAdapter(getChildFragmentManager(), programId));
+        pager.setCurrentItem(1, true); // Show page two
+    }
+
+    // Shows program list page only
+    private class ListPagerAdapter extends FragmentStatePagerAdapter {
+        public ListPagerAdapter(FragmentManager fm) {
+            super(fm);
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    return programListFragment;
+            }
+            Log.e("JJJ", "Unable to determine a fragment for page " + position + " - returning null");
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 1;
+        }
+    }
+
+    // Shows program list page and program details page
+    private class DetailsPagerAdapter extends FragmentStatePagerAdapter {
+        final String programId;
+
+        public DetailsPagerAdapter(FragmentManager fm, String programId) {
+            super(fm);
+            this.programId = programId;
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            switch (position) {
+                case 0:
+                    return programListFragment;
+                case 1:
+                    return ProgramDetailsFragment.newInstance(programId);
+            }
+            Log.e("JJJ", "Unable to determine a fragment for page " + position + " - returning null");
+            return null;
+        }
+
+        @Override
+        public int getCount() {
+            return 2;
+        }
+    }
+
+    public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {
+        public void onEnableSidePageInteraction(boolean enable);
+    }
 
 
 }

@@ -13,11 +13,14 @@ public class MainActivity extends FragmentActivity implements
         MainFragment.OnMainFragmentInteractionListener,
         PageFragment.OnFragmentInteractionListener,
         ScheduleFragment.OnFragmentInteractionListener,
+        ProgramsFragment.OnFragmentInteractionListener,
+        ProgramListFragment.OnFragmentInteractionListener,
+        ProgramDetailsFragment.OnFragmentInteractionListener,
         NewsFragment.OnFragmentInteractionListener,
         OfflineFragment.OnFragmentInteractionListener,
         PlayerFragment.OnFragmentInteractionListener {
 
-    ViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access previous and next wizard steps
+    RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
     SidePageTransformer pageTransformer;
     MainFragment mainFragment; // Keep the same main fragment across different page adapters
     String selectedTabTag;
@@ -31,7 +34,7 @@ public class MainActivity extends FragmentActivity implements
         mainFragment = new MainFragment();
 
         pageTransformer = new SidePageTransformer(SidePageTransformer.TransformType.SLIDE_OVER);
-        pager = (ViewPager) findViewById(R.id.pager);
+        pager = (RadioViewPager) findViewById(R.id.pager);
         pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
         pager.setPageTransformer(false, pageTransformer);
         pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
@@ -39,11 +42,26 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onBackPressed() {
-        boolean isViewingMainPage = (pager.getCurrentItem() == mainPagePosition);
-        if (isViewingMainPage) {
-            super.onBackPressed(); // Return to system
+        boolean isSidePageInteractionEnabled = pager.isPagingEnabled();
+        if (isSidePageInteractionEnabled) {
+            boolean isViewingMainPage = (pager.getCurrentItem() == mainPagePosition);
+            if (isViewingMainPage) {
+                super.onBackPressed(); // Return to system
+            } else {
+                pager.setCurrentItem(mainPagePosition); // Back to main page
+            }
         } else {
-            pager.setCurrentItem(mainPagePosition); // Back to main page
+            ProgramsFragment f = (ProgramsFragment) mainFragment.getChildFragmentManager().findFragmentByTag(MainFragment.TAG_TAB_PROGRAMS);
+            if (f == null) {
+                Log.d("JJJ", "OMG no programs fragment");
+                super.onBackPressed(); // Return to system
+                return;
+            }
+            if (f.isShowingDetails()) {
+                f.showList();
+            } else {
+                super.onBackPressed(); // Return to system
+            }
         }
     }
 
@@ -51,7 +69,12 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public void onShowSidePageInteraction(Side side) {
+    public void onBackButtonPressed() {
+        onBackPressed(); // React as if the physical back button was pressed
+    }
+
+    @Override
+    public void onShowSidePage(Side side) {
         Log.d("JJJ", "Show side page " + side);
         switch (side) {
             case HIDE:
@@ -64,6 +87,22 @@ public class MainActivity extends FragmentActivity implements
                 pager.setCurrentItem(mainPagePosition + 1);
                 break;
         }
+    }
+
+    @Override
+    public void onEnableSidePageInteraction(boolean enable) {
+        Log.d("JJJ", "Enable side page interaction " + enable);
+        pager.setPagingEnabled(enable);
+    }
+
+    @Override
+    public void onProgramSelected(String programId) {
+        ProgramsFragment f = (ProgramsFragment) mainFragment.getChildFragmentManager().findFragmentByTag(MainFragment.TAG_TAB_PROGRAMS);
+        if (f == null) {
+            Log.d("JJJ", "OMG no programs fragment but a program was selected in its child ProgramListFragment.?!?!! " + programId);
+            return;
+        }
+        f.showDetails(programId);
     }
 
     @Override

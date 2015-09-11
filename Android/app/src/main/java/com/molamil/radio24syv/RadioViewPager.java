@@ -35,4 +35,8 @@ public class RadioViewPager extends ViewPager {
         this.isPagingEnabled = b;
     }
 
+    public boolean isPagingEnabled() {
+        return isPagingEnabled;
+    }
+
 }

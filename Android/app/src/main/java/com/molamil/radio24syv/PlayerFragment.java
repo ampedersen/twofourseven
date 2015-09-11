@@ -155,7 +155,7 @@ public class PlayerFragment extends Fragment {
     }
 
     private void setSize(PlayerSize size) {
-        Log.d("JJJ", "setsize " + size + " was " + this.size);
+        Log.d("JJJ", "player setsize " + size + " was " + this.size);
         if (size == this.size) {
             return; // Return, already sized like that
         }

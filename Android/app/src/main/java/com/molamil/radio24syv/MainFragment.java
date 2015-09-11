@@ -126,7 +126,7 @@ public class MainFragment extends Fragment {
     }
 
     public void setDimming(Dimming dimming) {
-        Log.d("JJJ", "setdim " + dimming + " was " + this.dimming);
+        Log.d("JJJ", "main setdimming " + dimming + " was " + this.dimming);
         if (dimming == this.dimming) {
             return; // Return, already dimmed like that
         }
@@ -146,8 +146,7 @@ public class MainFragment extends Fragment {
             targetAlpha = 1; // Full dimming
         }
 
-        Log.d("JJJ", "dim from " + dimmer.getAlpha() + " to " + targetAlpha);
-//        boolean isAnimated = (this.dimming != null); // Animate if dimming has been assigned before
+        //Log.d("JJJ", "dim from " + dimmer.getAlpha() + " to " + targetAlpha);
         if (isAnimated) {
             dimmer.animate().alpha(targetAlpha).setDuration(DIMMING_DURATION_MS);
         } else {

@@ -1,44 +1,15 @@
-<FrameLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.molamil.radio24syv.ProgramsFragment"
-    android:background="@color/radio_black"
+    tools:context=".MainActivity"
     >
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="@string/title_fragment_programs" />
-
-    <LinearLayout
+    <com.molamil.radio24syv.RadioViewPager
+        android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:orientation="vertical"
-        >
+        />
 
-        <Button
-            android:id="@+id/categories_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Se kategorier"
-            />
-
-        <Button
-            android:id="@+id/search_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Søg"
-            />
-
-        <Button
-            android:id="@+id/some_program_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Bikinilinjen"
-            />
-
-    </LinearLayout>
-
-</FrameLayout>
+</RelativeLayout>
