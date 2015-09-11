@@ -44,7 +44,6 @@ public class ProgramsFragment extends PageFragment {
         pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
             public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-                Log.d("JJJ", "position " + position + " offset " + positionOffset);
             }
 
             @Override
@@ -69,7 +68,7 @@ public class ProgramsFragment extends PageFragment {
                     switch (pager.getCurrentItem()) {
                         case 0:
                             if (pager.getAdapter().getCount() > 0) {
-                                pager.setAdapter(new ListPagerAdapter(getChildFragmentManager())); // TODO animate and then change page adapter, this has no animation
+                                pager.setAdapter(new ListPagerAdapter(getChildFragmentManager()));
                             }
                             break;
                         case 1:

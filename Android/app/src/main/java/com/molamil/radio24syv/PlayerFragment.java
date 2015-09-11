@@ -154,7 +154,7 @@ public class PlayerFragment extends Fragment {
         }
     }
 
-    private void setSize(PlayerSize size) {
+    public void setSize(PlayerSize size) {
         Log.d("JJJ", "player setsize " + size + " was " + this.size);
         if (size == this.size) {
             return; // Return, already sized like that
@@ -191,6 +191,9 @@ public class PlayerFragment extends Fragment {
         }
     }
 
+    public PlayerSize getSize() {
+        return size;
+    }
 
     /**
      * This interface must be implemented by activities that contain this

@@ -87,6 +87,13 @@ public class MainFragment extends Fragment {
 //
 //        getChildFragmentManager().beginTransaction().replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
 
+        View dimmer = v.findViewById(R.id.dimmer);
+        dimmer.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setDimming(Dimming.NONE); // Remove dimming when clicked. It is only clickable when dimmed.
+            }
+        });
         updateDimming(v, false);
 
         return v;
@@ -131,9 +138,14 @@ public class MainFragment extends Fragment {
             return; // Return, already dimmed like that
         }
 
+        Dimming oldDimming = this.dimming;
         this.dimming = dimming;
 
         updateDimming(getView(), true);
+
+        if (listener != null) {
+            listener.onDimmingChanged(dimming, oldDimming);
+        }
     }
 
     private void updateDimming(View parentView, boolean isAnimated) {
@@ -142,8 +154,10 @@ public class MainFragment extends Fragment {
         long targetAlpha;
         if (dimming == Dimming.NONE) {
             targetAlpha = 0; // No dimming
+            dimmer.setClickable(false);
         } else {
             targetAlpha = 1; // Full dimming
+            dimmer.setClickable(true);
         }
 
         //Log.d("JJJ", "dim from " + dimmer.getAlpha() + " to " + targetAlpha);
@@ -156,5 +170,6 @@ public class MainFragment extends Fragment {
 
     public interface OnMainFragmentInteractionListener {
         public void onMainTabChanged(String tabTag);
+        public void onDimmingChanged(Dimming newDimming, Dimming oldDimming);
     }
 }

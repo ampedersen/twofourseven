@@ -110,8 +110,10 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onPlayerSizeChanged(PlayerFragment.PlayerSize newSize, PlayerFragment.PlayerSize oldSize) {
         if (newSize == PlayerFragment.PlayerSize.BIG) {
+            pager.setPagingEnabled(false);
             mainFragment.setDimming(MainFragment.Dimming.DIM);
         } else {
+            pager.setPagingEnabled(true);
             mainFragment.setDimming(MainFragment.Dimming.NONE);
         }
     }
@@ -124,6 +126,17 @@ public class MainActivity extends FragmentActivity implements
             playerFragment.setPlaying(true);
         } else {
             playerFragment.setPlaying(false);
+        }
+    }
+
+    @Override
+    public void onDimmingChanged(MainFragment.Dimming newDimming, MainFragment.Dimming oldDimming) {
+        boolean isRemoved = (oldDimming == MainFragment.Dimming.DIM) && (newDimming == MainFragment.Dimming.NONE);
+        if (isRemoved) {
+            PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
+            if (playerFragment.getSize() == PlayerFragment.PlayerSize.BIG) {
+                playerFragment.setSize(PlayerFragment.PlayerSize.SMALL);
+            }
         }
     }
 
@@ -157,6 +170,12 @@ public class MainActivity extends FragmentActivity implements
         }
 
         pager.setCurrentItem(mainPagePosition, false);
+
+        // Small player
+        PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
+        if (playerFragment.getSize() == PlayerFragment.PlayerSize.BIG) {
+            playerFragment.setSize(PlayerFragment.PlayerSize.SMALL);
+        }
     }
 
     /*
