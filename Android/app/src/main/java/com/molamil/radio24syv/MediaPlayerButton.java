@@ -2,7 +2,8 @@ package com.molamil.radio24syv;
 
 import android.content.Context;
 import android.content.res.TypedArray;
-import android.media.MediaPlayer;
+import android.graphics.Canvas;
+import android.graphics.DrawFilter;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -18,6 +19,7 @@ public class MediaPlayerButton extends Button implements
     int action;
     String url;
     RadioPlayer player;
+    private boolean isAvailable = true;
 
     public MediaPlayerButton(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -92,22 +94,91 @@ public class MediaPlayerButton extends Button implements
     }
 
     @Override
-    public void OnBusy(RadioPlayer player) {
+    protected void onDraw(Canvas canvas) {
+        //setEnabled(isAvailable()); // Disable if action is not available due to the current state of the player
+        if (isAvailable()) {
+            setBackgroundColor(getResources().getColor(R.color.radio_gray));
+        } else {
+            setBackgroundColor(getResources().getColor(R.color.radio_red));
+        }
+        super.onDraw(canvas);
+    }
 
+
+    @Override
+    public void OnBusy(RadioPlayer player) {
+        setIsAvailable(false);
     }
 
     @Override
     public void OnStarted(RadioPlayer player) {
-
+        switch (action) {
+            case RadioPlayer.ACTION_PLAY:
+                setIsAvailable(false);
+                break;
+            case RadioPlayer.ACTION_STOP:
+                setIsAvailable(true);
+                break;
+            case RadioPlayer.ACTION_PAUSE:
+                setIsAvailable(true);
+                break;
+            case RadioPlayer.ACTION_NEXT:
+                setIsAvailable(true);
+                break;
+            case RadioPlayer.ACTION_PREVIOUS:
+                setIsAvailable(true);
+                break;
+        }
     }
 
     @Override
     public void OnStopped(RadioPlayer player) {
-
+        switch (action) {
+            case RadioPlayer.ACTION_PLAY:
+                setIsAvailable(true);
+                break;
+            case RadioPlayer.ACTION_STOP:
+                setIsAvailable(false);
+                break;
+            case RadioPlayer.ACTION_PAUSE:
+                setIsAvailable(false);
+                break;
+            case RadioPlayer.ACTION_NEXT:
+                setIsAvailable(true);
+                break;
+            case RadioPlayer.ACTION_PREVIOUS:
+                setIsAvailable(true);
+                break;
+        }
     }
 
     @Override
     public void OnPaused(RadioPlayer player) {
+        switch (action) {
+            case RadioPlayer.ACTION_PLAY:
+                setIsAvailable(true);
+                break;
+            case RadioPlayer.ACTION_STOP:
+                setIsAvailable(true);
+                break;
+            case RadioPlayer.ACTION_PAUSE:
+                setIsAvailable(false);
+                break;
+            case RadioPlayer.ACTION_NEXT:
+                setIsAvailable(true);
+                break;
+            case RadioPlayer.ACTION_PREVIOUS:
+                setIsAvailable(true);
+                break;
+        }
+    }
 
+    public boolean isAvailable() {
+        return isAvailable;
+    }
+
+    public void setIsAvailable(boolean isAvailable) {
+        this.isAvailable = isAvailable;
+        postInvalidate();
     }
 }

@@ -1,8 +1,12 @@
 package com.molamil.radio24syv;
 
+import android.content.Context;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.provider.MediaStore;
 import android.util.Log;
 
 import java.io.IOException;
@@ -27,6 +31,11 @@ public class RadioPlayer {
     int action = -1;
     String url;
     PlayUrlTask task = null;
+    Context context;
+
+    public RadioPlayer(Context context) {
+        this.context = context;
+    }
 
     public void addListener(OnPlaybackListener listener) {
         if (!listenerList.contains(listener)) {
@@ -43,99 +52,115 @@ public class RadioPlayer {
     public void play(String url) {
         Log.d("JJJ", "play (was " + action + ") audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
 
-        this.url = url;
-        if (action == ACTION_PAUSE) {
-            if (player != null) {
-                action = ACTION_PLAY;
-                player.start();
-                for (OnPlaybackListener l : listenerList) {
-                    l.OnStarted(RadioPlayer.this);
-                }
-            }
-        } else {
-            action = ACTION_PLAY;
-            if (task == null) {
-                task = new PlayUrlTask();
-                task.execute(url);
+        boolean isLocal = !url.startsWith("http://");
+        if (!isLocal) {
+            ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
+            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
+            if (networkInfo != null && networkInfo.isConnected()) {
+                // Internet is happy
             } else {
-                Log.d("JJJ", "Unable to play " + url + " because already trying to play " + this.url);
+                Log.d("JJJ", "Unable to play " + url + " because internet connection is down");
+                setAction(ACTION_STOP);
+                return; // Return, internet is not happy
             }
-
-//            URL web;
-//            try {
-//                web = new URL(url);
-//            } catch (MalformedURLException e) {
-//                e.printStackTrace();
-//                web = null;
-//            }
-//            if (web != null) {
-//                try {
-//                    Log.d("JJJ", web.toString());
-//                    Log.d("JJJ", web.getContent().toString());
-//                } catch (IOException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//
-//            try {
-//                player.setDataSource(web.toString());
-//            } catch (IOException e) {
-//                Log.e("JJJ", "Unable to play URL " + url);
-//                e.printStackTrace();
-//                action = ACTION_STOP;
-//                for (OnPlaybackListener l : listenerList) {
-//                    l.OnStopped(RadioPlayer.this);
-//                }
-//                player.release();
-//                player = null;
-//            }
-//
-//            if (action == ACTION_PLAY) {
-//                player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//                    @Override
-//                    public void onPrepared(MediaPlayer mp) {
-//                        if (action == ACTION_PLAY) {
-//                            player.start(); // Start playing if that is still the action we want to perform
-//                            for (OnPlaybackListener l : listenerList) {
-//                                l.OnStarted(RadioPlayer.this);
-//                            }
-//                        }
-//                    }
-//                });
-//
-//                for (OnPlaybackListener l : listenerList) {
-//                    l.OnBusy(RadioPlayer.this);
-//                }
-//                player.prepareAsync();
-//            }
         }
+
+        this.url = url;
+        setAction(ACTION_PLAY);
     }
 
     public void stop() {
-        Log.d("JJJ", "stop (was \" + action + \") audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
-
-        if (action == ACTION_PLAY) {
-            if (player != null) {
-                player.stop();
-                action = ACTION_PAUSE;
-            }
-            for (OnPlaybackListener l : listenerList) {
-                l.OnStopped(RadioPlayer.this);
-            }
-        }
+        setAction(ACTION_STOP);
     }
 
     public void pause() {
-        Log.d("JJJ", "pause (was \" + action + \") audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
+        setAction(ACTION_PAUSE);
+    }
 
-        if (action == ACTION_PLAY) {
-            if (player != null) {
-                player.pause();
-                action = ACTION_PAUSE;
-            }
-            for (OnPlaybackListener l : listenerList) {
-                l.OnPaused(RadioPlayer.this);
-            }
+    public void next() {
+        setAction(ACTION_NEXT);
+    }
+
+    public void previous() {
+        setAction(ACTION_PREVIOUS);
+    }
+
+    private void setAction(int newAction) {
+        Log.d("JJJ", "setAction " + newAction + " (was " + action + ") + audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
+
+        if (!isActionAllowed(newAction)) {
+            Log.d("JJJ", "Unable to perform action " + newAction + " because it is not allowed while doing action " + action);
+            return; // Return, action is not allowed
+        }
+
+        switch (newAction) {
+
+            case ACTION_PLAY:
+                if (action == ACTION_PAUSE) {
+                    if (player != null) {
+                        player.start();
+                        for (OnPlaybackListener l : listenerList) {
+                            l.OnStarted(RadioPlayer.this);
+                        }
+                    }
+                }
+                else {
+                    if (task != null) {
+                        task.cancel(true);
+                    }
+                    task = new PlayUrlTask();
+                    task.execute(url);
+                }
+                break;
+
+            case ACTION_STOP:
+                if (player != null) {
+                    if (player.isPlaying()) {
+                        player.stop();
+                    }
+                    player.release();
+                    player = null;
+                    for (OnPlaybackListener l : listenerList) {
+                        l.OnStopped(RadioPlayer.this);
+                    }
+                }
+                break;
+
+            case ACTION_PAUSE:
+                if (player != null) {
+                    player.pause();
+                }
+                for (OnPlaybackListener l : listenerList) {
+                    l.OnPaused(RadioPlayer.this);
+                }
+                break;
+
+            case ACTION_NEXT:
+                Log.d("JJJ", "TODO implement ACTION_NEXT");
+                break;
+
+            case ACTION_PREVIOUS:
+                Log.d("JJJ", "TODO implement ACTION_PREVIOUS");
+                break;
+        }
+
+        action = newAction;
+    }
+
+    private boolean isActionAllowed(int newAction) {
+        switch (newAction) {
+            case ACTION_PLAY:
+                return true;
+            case ACTION_STOP:
+                return (action == ACTION_PLAY);
+            case ACTION_PAUSE:
+                return (action == ACTION_PLAY);
+            case ACTION_NEXT:
+                return (action == ACTION_PLAY) || (action == ACTION_STOP) || (action == ACTION_PAUSE);
+            case ACTION_PREVIOUS:
+                return (action == ACTION_PLAY) || (action == ACTION_STOP) || (action == ACTION_PAUSE);
+            default:
+                return true;
         }
     }
 
@@ -148,11 +173,7 @@ public class RadioPlayer {
                 l.OnBusy(RadioPlayer.this);
             }
 
-            if (player == null) {
-                player = new MediaPlayer();
-                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            }
-
+            // Validate URL
             URL web;
             try {
                 web = new URL(url);
@@ -166,54 +187,50 @@ public class RadioPlayer {
                     Log.d("JJJ", web.getContent().toString());
                 } catch (IOException e) {
                     e.printStackTrace();
+                    web = null;
                 }
             }
+            if (web == null) {
+                Log.d("JJJ", "Unable play URL because it is not valid " + url);
+                setAction(ACTION_STOP);
+                return null; // Return, bad URL
+            }
 
+            // Prepare player
+            if (player == null) {
+                player = new MediaPlayer();
+                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+            } else {
+                if (player.isPlaying()) {
+                    player.stop();
+                }
+                player.reset(); // Reset before assigning a new data source
+            }
             try {
                 player.setDataSource(web.toString());
             } catch (IOException e) {
-                Log.e("JJJ", "Unable to play URL " + url);
+                Log.e("JJJ", "Unable to play URL because of data source error " + url);
                 e.printStackTrace();
-                action = ACTION_STOP;
-                for (OnPlaybackListener l : listenerList) {
-                    l.OnStopped(RadioPlayer.this);
-                }
-                player.release();
-                player = null;
+                setAction(ACTION_STOP);
+                return null; // Return, data source error
             }
 
+            // Play URL
             if (action == ACTION_PLAY) {
-                //Only for prepareAsync i think...
-//                player.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
-//                    @Override
-//                    public void onPrepared(MediaPlayer mp) {
-//                        if (action == ACTION_PLAY) {
-//                            player.start(); // Start playing if that is still the action we want to perform
-//                            for (OnPlaybackListener l : listenerList) {
-//                                l.OnStarted(RadioPlayer.this);
-//                            }
-//                        }
-//                    }
-//                });
-
                 try {
                     player.prepare();
-                    if (action == ACTION_PLAY) {
-                        player.start();
-                        for (OnPlaybackListener l : listenerList) {
-                            l.OnStarted(RadioPlayer.this);
-                        }
+                    player.start();
+                    for (OnPlaybackListener l : listenerList) {
+                        l.OnStarted(RadioPlayer.this);
                     }
                 } catch (IOException e) {
+                    Log.e("JJJ", "Unable to actually play URL because of some playback error " + url);
                     e.printStackTrace();
-                    action = ACTION_STOP;
-                    for (OnPlaybackListener l : listenerList) {
-                        l.OnStopped(RadioPlayer.this);
-                    }
-                    player.release();
-                    player = null;
+                    setAction(ACTION_STOP);
+                    return null; // Return, playback error
                 }
             }
+
             return null;
         }
 

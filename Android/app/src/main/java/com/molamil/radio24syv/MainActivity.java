@@ -43,7 +43,7 @@ public class MainActivity extends FragmentActivity implements
         pager.setPageTransformer(false, pageTransformer);
         pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
 
-        mediaPlayer = new RadioPlayer();
+        mediaPlayer = new RadioPlayer(this);
     }
 
     @Override

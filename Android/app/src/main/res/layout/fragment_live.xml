@@ -30,22 +30,6 @@
             app:action="play"
             app:url="http://streaming.radio24syv.dk/nice"
             />
-        <!--<com.molamil.radio24syv.MediaPlayerButton-->
-            <!--android:id="@+id/play_button"-->
-            <!--android:layout_width="100dp"-->
-            <!--android:layout_height="100dp"-->
-            <!--android:background="@drawable/play_button"-->
-            <!--app:action="play"-->
-            <!--app:url="http://rrr.sz.xlcdn.com/?account=Radio24syv&amp;file=ENC1_Web128&amp;type=live&amp;service=icecast&amp;port=8000&amp;output=pls"-->
-            <!--/>-->
-        <!--<com.molamil.radio24syv.MediaPlayerButton-->
-            <!--android:id="@+id/play_button"-->
-            <!--android:layout_width="100dp"-->
-            <!--android:layout_height="100dp"-->
-            <!--android:background="@drawable/play_button"-->
-            <!--app:action="play"-->
-            <!--app:url="http://ice.cr2.streamzilla.xlcdn.com:8000/sz=Radio24syv=ENC1_Web128?token=a8b1b3d5b8808790229b18ba79891fd9&amp;time=55f6b34d"-->
-            <!--/>-->
 
     </LinearLayout>
 </FrameLayout>
