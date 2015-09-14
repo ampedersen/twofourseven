@@ -28,7 +28,7 @@
             android:layout_height="100dp"
             android:background="@drawable/play_button"
             app:action="play"
-            app:url="http://streaming.radio24syv.dk/nice"
+            app:url="@string/url_live_radio"
             />
 
     </LinearLayout>

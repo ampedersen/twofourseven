@@ -26,4 +26,6 @@
     <string name="tab_offline">Lyt offline</string>
 
     <string name="live_schedule_button">Se sendeplan</string>
+
+    <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>
 </resources>

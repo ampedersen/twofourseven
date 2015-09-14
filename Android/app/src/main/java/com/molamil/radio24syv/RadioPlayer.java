@@ -15,6 +15,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 /**
+ * Encapsulation of the MediaPlayer class. Supports background playback of URL, standard play/pause/etc actions, multiple listener callbacks for player states.
  * Created by jens on 14/09/15.
  */
 public class RadioPlayer {
@@ -25,10 +26,18 @@ public class RadioPlayer {
     public final static int ACTION_NEXT = 3;
     public final static int ACTION_PREVIOUS = 4;
 
-    public final static String URL_LIVE_RADIO = "http://streaming.radio24syv.dk/nice"; //TODO fetch live radio url from somewhere?
+    public static String getActionName(int action) {
+        final String[] names = new String[] { "play", "stop", "pause", "next", "previous" };
+        try {
+            return names[action];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return "";
+        }
+    }
+
     MediaPlayer player;
     ArrayList<OnPlaybackListener> listenerList = new ArrayList<>();
-    int action = -1;
+    int action = ACTION_STOP;
     String url;
     PlayUrlTask task = null;
     Context context;

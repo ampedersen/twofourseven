@@ -27,9 +27,9 @@ public class LiveFragment extends PageFragment {
     private String mParam1;
     private String mParam2;
 
-    private OnFragmentInteractionListener mListener;
+    private OnFragmentInteractionListener listener;
     private PlayerFragment.OnFragmentInteractionListener playerListener;
-    private PlayerFragment.MediaPlayerProvider mediaPlayerProvider;
+    private PlayerFragment.RadioPlayerProvider radioPlayerProvider;
 
     /**
      * Use this factory method to create a new instance of
@@ -71,8 +71,8 @@ public class LiveFragment extends PageFragment {
         scheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onShowSidePage(OnFragmentInteractionListener.Side.SHOW_RIGHT);
+                if (listener != null) {
+                    listener.onShowSidePage(OnFragmentInteractionListener.Side.SHOW_RIGHT);
                 }
             }
         });
@@ -93,15 +93,16 @@ public class LiveFragment extends PageFragment {
     @Override
     public void onActivityCreated (Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+
         MediaPlayerButton playButton = (MediaPlayerButton)getView().findViewById(R.id.play_button);
-        playButton.setRadioPlayer(mediaPlayerProvider.getMediaPlayer());
+        playButton.setRadioPlayer(radioPlayerProvider.getRadioPlayer()); // Setup play button. Must do this in onActivityCreated() to be sure our host activity is up and running.
     }
 
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            listener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -113,17 +114,19 @@ public class LiveFragment extends PageFragment {
                     + " must implement PlayerFragment.OnFragmentInteractionListener");
         }
         try {
-            mediaPlayerProvider = (PlayerFragment.MediaPlayerProvider) activity;
+            radioPlayerProvider = (PlayerFragment.RadioPlayerProvider) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement PlayerFragment.MediaPlayerProvider");
+                    + " must implement PlayerFragment.RadioPlayerProvider");
         }
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
+        playerListener = null;
+        radioPlayerProvider = null;
     }
 
 

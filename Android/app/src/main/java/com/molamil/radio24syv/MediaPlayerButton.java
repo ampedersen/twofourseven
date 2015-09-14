@@ -6,6 +6,7 @@ import android.graphics.Canvas;
 import android.graphics.DrawFilter;
 import android.util.AttributeSet;
 import android.util.Log;
+import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 
@@ -76,6 +77,11 @@ public class MediaPlayerButton extends Button implements
             return;
         }
 
+        if (!isAvailable()) {
+            Log.d("JJJ", "Unable to click button (id " + getId() + ") because it is not available");
+            return; // Return, cannot click button
+        }
+
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
                 player.play(url);
@@ -97,10 +103,13 @@ public class MediaPlayerButton extends Button implements
     protected void onDraw(Canvas canvas) {
         //setEnabled(isAvailable()); // Disable if action is not available due to the current state of the player
         if (isAvailable()) {
-            setBackgroundColor(getResources().getColor(R.color.radio_gray));
+            setTextColor(getResources().getColor(android.R.color.holo_green_light));
         } else {
-            setBackgroundColor(getResources().getColor(R.color.radio_red));
+            setTextColor(getResources().getColor(android.R.color.holo_red_light));
         }
+        setTextSize(12);
+        setText(RadioPlayer.getActionName(action));
+
         super.onDraw(canvas);
     }
 
@@ -114,7 +123,8 @@ public class MediaPlayerButton extends Button implements
     public void OnStarted(RadioPlayer player) {
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                setIsAvailable(false);
+                boolean isPlayingMyUrl = (player.url.equals(url));
+                setIsAvailable(!isPlayingMyUrl); // Enable if not playing our stream
                 break;
             case RadioPlayer.ACTION_STOP:
                 setIsAvailable(true);
@@ -179,6 +189,6 @@ public class MediaPlayerButton extends Button implements
 
     public void setIsAvailable(boolean isAvailable) {
         this.isAvailable = isAvailable;
-        postInvalidate();
+        postInvalidate(); // Redraw view next frame
     }
 }

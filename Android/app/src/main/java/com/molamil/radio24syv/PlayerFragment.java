@@ -1,8 +1,6 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
-import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -20,7 +18,7 @@ import android.widget.Button;
  * Use the {@link PlayerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PlayerFragment extends Fragment {
+public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackListener {
     public enum PlayerSize { NONE, SMALL, BIG };
     public enum PlayerAction { PLAY, STOP };
 
@@ -29,7 +27,7 @@ public class PlayerFragment extends Fragment {
     String title;
 
     OnFragmentInteractionListener mListener;
-    MediaPlayerProvider mediaPlayerProvider;
+    RadioPlayerProvider radioPlayerProvider;
 
     PlayerSize size = PlayerSize.NONE;
 
@@ -86,30 +84,35 @@ public class PlayerFragment extends Fragment {
             }
         });
 
-        Button playButton = (Button)v.findViewById(R.id.play_button);
-        playButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    if (isPlaying) {
-                        mListener.onPlayerControl(PlayerAction.STOP);
-                    } else {
-                        mListener.onPlayerControl(PlayerAction.PLAY);
-                    }
-                }
-            }
-        });
+//        Button playButton = (Button)v.findViewById(R.id.play_button);
+//        playButton.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                if (mListener != null) {
+//                    if (isPlaying) {
+//                        mListener.onPlayerControl(PlayerAction.STOP);
+//                    } else {
+//                        mListener.onPlayerControl(PlayerAction.PLAY);
+//                    }
+//                }
+//            }
+//        });
 
         updateSize(v);
-        updatePlayButton(v);
+//        updatePlayButton(v);
+
+        RadioPlayer player = radioPlayerProvider.getRadioPlayer();
+        player.addListener(this);
+        linkPlaybackButtons(player, v);
 
         return v;
     }
 
     @Override
-    public void onResume() {
-        super.onResume();
+    public void onActivityCreated (Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
     }
+
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -120,12 +123,10 @@ public class PlayerFragment extends Fragment {
                     + " must implement OnFragmentInteractionListener");
         }
         try {
-            mediaPlayerProvider = (PlayerFragment.MediaPlayerProvider) activity;
-            //todo make event in MediaPlauerProvider telling when Mediapluer state has changed (play/stop/title/duraciton/picture"
-            //todo subscirbe and show player when playing starts and hide when stops (no hide when paused)"
+            radioPlayerProvider = (RadioPlayerProvider) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
-                    + " must implement PlayerFragment.MediaPlayerProvider");
+                    + " must implement PlayerFragment.RadioPlayerProvider");
         }
     }
 
@@ -135,34 +136,75 @@ public class PlayerFragment extends Fragment {
         mListener = null;
     }
 
-    boolean isOffline;
-    boolean isPlaying;
-
-    public void setOffline(boolean isOffline) {
-        this.isOffline = isOffline;
-        updatePlayButton(getView());
-    }
-
-    public void setPlaying(boolean isPlaying) {
+    @Override
+    public void OnBusy(RadioPlayer player) {
         if (size == PlayerSize.NONE) {
             setSize(PlayerSize.SMALL);
         }
-        this.isPlaying = isPlaying;
-        updatePlayButton(getView());
+        linkPlaybackButtons(player, getView());
     }
 
-    private void updatePlayButton(View parentView) {
-        Button playButton = (Button) parentView.findViewById(R.id.play_button);
-        if (isPlaying) {
-            if (isOffline) {
-                playButton.setText("Pause");
-            } else {
-                playButton.setText("Stop");
-            }
-        } else {
-            playButton.setText("Play");
+    @Override
+    public void OnStarted(RadioPlayer player) {
+        if (size == PlayerSize.NONE) {
+            setSize(PlayerSize.SMALL);
         }
+        linkPlaybackButtons(player, getView());
     }
+
+    private void linkPlaybackButtons(RadioPlayer player, View parentView) {
+        // Link all buttons to always show current playback status
+        linkButton(player, parentView, R.id.play_button);
+        linkButton(player, parentView, R.id.stop_button);
+        linkButton(player, parentView, R.id.pause_button);
+        linkButton(player, parentView, R.id.next_button);
+        linkButton(player, parentView, R.id.previous_button);
+    }
+
+    private void linkButton(RadioPlayer player, View parentView, int buttonId) {
+        MediaPlayerButton b = (MediaPlayerButton)parentView.findViewById(buttonId);
+        b.setRadioPlayer(player);
+        b.url = player.url;
+    }
+
+    @Override
+    public void OnStopped(RadioPlayer player) {
+
+    }
+
+    @Override
+    public void OnPaused(RadioPlayer player) {
+
+    }
+
+//    boolean isOffline;
+//    boolean isPlaying;
+//
+//    public void setOffline(boolean isOffline) {
+//        this.isOffline = isOffline;
+//        updatePlayButton(getView());
+//    }
+//
+//    public void setPlaying(boolean isPlaying) {
+//        if (size == PlayerSize.NONE) {
+//            setSize(PlayerSize.SMALL);
+//        }
+//        this.isPlaying = isPlaying;
+//        updatePlayButton(getView());
+//    }
+//
+//    private void updatePlayButton(View parentView) {
+//        Button playButton = (Button) parentView.findViewById(R.id.play_button);
+//        if (isPlaying) {
+//            if (isOffline) {
+//                playButton.setText("Pause");
+//            } else {
+//                playButton.setText("Stop");
+//            }
+//        } else {
+//            playButton.setText("Play");
+//        }
+//    }
 
     public void setSize(PlayerSize size) {
         Log.d("JJJ", "player setsize " + size + " was " + this.size);
@@ -180,25 +222,31 @@ public class PlayerFragment extends Fragment {
         }
     }
 
-    private void updateSize(View parentView) {
-        if (size == PlayerSize.NONE) {
-            parentView.setVisibility(View.GONE);
-        } else {
-            parentView.setVisibility(View.VISIBLE);
-            View bigThingy = parentView.findViewById(R.id.big_thingy);
-            Button expandButton = (Button) parentView.findViewById(R.id.size_button);
-            int targetColorId;
-            if (size == PlayerSize.BIG) {
-                bigThingy.setVisibility(View.VISIBLE);
-                expandButton.setText("Small");
-                targetColorId = R.color.radio_gray_dark;
-            } else {
-                bigThingy.setVisibility(View.GONE);
-                expandButton.setText("Big");
-                targetColorId = R.color.radio_gray_darker;
+    private void updateSize(final View parentView) {
+        // Delay updating UI until the view's own thread because we may be called from the background thread handling radio playback, and only UI thread can touch UI stuff.
+        parentView.post(new Runnable() {
+            @Override
+            public void run() {
+                if (size == PlayerSize.NONE) {
+                    parentView.setVisibility(View.GONE);
+                } else {
+                    parentView.setVisibility(View.VISIBLE);
+                    View bigThingy = parentView.findViewById(R.id.big_thingy);
+                    Button expandButton = (Button) parentView.findViewById(R.id.size_button);
+                    int targetColorId;
+                    if (size == PlayerSize.BIG) {
+                        bigThingy.setVisibility(View.VISIBLE);
+                        expandButton.setText("Small");
+                        targetColorId = R.color.radio_gray_dark;
+                    } else {
+                        bigThingy.setVisibility(View.GONE);
+                        expandButton.setText("Big");
+                        targetColorId = R.color.radio_gray_darker;
+                    }
+                    parentView.setBackgroundColor(getResources().getColor(targetColorId));
+                }
             }
-            parentView.setBackgroundColor(getResources().getColor(targetColorId));
-        }
+        });
     }
 
     public PlayerSize getSize() {
@@ -217,11 +265,10 @@ public class PlayerFragment extends Fragment {
      */
     public interface OnFragmentInteractionListener {
         public void onPlayerSizeChanged(PlayerSize newSize, PlayerSize oldSize);
-        public void onPlayerControl(PlayerAction action);
     }
 
-    public interface MediaPlayerProvider {
-        public RadioPlayer getMediaPlayer();
+    public interface RadioPlayerProvider {
+        public RadioPlayer getRadioPlayer();
     }
 
 }

@@ -1,7 +1,5 @@
 package com.molamil.radio24syv;
 
-import android.content.Context;
-import android.media.MediaPlayer;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -12,7 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 public class MainActivity extends FragmentActivity implements
-        PlayerFragment.MediaPlayerProvider,
+        PlayerFragment.RadioPlayerProvider,
         MainFragment.OnMainFragmentInteractionListener,
         PageFragment.OnFragmentInteractionListener,
         ScheduleFragment.OnFragmentInteractionListener,
@@ -28,7 +26,7 @@ public class MainActivity extends FragmentActivity implements
     MainFragment mainFragment; // Keep the same main fragment across different page adapters
     String selectedTabTag;
     int mainPagePosition; // The position of the main page changes depending on the selected tab
-    RadioPlayer mediaPlayer;
+    RadioPlayer radioPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,7 +41,7 @@ public class MainActivity extends FragmentActivity implements
         pager.setPageTransformer(false, pageTransformer);
         pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
 
-        mediaPlayer = new RadioPlayer(this);
+        radioPlayer = new RadioPlayer(this);
     }
 
     @Override
@@ -123,9 +121,9 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    @Override
-    public void onPlayerControl(PlayerFragment.PlayerAction action) {
-        Log.d("JJJ", "onPlayerControl " + action);
+//    @Override
+//    public void onPlayerControl(PlayerFragment.PlayerAction action) {
+//        Log.d("JJJ", "onPlayerControl " + action);
 //        PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
 //        if (action == PlayerFragment.PlayerAction.PLAY) {
 //            playerFragment.setPlaying(true);
@@ -136,17 +134,17 @@ public class MainActivity extends FragmentActivity implements
 
 
 //        if (action == PlayerFragment.PlayerAction.PLAY) {
-//                if (mediaPlayer == null) {
-//                    mediaPlayer = MediaPlayer.create(this, R.raw.test);
+//                if (radioPlayer == null) {
+//                    radioPlayer = MediaPlayer.create(this, R.raw.test);
 //                }
-//                mediaPlayer.start();
+//                radioPlayer.start();
 //            } else if (action == PlayerFragment.PlayerAction.STOP) {
-//                if (mediaPlayer != null) {
-//                    mediaPlayer.stop();
+//                if (radioPlayer != null) {
+//                    radioPlayer.stop();
 //                }
 //        }
 
-    }
+//    }
 
     @Override
     public void onDimmingChanged(MainFragment.Dimming newDimming, MainFragment.Dimming oldDimming) {
@@ -198,8 +196,8 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public RadioPlayer getMediaPlayer() {
-        return mediaPlayer;
+    public RadioPlayer getRadioPlayer() {
+        return radioPlayer;
     }
 
     /*
