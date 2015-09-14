@@ -28,7 +28,7 @@ public class MainActivity extends FragmentActivity implements
     MainFragment mainFragment; // Keep the same main fragment across different page adapters
     String selectedTabTag;
     int mainPagePosition; // The position of the main page changes depending on the selected tab
-    MediaPlayer mediaPlayer;
+    RadioPlayer mediaPlayer;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -42,6 +42,8 @@ public class MainActivity extends FragmentActivity implements
         pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
         pager.setPageTransformer(false, pageTransformer);
         pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
+
+        mediaPlayer = new RadioPlayer();
     }
 
     @Override
@@ -130,16 +132,19 @@ public class MainActivity extends FragmentActivity implements
 //        } else {
 //            playerFragment.setPlaying(false);
 //        }
-        if (action == PlayerFragment.PlayerAction.PLAY) {
-            if (mediaPlayer == null) {
-                mediaPlayer = MediaPlayer.create(this, R.raw.test);
-            }
-            mediaPlayer.start();
-        } else if (action == PlayerFragment.PlayerAction.STOP) {
-            if (mediaPlayer != null) {
-                mediaPlayer.stop();
-            }
-        }
+
+
+
+//        if (action == PlayerFragment.PlayerAction.PLAY) {
+//                if (mediaPlayer == null) {
+//                    mediaPlayer = MediaPlayer.create(this, R.raw.test);
+//                }
+//                mediaPlayer.start();
+//            } else if (action == PlayerFragment.PlayerAction.STOP) {
+//                if (mediaPlayer != null) {
+//                    mediaPlayer.stop();
+//                }
+//        }
 
     }
 
@@ -193,7 +198,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public MediaPlayer getMediaPlayer() {
+    public RadioPlayer getMediaPlayer() {
         return mediaPlayer;
     }
 

@@ -77,7 +77,7 @@ public class LiveFragment extends PageFragment {
             }
         });
 
-        MediaPlayerButton playButton = (MediaPlayerButton)v.findViewById(R.id.play_button);
+//        MediaPlayerButton playButton = (MediaPlayerButton)v.findViewById(R.id.play_button);
 //        playButton.setOnClickListener(new View.OnClickListener() {
 //            @Override
 //            public void onClick(View v) {
@@ -86,9 +86,15 @@ public class LiveFragment extends PageFragment {
 //                }
 //            }
 //        });
-        playButton.setMediaPlayer(mediaPlayerProvider.getMediaPlayer());
 
         return v;
+    }
+
+    @Override
+    public void onActivityCreated (Bundle savedInstanceState) {
+        super.onActivityCreated(savedInstanceState);
+        MediaPlayerButton playButton = (MediaPlayerButton)getView().findViewById(R.id.play_button);
+        playButton.setRadioPlayer(mediaPlayerProvider.getMediaPlayer());
     }
 
     @Override

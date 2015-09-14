@@ -121,8 +121,8 @@ public class PlayerFragment extends Fragment {
         }
         try {
             mediaPlayerProvider = (PlayerFragment.MediaPlayerProvider) activity;
-            "todo make event in MediaPlauerProvider telling when Mediapluer state has changed (play/stop/title/duraciton/picture"
-            "todo subscirbe and show player when playing starts and hide when stops (no hide when paused)"
+            //todo make event in MediaPlauerProvider telling when Mediapluer state has changed (play/stop/title/duraciton/picture"
+            //todo subscirbe and show player when playing starts and hide when stops (no hide when paused)"
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement PlayerFragment.MediaPlayerProvider");
@@ -221,7 +221,7 @@ public class PlayerFragment extends Fragment {
     }
 
     public interface MediaPlayerProvider {
-        public MediaPlayer getMediaPlayer();
+        public RadioPlayer getMediaPlayer();
     }
 
 }

@@ -8,5 +8,6 @@
             <enum name="next" value="3"/>
             <enum name="previous" value="4"/>
         </attr>
+        <attr name="url" format="string" />
     </declare-styleable>
 </resources>

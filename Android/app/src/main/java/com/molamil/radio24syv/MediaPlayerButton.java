@@ -12,16 +12,12 @@ import android.widget.Button;
  * Created by jens on 11/09/15.
  */
 public class MediaPlayerButton extends Button implements
-        View.OnClickListener {
-
-    public final static int ACTION_PLAY = 0;
-    public final static int ACTION_STOP = 1;
-    public final static int ACTION_PAUSE = 2;
-    public final static int ACTION_NEXT = 3;
-    public final static int ACTION_PREVIOUS = 4;
+        View.OnClickListener,
+        RadioPlayer.OnPlaybackListener {
 
     int action;
-    MediaPlayer mediaPlayer;
+    String url;
+    RadioPlayer player;
 
     public MediaPlayerButton(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -33,7 +29,8 @@ public class MediaPlayerButton extends Button implements
                 0, 0);
 
         try {
-            action = a.getInteger(R.styleable.MediaPlayerButton_action, ACTION_PLAY);
+            action = a.getInteger(R.styleable.MediaPlayerButton_action, RadioPlayer.ACTION_PLAY);
+            url = a.getString(R.styleable.MediaPlayerButton_url);
         } finally {
             a.recycle();
         }
@@ -49,31 +46,68 @@ public class MediaPlayerButton extends Button implements
         return action;
     }
 
-    public void setMediaPlayer(MediaPlayer mediaPlayer) {
-        this.mediaPlayer = mediaPlayer;
+    public void setRadioPlayer(RadioPlayer player) {
+        this.player = player;
+        player.addListener(this);
+    }
+
+    @Override
+    protected void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        // View is now attached
+    }
+
+    @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        // View is now detached, and about to be destroyed
+        if (player != null) {
+            player.removeListener(this);
+            player = null;
+        }
     }
 
     @Override
     public void onClick(View v) {
-        Log.d("JJJ", "action " + action + " mediapleyer " + mediaPlayer);
-        if (mediaPlayer == null) {
+        Log.d("JJJ", "action " + action + " player " + player);
+        if (player == null) {
             return;
         }
 
         switch (action) {
-            case ACTION_PLAY:
-                mediaPlayer.start();
+            case RadioPlayer.ACTION_PLAY:
+                player.play(url);
                 break;
-            case ACTION_STOP:
-                mediaPlayer.stop();
+            case RadioPlayer.ACTION_STOP:
+                player.stop();
                 break;
-            case ACTION_PAUSE:
-                mediaPlayer.pause();
+            case RadioPlayer.ACTION_PAUSE:
+                player.pause();
                 break;
-            case ACTION_NEXT:
+            case RadioPlayer.ACTION_NEXT:
                 break;
-            case ACTION_PREVIOUS:
+            case RadioPlayer.ACTION_PREVIOUS:
                 break;
         }
+    }
+
+    @Override
+    public void OnBusy(RadioPlayer player) {
+
+    }
+
+    @Override
+    public void OnStarted(RadioPlayer player) {
+
+    }
+
+    @Override
+    public void OnStopped(RadioPlayer player) {
+
+    }
+
+    @Override
+    public void OnPaused(RadioPlayer player) {
+
     }
 }
