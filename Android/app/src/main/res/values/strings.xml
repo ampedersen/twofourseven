@@ -1,10 +1,8 @@
 <resources>
     <string name="app_name">Radio24syv</string>
 
-    <string name="hello_world">Hello world!</string>
-    <string name="action_settings">Settings</string>
-
     <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_world">Hello world!</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
     <string name="title_activity_intro">IntroActivity</string>
     <string name="title_activity_main">MainActivity</string>
@@ -18,13 +16,16 @@
     <string name="title_fragment_schedule">ScheduleFragment</string>
     <string name="title_fragment_program_details">ProgramDetailsFragment</string>
 
+    <!-- Intro -->
     <string name="intro_next">Videre</string>
 
+    <!-- Main -->
     <string name="tab_live">Live Radio</string>
     <string name="tab_programs">Programs</string>
     <string name="tab_news">Sidste nyt</string>
     <string name="tab_offline">Lyt offline</string>
 
+    <!-- Live Radio -->
     <string name="live_schedule_button">Se sendeplan</string>
 
     <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>
