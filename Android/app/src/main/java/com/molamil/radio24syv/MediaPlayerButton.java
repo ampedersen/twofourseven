@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
 import android.graphics.DrawFilter;
+import android.graphics.Paint;
+import android.graphics.Rect;
+import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.util.TypedValue;
@@ -99,20 +102,47 @@ public class MediaPlayerButton extends Button implements
         }
     }
 
+
+    static Paint greenPaint = null;
+    static Paint redPaint = null;
+
     @Override
     protected void onDraw(Canvas canvas) {
         //setEnabled(isAvailable()); // Disable if action is not available due to the current state of the player
-        if (isAvailable()) {
-            setTextColor(getResources().getColor(android.R.color.holo_green_light));
-        } else {
-            setTextColor(getResources().getColor(android.R.color.holo_red_light));
+
+        if (greenPaint == null) {
+            greenPaint = new Paint();
+            greenPaint.setTextSize(12 * getResources().getDisplayMetrics().scaledDensity);
+            greenPaint.setColor(getResources().getColor(android.R.color.holo_green_light));
         }
-        setTextSize(12);
-        setText(RadioPlayer.getActionName(action));
+        if (redPaint == null) {
+            redPaint = new Paint();
+            redPaint.setTextSize(12 * getResources().getDisplayMetrics().scaledDensity);
+            redPaint.setColor(getResources().getColor(android.R.color.holo_red_light));
+        }
+
+        Paint p;
+        if (isAvailable()) {
+            p = greenPaint;
+        } else {
+            p = redPaint;
+        }
+        drawCenter(canvas, p, RadioPlayer.getActionName(action)); // Draw center(ish)
 
         super.onDraw(canvas);
     }
 
+    // http://stackoverflow.com/a/32081250
+    private void drawCenter(Canvas canvas, Paint paint, String text) {
+        int cHeight = canvas.getClipBounds().height();
+        int cWidth = canvas.getClipBounds().width();
+        Rect r = new Rect();
+        paint.setTextAlign(Paint.Align.LEFT);
+        paint.getTextBounds(text, 0, text.length(), r);
+        float x = cWidth / 2f - r.width() / 2f - r.left;
+        float y = cHeight / 2f + r.height() / 2f - r.bottom;
+        canvas.drawText(text, x, y, paint);
+    }
 
     @Override
     public void OnBusy(RadioPlayer player) {

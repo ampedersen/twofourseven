@@ -161,7 +161,7 @@ public class RadioPlayer {
             case ACTION_PLAY:
                 return true;
             case ACTION_STOP:
-                return (action == ACTION_PLAY);
+                return (action == ACTION_PLAY) || (action == ACTION_PAUSE);
             case ACTION_PAUSE:
                 return (action == ACTION_PLAY);
             case ACTION_NEXT:
