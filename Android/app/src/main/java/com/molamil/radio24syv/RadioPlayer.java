@@ -1,11 +1,15 @@
 package com.molamil.radio24syv;
 
+import android.content.ComponentName;
 import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.AsyncTask;
+import android.os.IBinder;
 import android.provider.MediaStore;
 import android.util.Log;
 
@@ -15,7 +19,7 @@ import java.net.URL;
 import java.util.ArrayList;
 
 /**
- * Encapsulation of the MediaPlayer class. Supports background playback of URL, standard play/pause/etc actions, multiple listener callbacks for player states.
+ * Plays audio and manages the RadioPlayerService. Supports playback of URL, standard play/pause/etc actions, multiple listener callbacks for player states.
  * Created by jens on 14/09/15.
  */
 public class RadioPlayer {
@@ -35,15 +39,40 @@ public class RadioPlayer {
         }
     }
 
-    MediaPlayer player;
+//    MediaPlayer player;
     ArrayList<OnPlaybackListener> listenerList = new ArrayList<>();
     int action = ACTION_STOP;
-    String url;
-    PlayUrlTask task = null;
+//    String url;
+//    PlayUrlTask task = null;
     Context context;
+    RadioPlayerService service = null;
+    boolean isBoundToService;
 
     public RadioPlayer(Context context) {
+        Log.d("JJJ", "Create RadioPlayer - starting radio service");
         this.context = context;
+
+        Intent i = new Intent(context, RadioPlayerService.class);
+        context.startService(i); // Because the service is started using startService() it will keep running even when the host activity is destroyed. It would usually auto-cleanup because we are using bindService().
+        context.bindService(i, serviceConnection, Context.BIND_AUTO_CREATE); // ServiceConnection will assign service reference to our "service" variable
+    }
+
+    public void cleanup() {
+        Log.d("JJJ", "Cleanup RadioPlayer - stopping radio service");
+        if (isBoundToService) {
+            context.unbindService(serviceConnection);
+            Intent i = new Intent(context, RadioPlayerService.class);
+            context.stopService(i);
+        }
+    }
+
+    public String getUrl() {
+        if (isBoundToService) {
+            return service.getUrl();
+        } else {
+            Log.d("JJJ", "Unable to get URL from service because it is not connected");
+            return "";
+        }
     }
 
     public void addListener(OnPlaybackListener listener) {
@@ -162,6 +191,10 @@ public class RadioPlayer {
     }
 
     private boolean isActionAllowed(int newAction) {
+        if (!isBoundToService) {
+            return false; // Return false, we cannot perform any action before we are connected to the service
+        }
+
         switch (newAction) {
             case ACTION_PLAY:
                 return true;
@@ -272,4 +305,22 @@ public class RadioPlayer {
     public interface RadioPlayerProvider {
         public RadioPlayer getRadioPlayer();
     }
+
+    /** Defines callbacks for service binding, passed to bindService() */
+    private ServiceConnection serviceConnection = new ServiceConnection() {
+
+        @Override
+        public void onServiceConnected(ComponentName className, IBinder service) {
+            // We've bound to RadioPlayerService, cast the IBinder and get RadioPlayerService instance
+            RadioPlayerService.RadioPlayerServiceBinder binder = (RadioPlayerService.RadioPlayerServiceBinder) service;
+            RadioPlayer.this.service = binder.getService();
+            RadioPlayer.this.service.setOn
+            isBoundToService = true;
+        }
+
+        @Override
+        public void onServiceDisconnected(ComponentName arg0) {
+            isBoundToService = false;
+        }
+    };
 }

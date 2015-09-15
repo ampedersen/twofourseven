@@ -45,6 +45,17 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
+    protected void onDestroy() {
+        super.onDestroy();
+
+        if (isFinishing()) {
+            if (radioPlayer != null) {
+                radioPlayer.cleanup();
+            }
+        }
+    }
+
+    @Override
     public void onBackPressed() {
         boolean isSidePageInteractionEnabled = pager.isPagingEnabled();
         if (isSidePageInteractionEnabled) {
