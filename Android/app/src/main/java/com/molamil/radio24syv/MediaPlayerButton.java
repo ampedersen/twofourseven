@@ -3,13 +3,10 @@ package com.molamil.radio24syv;
 import android.content.Context;
 import android.content.res.TypedArray;
 import android.graphics.Canvas;
-import android.graphics.DrawFilter;
 import android.graphics.Paint;
 import android.graphics.Rect;
-import android.text.TextPaint;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.View;
 import android.widget.Button;
 
@@ -20,9 +17,10 @@ public class MediaPlayerButton extends Button implements
         View.OnClickListener,
         RadioPlayer.OnPlaybackListener {
 
-    int action;
-    String url;
-    RadioPlayer player;
+    private int action;
+    private String url;
+
+    private RadioPlayer player;
     private boolean isAvailable = true;
 
     public MediaPlayerButton(Context context, AttributeSet attrs) {
@@ -36,7 +34,7 @@ public class MediaPlayerButton extends Button implements
 
         try {
             action = a.getInteger(R.styleable.MediaPlayerButton_action, RadioPlayer.ACTION_PLAY);
-            url = a.getString(R.styleable.MediaPlayerButton_url);
+            setUrl(a.getString(R.styleable.MediaPlayerButton_url));
         } finally {
             a.recycle();
         }
@@ -44,12 +42,20 @@ public class MediaPlayerButton extends Button implements
         setOnClickListener(this);
     }
 
+    public int getAction() {
+        return action;
+    }
+
     public void setAction(int action) {
         this.action = action;
     }
 
-    public int getAction() {
-        return action;
+    public String getUrl() {
+        return url;
+    }
+
+    public void setUrl(String url) {
+        this.url = url;
     }
 
     public void setRadioPlayer(RadioPlayer player) {
@@ -87,7 +93,7 @@ public class MediaPlayerButton extends Button implements
 
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                player.play(url);
+                player.play(getUrl());
                 break;
             case RadioPlayer.ACTION_STOP:
                 player.stop();
@@ -147,25 +153,6 @@ public class MediaPlayerButton extends Button implements
         canvas.drawText(text, x, y, paint);
     }
 
-//    @Override
-//    public void OnBusy(RadioPlayer player) {
-//        setIsAvailable(player.isActionAllowed(url, action));
-//    }
-//
-//    @Override
-//    public void OnStarted(RadioPlayer player) {
-//        setIsAvailable(player.isActionAllowed(url, action));
-//    }
-//
-//    @Override
-//    public void OnStopped(RadioPlayer player) {
-//        setIsAvailable(player.isActionAllowed(url, action));
-//    }
-//
-//    @Override
-//    public void OnPaused(RadioPlayer player) {
-//        setIsAvailable(player.isActionAllowed(url, action));
-//    }
     @Override
     public void OnBusy(RadioPlayer player) {
         setIsAvailable(false);
@@ -175,7 +162,7 @@ public class MediaPlayerButton extends Button implements
     public void OnStarted(RadioPlayer player) {
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                boolean isPlayingMyUrl = (player.url.equals(url));
+                boolean isPlayingMyUrl = (player.url.equals(getUrl()));
                 setIsAvailable(!isPlayingMyUrl); // Enable if not playing our stream
                 break;
             case RadioPlayer.ACTION_STOP:
@@ -239,8 +226,9 @@ public class MediaPlayerButton extends Button implements
         return isAvailable;
     }
 
-    public void setIsAvailable(boolean isAvailable) {
+    private void setIsAvailable(boolean isAvailable) {
         this.isAvailable = isAvailable;
         postInvalidate(); // Redraw view next frame
     }
+
 }

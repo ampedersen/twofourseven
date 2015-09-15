@@ -148,7 +148,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     private void linkButton(RadioPlayer player, View parentView, int buttonId) {
         MediaPlayerButton b = (MediaPlayerButton)parentView.findViewById(buttonId);
-        b.url = player.url;
+        b.setUrl(player.url);
         b.setRadioPlayer(player);
     }
 
