@@ -29,7 +29,7 @@ public class LiveFragment extends PageFragment {
 
     private OnFragmentInteractionListener listener;
     private PlayerFragment.OnFragmentInteractionListener playerListener;
-    private PlayerFragment.RadioPlayerProvider radioPlayerProvider;
+    private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
 
     /**
      * Use this factory method to create a new instance of
@@ -77,21 +77,11 @@ public class LiveFragment extends PageFragment {
             }
         });
 
-//        MediaPlayerButton playButton = (MediaPlayerButton)v.findViewById(R.id.play_button);
-//        playButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (playerListener != null) {
-//                    playerListener.onPlayerControl(PlayerFragment.PlayerAction.PLAY); // TODO custom play button taking care of its own state
-//                }
-//            }
-//        });
-
         return v;
     }
 
     @Override
-    public void onActivityCreated (Bundle savedInstanceState) {
+    public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
         MediaPlayerButton playButton = (MediaPlayerButton)getView().findViewById(R.id.play_button);
@@ -114,7 +104,7 @@ public class LiveFragment extends PageFragment {
                     + " must implement PlayerFragment.OnFragmentInteractionListener");
         }
         try {
-            radioPlayerProvider = (PlayerFragment.RadioPlayerProvider) activity;
+            radioPlayerProvider = (RadioPlayer.RadioPlayerProvider) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement PlayerFragment.RadioPlayerProvider");

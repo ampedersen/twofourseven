@@ -10,7 +10,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 public class MainActivity extends FragmentActivity implements
-        PlayerFragment.RadioPlayerProvider,
+        RadioPlayer.RadioPlayerProvider,
         MainFragment.OnMainFragmentInteractionListener,
         PageFragment.OnFragmentInteractionListener,
         ScheduleFragment.OnFragmentInteractionListener,
@@ -120,31 +120,6 @@ public class MainActivity extends FragmentActivity implements
             mainFragment.setDimming(MainFragment.Dimming.NONE);
         }
     }
-
-//    @Override
-//    public void onPlayerControl(PlayerFragment.PlayerAction action) {
-//        Log.d("JJJ", "onPlayerControl " + action);
-//        PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
-//        if (action == PlayerFragment.PlayerAction.PLAY) {
-//            playerFragment.setPlaying(true);
-//        } else {
-//            playerFragment.setPlaying(false);
-//        }
-
-
-
-//        if (action == PlayerFragment.PlayerAction.PLAY) {
-//                if (radioPlayer == null) {
-//                    radioPlayer = MediaPlayer.create(this, R.raw.test);
-//                }
-//                radioPlayer.start();
-//            } else if (action == PlayerFragment.PlayerAction.STOP) {
-//                if (radioPlayer != null) {
-//                    radioPlayer.stop();
-//                }
-//        }
-
-//    }
 
     @Override
     public void onDimmingChanged(MainFragment.Dimming newDimming, MainFragment.Dimming oldDimming) {

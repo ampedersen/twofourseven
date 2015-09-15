@@ -27,7 +27,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     String title;
 
     OnFragmentInteractionListener mListener;
-    RadioPlayerProvider radioPlayerProvider;
+    RadioPlayer.RadioPlayerProvider radioPlayerProvider;
 
     PlayerSize size = PlayerSize.NONE;
 
@@ -84,26 +84,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             }
         });
 
-//        Button playButton = (Button)v.findViewById(R.id.play_button);
-//        playButton.setOnClickListener(new View.OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                if (mListener != null) {
-//                    if (isPlaying) {
-//                        mListener.onPlayerControl(PlayerAction.STOP);
-//                    } else {
-//                        mListener.onPlayerControl(PlayerAction.PLAY);
-//                    }
-//                }
-//            }
-//        });
-
         updateSize(v);
-//        updatePlayButton(v);
-
-        RadioPlayer player = radioPlayerProvider.getRadioPlayer();
-        player.addListener(this);
-        linkPlaybackButtons(player, v);
 
         return v;
     }
@@ -111,6 +92,10 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     @Override
     public void onActivityCreated (Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
+        RadioPlayer player = radioPlayerProvider.getRadioPlayer();
+        player.addListener(this);
+        linkPlaybackButtons(player, getView());
+
     }
 
     @Override
@@ -123,7 +108,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
                     + " must implement OnFragmentInteractionListener");
         }
         try {
-            radioPlayerProvider = (RadioPlayerProvider) activity;
+            radioPlayerProvider = (RadioPlayer.RadioPlayerProvider) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement PlayerFragment.RadioPlayerProvider");
@@ -163,8 +148,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     private void linkButton(RadioPlayer player, View parentView, int buttonId) {
         MediaPlayerButton b = (MediaPlayerButton)parentView.findViewById(buttonId);
-        b.setRadioPlayer(player);
         b.url = player.url;
+        b.setRadioPlayer(player);
     }
 
     @Override
@@ -177,35 +162,6 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     }
 
-//    boolean isOffline;
-//    boolean isPlaying;
-//
-//    public void setOffline(boolean isOffline) {
-//        this.isOffline = isOffline;
-//        updatePlayButton(getView());
-//    }
-//
-//    public void setPlaying(boolean isPlaying) {
-//        if (size == PlayerSize.NONE) {
-//            setSize(PlayerSize.SMALL);
-//        }
-//        this.isPlaying = isPlaying;
-//        updatePlayButton(getView());
-//    }
-//
-//    private void updatePlayButton(View parentView) {
-//        Button playButton = (Button) parentView.findViewById(R.id.play_button);
-//        if (isPlaying) {
-//            if (isOffline) {
-//                playButton.setText("Pause");
-//            } else {
-//                playButton.setText("Stop");
-//            }
-//        } else {
-//            playButton.setText("Play");
-//        }
-//    }
-
     public void setSize(PlayerSize size) {
         Log.d("JJJ", "player setsize " + size + " was " + this.size);
         if (size == this.size) {
@@ -215,38 +171,42 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         PlayerSize oldSize = this.size;
         this.size = size;
 
-        updateSize(getView());
+        updateSizeSafely(getView());
 
         if (mListener != null) {
             mListener.onPlayerSizeChanged(size, oldSize);
         }
     }
 
-    private void updateSize(final View parentView) {
-        // Delay updating UI until the view's own thread because we may be called from the background thread handling radio playback, and only UI thread can touch UI stuff.
+    private void updateSizeSafely(final View parentView) {
+        // Delay updating UI until the view's own thread. We may be called from the background thread handling radio playback, and only UI thread can touch UI stuff.
         parentView.post(new Runnable() {
             @Override
             public void run() {
-                if (size == PlayerSize.NONE) {
-                    parentView.setVisibility(View.GONE);
-                } else {
-                    parentView.setVisibility(View.VISIBLE);
-                    View bigThingy = parentView.findViewById(R.id.big_thingy);
-                    Button expandButton = (Button) parentView.findViewById(R.id.size_button);
-                    int targetColorId;
-                    if (size == PlayerSize.BIG) {
-                        bigThingy.setVisibility(View.VISIBLE);
-                        expandButton.setText("Small");
-                        targetColorId = R.color.radio_gray_dark;
-                    } else {
-                        bigThingy.setVisibility(View.GONE);
-                        expandButton.setText("Big");
-                        targetColorId = R.color.radio_gray_darker;
-                    }
-                    parentView.setBackgroundColor(getResources().getColor(targetColorId));
-                }
+                updateSize(parentView);
             }
         });
+    }
+
+    private void updateSize(final View parentView) {
+        if (size == PlayerSize.NONE) {
+            parentView.setVisibility(View.GONE);
+        } else {
+            parentView.setVisibility(View.VISIBLE);
+            View bigThingy = parentView.findViewById(R.id.big_thingy);
+            Button expandButton = (Button) parentView.findViewById(R.id.size_button);
+            int targetColorId;
+            if (size == PlayerSize.BIG) {
+                bigThingy.setVisibility(View.VISIBLE);
+                expandButton.setText("Small");
+                targetColorId = R.color.radio_gray_dark;
+            } else {
+                bigThingy.setVisibility(View.GONE);
+                expandButton.setText("Big");
+                targetColorId = R.color.radio_gray_darker;
+            }
+            parentView.setBackgroundColor(getResources().getColor(targetColorId));
+        }
     }
 
     public PlayerSize getSize() {
@@ -267,8 +227,5 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         public void onPlayerSizeChanged(PlayerSize newSize, PlayerSize oldSize);
     }
 
-    public interface RadioPlayerProvider {
-        public RadioPlayer getRadioPlayer();
-    }
 
 }

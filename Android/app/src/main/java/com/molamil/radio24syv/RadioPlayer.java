@@ -49,6 +49,17 @@ public class RadioPlayer {
     public void addListener(OnPlaybackListener listener) {
         if (!listenerList.contains(listener)) {
             listenerList.add(listener);
+
+            // Fire events to reflect current state
+            if (task != null) {
+                listener.OnBusy(RadioPlayer.this);
+            } else if (action == ACTION_PLAY) {
+                listener.OnStarted(RadioPlayer.this);
+            } else if (action == ACTION_STOP) {
+                listener.OnStopped(RadioPlayer.this);
+            } else if (action == ACTION_PAUSE) {
+                listener.OnPaused(RadioPlayer.this);
+            }
         }
     }
 
@@ -69,32 +80,32 @@ public class RadioPlayer {
                 // Internet is happy
             } else {
                 Log.d("JJJ", "Unable to play " + url + " because internet connection is down");
-                setAction(ACTION_STOP);
+                setAction(url, ACTION_STOP);
                 return; // Return, internet is not happy
             }
         }
 
         this.url = url;
-        setAction(ACTION_PLAY);
+        setAction(url, ACTION_PLAY);
     }
 
     public void stop() {
-        setAction(ACTION_STOP);
+        setAction(url, ACTION_STOP);
     }
 
     public void pause() {
-        setAction(ACTION_PAUSE);
+        setAction(url, ACTION_PAUSE);
     }
 
     public void next() {
-        setAction(ACTION_NEXT);
+        setAction(url, ACTION_NEXT);
     }
 
     public void previous() {
-        setAction(ACTION_PREVIOUS);
+        setAction(url, ACTION_PREVIOUS);
     }
 
-    private void setAction(int newAction) {
+    private void setAction(final String url, int newAction) {
         Log.d("JJJ", "setAction " + newAction + " (was " + action + ") + audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
 
         if (!isActionAllowed(newAction)) {
@@ -108,9 +119,7 @@ public class RadioPlayer {
                 if (action == ACTION_PAUSE) {
                     if (player != null) {
                         player.start();
-                        for (OnPlaybackListener l : listenerList) {
-                            l.OnStarted(RadioPlayer.this);
-                        }
+                        callbackStarted();
                     }
                 }
                 else {
@@ -129,9 +138,7 @@ public class RadioPlayer {
                     }
                     player.release();
                     player = null;
-                    for (OnPlaybackListener l : listenerList) {
-                        l.OnStopped(RadioPlayer.this);
-                    }
+                    callbackStopped();
                 }
                 break;
 
@@ -139,9 +146,7 @@ public class RadioPlayer {
                 if (player != null) {
                     player.pause();
                 }
-                for (OnPlaybackListener l : listenerList) {
-                    l.OnPaused(RadioPlayer.this);
-                }
+                callbackPaused();
                 break;
 
             case ACTION_NEXT:
@@ -178,30 +183,16 @@ public class RadioPlayer {
         protected Void doInBackground(String... urls) {
             Log.d("JJJ", urls[0]);
 
-            for (OnPlaybackListener l : listenerList) {
-                l.OnBusy(RadioPlayer.this);
-            }
+            callbackBusy();
 
             // Validate URL
             URL web;
             try {
                 web = new URL(url);
             } catch (MalformedURLException e) {
-                e.printStackTrace();
-                web = null;
-            }
-            if (web != null) {
-                try {
-                    Log.d("JJJ", web.toString());
-                    Log.d("JJJ", web.getContent().toString());
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    web = null;
-                }
-            }
-            if (web == null) {
                 Log.d("JJJ", "Unable play URL because it is not valid " + url);
-                setAction(ACTION_STOP);
+                e.printStackTrace();
+                setAction(url, ACTION_STOP);
                 return null; // Return, bad URL
             }
 
@@ -213,14 +204,14 @@ public class RadioPlayer {
                 if (player.isPlaying()) {
                     player.stop();
                 }
-                player.reset(); // Reset before assigning a new data source
+                player.reset(); // Reset before changing data source
             }
             try {
                 player.setDataSource(web.toString());
             } catch (IOException e) {
                 Log.e("JJJ", "Unable to play URL because of data source error " + url);
                 e.printStackTrace();
-                setAction(ACTION_STOP);
+                setAction(url, ACTION_STOP);
                 return null; // Return, data source error
             }
 
@@ -229,13 +220,11 @@ public class RadioPlayer {
                 try {
                     player.prepare();
                     player.start();
-                    for (OnPlaybackListener l : listenerList) {
-                        l.OnStarted(RadioPlayer.this);
-                    }
+                    callbackStarted();
                 } catch (IOException e) {
                     Log.e("JJJ", "Unable to actually play URL because of some playback error " + url);
                     e.printStackTrace();
-                    setAction(ACTION_STOP);
+                    setAction(url, ACTION_STOP);
                     return null; // Return, playback error
                 }
             }
@@ -244,11 +233,33 @@ public class RadioPlayer {
         }
 
         // onPostExecute displays the results of the AsyncTask.
-//        @Override
-//        protected void onPostExecute(Void nothing) {
-//            if (action == ACTION_PLAY) {
-//            }
-//        }
+        @Override
+        protected void onPostExecute(Void nothing) {
+            task = null;
+        }
+    }
+
+    private void callbackBusy() {
+        for (OnPlaybackListener l : listenerList) {
+            l.OnBusy(RadioPlayer.this);
+        }
+    }
+    private void callbackStarted() {
+        for (OnPlaybackListener l : listenerList) {
+            l.OnStarted(RadioPlayer.this);
+        }
+    }
+
+    private void callbackStopped() {
+        for (OnPlaybackListener l : listenerList) {
+            l.OnStopped(RadioPlayer.this);
+        }
+    }
+
+    private void callbackPaused() {
+        for (OnPlaybackListener l : listenerList) {
+            l.OnPaused(RadioPlayer.this);
+        }
     }
 
     public interface OnPlaybackListener {
@@ -256,5 +267,9 @@ public class RadioPlayer {
         public void OnStarted(RadioPlayer player);
         public void OnStopped(RadioPlayer player);
         public void OnPaused(RadioPlayer player);
+    }
+
+    public interface RadioPlayerProvider {
+        public RadioPlayer getRadioPlayer();
     }
 }

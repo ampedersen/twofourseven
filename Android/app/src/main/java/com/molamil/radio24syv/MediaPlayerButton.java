@@ -96,8 +96,10 @@ public class MediaPlayerButton extends Button implements
                 player.pause();
                 break;
             case RadioPlayer.ACTION_NEXT:
+                player.next();
                 break;
             case RadioPlayer.ACTION_PREVIOUS:
+                player.previous();
                 break;
         }
     }
@@ -127,7 +129,7 @@ public class MediaPlayerButton extends Button implements
         } else {
             p = redPaint;
         }
-        drawCenter(canvas, p, RadioPlayer.getActionName(action)); // Draw center(ish)
+        drawCenter(canvas, p, RadioPlayer.getActionName(action));
 
         super.onDraw(canvas);
     }
@@ -140,10 +142,30 @@ public class MediaPlayerButton extends Button implements
         paint.setTextAlign(Paint.Align.LEFT);
         paint.getTextBounds(text, 0, text.length(), r);
         float x = cWidth / 2f - r.width() / 2f - r.left;
-        float y = cHeight / 2f + r.height() / 2f - r.bottom;
+        //float y = cHeight / 2f + r.height() / 2f - r.bottom;
+        float y = cHeight / 2f + 4; // Hack to use same y position no matter text height
         canvas.drawText(text, x, y, paint);
     }
 
+//    @Override
+//    public void OnBusy(RadioPlayer player) {
+//        setIsAvailable(player.isActionAllowed(url, action));
+//    }
+//
+//    @Override
+//    public void OnStarted(RadioPlayer player) {
+//        setIsAvailable(player.isActionAllowed(url, action));
+//    }
+//
+//    @Override
+//    public void OnStopped(RadioPlayer player) {
+//        setIsAvailable(player.isActionAllowed(url, action));
+//    }
+//
+//    @Override
+//    public void OnPaused(RadioPlayer player) {
+//        setIsAvailable(player.isActionAllowed(url, action));
+//    }
     @Override
     public void OnBusy(RadioPlayer player) {
         setIsAvailable(false);
