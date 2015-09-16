@@ -1,16 +1,17 @@
 package com.molamil.radio24syv;
 
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.AsyncTask;
 import android.os.IBinder;
 import android.provider.MediaStore;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
@@ -24,6 +25,11 @@ import java.util.ArrayList;
  */
 public class RadioPlayer {
 
+    public final static String URL_UNASSIGNED = null;
+    public final static int ACTION_UNASSIGNED = -1;
+    public final static int STATE_UNASSIGNED = -1;
+
+    // Actions that can be performed by the player
     public final static int ACTION_PLAY = 0;
     public final static int ACTION_STOP = 1;
     public final static int ACTION_PAUSE = 2;
@@ -39,14 +45,32 @@ public class RadioPlayer {
         }
     }
 
-//    MediaPlayer player;
+    // States the player can be in
+    public final static int STATE_STOPPED = 0;
+    public final static int STATE_STARTED = 1;
+    public final static int STATE_PAUSED = 2;
+    public final static int STATE_BUSY = 3;
+
+    public static String getStateName(int state) {
+        final String[] names = new String[] { "stopped", "started", "paused", "busy" };
+        try {
+            return names[state];
+        } catch (ArrayIndexOutOfBoundsException e) {
+            return "";
+        }
+    }
+
+    //    MediaPlayer player;
     ArrayList<OnPlaybackListener> listenerList = new ArrayList<>();
-    int action = ACTION_STOP;
-//    String url;
+//    int action = ACTION_STOP;
+    private String url = URL_UNASSIGNED; // Keeps track of the url that was most recently set an action with
 //    PlayUrlTask task = null;
     Context context;
     RadioPlayerService service = null;
     boolean isBoundToService;
+
+    int pendingAction = ACTION_UNASSIGNED; // If the service is not yet bound this action will get performed once bound
+    String pendingUrl = URL_UNASSIGNED;
 
     public RadioPlayer(Context context) {
         Log.d("JJJ", "Create RadioPlayer - starting radio service");
@@ -55,7 +79,28 @@ public class RadioPlayer {
         Intent i = new Intent(context, RadioPlayerService.class);
         context.startService(i); // Because the service is started using startService() it will keep running even when the host activity is destroyed. It would usually auto-cleanup because we are using bindService().
         context.bindService(i, serviceConnection, Context.BIND_AUTO_CREATE); // ServiceConnection will assign service reference to our "service" variable
+
+        // Register to receive messages.
+        // We are registering an observer (mMessageReceiver) to receive Intents
+        // with actions named "custom-event-name".
+        LocalBroadcastManager.getInstance(context).registerReceiver(mMessageReceiver, new IntentFilter(RadioPlayerService.BROADCAST_ID));
     }
+
+    // Our handler for received Intents. This will be called whenever an Intent
+    // with an action named "custom-event-name" is broadcasted.
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            int state = intent.getIntExtra(RadioPlayerService.BROADCAST_STATE, STATE_UNASSIGNED);
+            String url = intent.getStringExtra(RadioPlayerService.BROADCAST_URL);
+            if (url == null) {
+                url = URL_UNASSIGNED;
+            }
+            Log.d("JJJ", "Got message: " + RadioPlayerService.BROADCAST_STATE + " " + getStateName(state) + " " + RadioPlayerService.BROADCAST_URL + " " + url);
+            callback(); // Callback to listeners that something happened
+        }
+    };
 
     public void cleanup() {
         Log.d("JJJ", "Cleanup RadioPlayer - stopping radio service");
@@ -64,31 +109,33 @@ public class RadioPlayer {
             Intent i = new Intent(context, RadioPlayerService.class);
             context.stopService(i);
         }
+
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(context).unregisterReceiver(mMessageReceiver);
     }
 
     public String getUrl() {
         if (isBoundToService) {
-            return service.getUrl();
+            return service.getUrl(); // The actual playing url. Might be different from this.url if the call has not gone through yet.
         } else {
             Log.d("JJJ", "Unable to get URL from service because it is not connected");
-            return "";
+            return URL_UNASSIGNED;
+        }
+    }
+
+    public int getState() {
+        if (isBoundToService) {
+            return service.getState();
+        } else {
+            Log.d("JJJ", "Unable to get state from service because it is not connected");
+            return STATE_UNASSIGNED;
         }
     }
 
     public void addListener(OnPlaybackListener listener) {
         if (!listenerList.contains(listener)) {
             listenerList.add(listener);
-
-            // Fire events to reflect current state
-            if (task != null) {
-                listener.OnBusy(RadioPlayer.this);
-            } else if (action == ACTION_PLAY) {
-                listener.OnStarted(RadioPlayer.this);
-            } else if (action == ACTION_STOP) {
-                listener.OnStopped(RadioPlayer.this);
-            } else if (action == ACTION_PAUSE) {
-                listener.OnPaused(RadioPlayer.this);
-            }
+            callback(listener); // Fire events to reflect current state
         }
     }
 
@@ -98,22 +145,37 @@ public class RadioPlayer {
         }
     }
 
-    public void play(String url) {
-        Log.d("JJJ", "play (was " + action + ") audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
-
-        boolean isLocal = !url.startsWith("http://");
-        if (!isLocal) {
-            ConnectivityManager connMgr = (ConnectivityManager)context.getSystemService(Context.CONNECTIVITY_SERVICE);
-            NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-            if (networkInfo != null && networkInfo.isConnected()) {
-                // Internet is happy
-            } else {
-                Log.d("JJJ", "Unable to play " + url + " because internet connection is down");
-                setAction(url, ACTION_STOP);
-                return; // Return, internet is not happy
-            }
+    private void callback() {
+        for (OnPlaybackListener l : listenerList) {
+            callback(l);
         }
+    }
 
+    private void callback(OnPlaybackListener listener) {
+        if (isBoundToService) {
+            switch (service.getState()) {
+                case STATE_STOPPED:
+                    listener.OnStopped(this);
+                    break;
+                case STATE_STARTED:
+                    listener.OnStarted(this);
+                    break;
+                case STATE_PAUSED:
+                    listener.OnPaused(this);
+                    break;
+                case STATE_BUSY:
+                    listener.OnBusy(this);
+                    break;
+                default:
+                    Log.d("JJJ", "Unable to fire callback event because none is defined for state:" + getStateName(service.getState()));
+                    break;
+            }
+        } else {
+            Log.d("JJJ", "Unable to fire callback event in because service is not bound");
+        }
+    }
+
+    public void play(String url) {
         this.url = url;
         setAction(url, ACTION_PLAY);
     }
@@ -126,173 +188,33 @@ public class RadioPlayer {
         setAction(url, ACTION_PAUSE);
     }
 
-    public void next() {
-        setAction(url, ACTION_NEXT);
-    }
+    public void next() { setAction(url, ACTION_NEXT); }
 
-    public void previous() {
-        setAction(url, ACTION_PREVIOUS);
-    }
+    public void previous() { setAction(url, ACTION_PREVIOUS); }
 
-    private void setAction(final String url, int newAction) {
-        Log.d("JJJ", "setAction " + newAction + " (was " + action + ") + audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
-
-        if (!isActionAllowed(newAction)) {
-            Log.d("JJJ", "Unable to perform action " + newAction + " because it is not allowed while doing action " + action);
-            return; // Return, action is not allowed
-        }
-
-        switch (newAction) {
-
-            case ACTION_PLAY:
-                if (action == ACTION_PAUSE) {
-                    if (player != null) {
-                        player.start();
-                        callbackStarted();
-                    }
-                }
-                else {
-                    if (task != null) {
-                        task.cancel(true);
-                    }
-                    task = new PlayUrlTask();
-                    task.execute(url);
-                }
-                break;
-
-            case ACTION_STOP:
-                if (player != null) {
-                    if (player.isPlaying()) {
-                        player.stop();
-                    }
-                    player.release();
-                    player = null;
-                    callbackStopped();
-                }
-                break;
-
-            case ACTION_PAUSE:
-                if (player != null) {
-                    player.pause();
-                }
-                callbackPaused();
-                break;
-
-            case ACTION_NEXT:
-                Log.d("JJJ", "TODO implement ACTION_NEXT");
-                break;
-
-            case ACTION_PREVIOUS:
-                Log.d("JJJ", "TODO implement ACTION_PREVIOUS");
-                break;
-        }
-
-        action = newAction;
-    }
-
-    private boolean isActionAllowed(int newAction) {
-        if (!isBoundToService) {
-            return false; // Return false, we cannot perform any action before we are connected to the service
-        }
-
-        switch (newAction) {
-            case ACTION_PLAY:
-                return true;
-            case ACTION_STOP:
-                return (action == ACTION_PLAY) || (action == ACTION_PAUSE);
-            case ACTION_PAUSE:
-                return (action == ACTION_PLAY);
-            case ACTION_NEXT:
-                return (action == ACTION_PLAY) || (action == ACTION_STOP) || (action == ACTION_PAUSE);
-            case ACTION_PREVIOUS:
-                return (action == ACTION_PLAY) || (action == ACTION_STOP) || (action == ACTION_PAUSE);
-            default:
-                return true;
+    private void setAction(final String url, int action) {
+        Log.d("JJJ", "setAction " + action + " isBound " + isBoundToService + " " + service + " url " + url);
+        if (isBoundToService) {
+            service.setAction(url, action);
+            clearPendingAction(); // We got hole through to the service, clear pending action
+        } else {
+            Log.d("JJJ", "Unable to set action for service because service is not bound - will set the action when it get bound");
+            setPendingAction(url, action);
         }
     }
 
-    private class PlayUrlTask extends AsyncTask<String, Void, Void> {
-        @Override
-        protected Void doInBackground(String... urls) {
-            Log.d("JJJ", urls[0]);
-
-            callbackBusy();
-
-            // Validate URL
-            URL web;
-            try {
-                web = new URL(url);
-            } catch (MalformedURLException e) {
-                Log.d("JJJ", "Unable play URL because it is not valid " + url);
-                e.printStackTrace();
-                setAction(url, ACTION_STOP);
-                return null; // Return, bad URL
-            }
-
-            // Prepare player
-            if (player == null) {
-                player = new MediaPlayer();
-                player.setAudioStreamType(AudioManager.STREAM_MUSIC);
-            } else {
-                if (player.isPlaying()) {
-                    player.stop();
-                }
-                player.reset(); // Reset before changing data source
-            }
-            try {
-                player.setDataSource(web.toString());
-            } catch (IOException e) {
-                Log.e("JJJ", "Unable to play URL because of data source error " + url);
-                e.printStackTrace();
-                setAction(url, ACTION_STOP);
-                return null; // Return, data source error
-            }
-
-            // Play URL
-            if (action == ACTION_PLAY) {
-                try {
-                    player.prepare();
-                    player.start();
-                    callbackStarted();
-                } catch (IOException e) {
-                    Log.e("JJJ", "Unable to actually play URL because of some playback error " + url);
-                    e.printStackTrace();
-                    setAction(url, ACTION_STOP);
-                    return null; // Return, playback error
-                }
-            }
-
-            return null;
-        }
-
-        // onPostExecute displays the results of the AsyncTask.
-        @Override
-        protected void onPostExecute(Void nothing) {
-            task = null;
-        }
+    private void clearPendingAction() {
+        setPendingAction(URL_UNASSIGNED, ACTION_UNASSIGNED);
     }
 
-    private void callbackBusy() {
-        for (OnPlaybackListener l : listenerList) {
-            l.OnBusy(RadioPlayer.this);
-        }
-    }
-    private void callbackStarted() {
-        for (OnPlaybackListener l : listenerList) {
-            l.OnStarted(RadioPlayer.this);
-        }
+    private boolean isPendingAction() {
+        return (pendingUrl != null) && (!pendingUrl.equals(URL_UNASSIGNED)) && (pendingAction != ACTION_UNASSIGNED);
     }
 
-    private void callbackStopped() {
-        for (OnPlaybackListener l : listenerList) {
-            l.OnStopped(RadioPlayer.this);
-        }
-    }
-
-    private void callbackPaused() {
-        for (OnPlaybackListener l : listenerList) {
-            l.OnPaused(RadioPlayer.this);
-        }
+    private void setPendingAction(String url, int action) {
+        Log.d("JJJ", "set pending action " + getActionName(action) + " url " + url);
+        pendingUrl = url;
+        pendingAction = action;
     }
 
     public interface OnPlaybackListener {
@@ -311,15 +233,21 @@ public class RadioPlayer {
 
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
+            Log.d("JJJ", "Service bound");
             // We've bound to RadioPlayerService, cast the IBinder and get RadioPlayerService instance
             RadioPlayerService.RadioPlayerServiceBinder binder = (RadioPlayerService.RadioPlayerServiceBinder) service;
             RadioPlayer.this.service = binder.getService();
-            RadioPlayer.this.service.setOn
             isBoundToService = true;
+
+            if (isPendingAction()) {
+                Log.d("JJJ", "Executing pending action " + getActionName(pendingAction) + " url " + pendingUrl);
+                setAction(pendingUrl, pendingAction);
+            }
         }
 
         @Override
         public void onServiceDisconnected(ComponentName arg0) {
+            Log.d("JJJ", "Service unbound");
             isBoundToService = false;
         }
     };
