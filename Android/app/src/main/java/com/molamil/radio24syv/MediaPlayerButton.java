@@ -162,7 +162,7 @@ public class MediaPlayerButton extends Button implements
     public void OnStarted(RadioPlayer player) {
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                boolean isPlayingMyUrl = (player.url.equals(getUrl()));
+                boolean isPlayingMyUrl = (player.getUrl().equals(getUrl()));
                 setIsAvailable(!isPlayingMyUrl); // Enable if not playing our stream
                 break;
             case RadioPlayer.ACTION_STOP:

@@ -38,6 +38,10 @@ public class RadioPlayerService extends Service implements
     private String url = RadioPlayer.URL_UNASSIGNED;
     private final IBinder binder = new RadioPlayerServiceBinder(); // Binder given to clients
 
+    private MediaPlayer player;
+    private int action = RadioPlayer.ACTION_STOP;
+    private PlayUrlTask task = null;
+
     @Override
     public void onCreate() {
         // The service is being created
@@ -217,7 +221,7 @@ public class RadioPlayerService extends Service implements
     }
 
     public String getUrl() {
-        return null;
+        return url;
     }
 
     // Send an Intent with an action named "custom-event-name". The Intent sent should
@@ -246,7 +250,7 @@ public class RadioPlayerService extends Service implements
             } catch (MalformedURLException e) {
                 Log.d("JJJ", "Unable play URL because it is not valid " + url);
                 e.printStackTrace();
-                setAction(url, ACTION_STOP);
+                setAction(url, RadioPlayer.ACTION_STOP);
                 return null; // Return, bad URL
             }
 
@@ -265,12 +269,12 @@ public class RadioPlayerService extends Service implements
             } catch (IOException e) {
                 Log.e("JJJ", "Unable to play URL because of data source error " + url);
                 e.printStackTrace();
-                setAction(url, ACTION_STOP);
+                setAction(url, RadioPlayer.ACTION_STOP);
                 return null; // Return, data source error
             }
 
             // Play URL
-            if (action == ACTION_PLAY) {
+            if (action == RadioPlayer.ACTION_PLAY) {
                 try {
                     player.prepare();
                     player.start();
@@ -278,7 +282,7 @@ public class RadioPlayerService extends Service implements
                 } catch (IOException e) {
                     Log.e("JJJ", "Unable to actually play URL because of some playback error " + url);
                     e.printStackTrace();
-                    setAction(url, ACTION_STOP);
+                    setAction(url, RadioPlayer.ACTION_STOP);
                     return null; // Return, playback error
                 }
             }

@@ -6,17 +6,10 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.ServiceConnection;
-import android.media.AudioManager;
-import android.media.MediaPlayer;
-import android.os.AsyncTask;
 import android.os.IBinder;
-import android.provider.MediaStore;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -25,11 +18,8 @@ import java.util.ArrayList;
  */
 public class RadioPlayer {
 
-    public final static String URL_UNASSIGNED = null;
-    public final static int ACTION_UNASSIGNED = -1;
-    public final static int STATE_UNASSIGNED = -1;
-
     // Actions that can be performed by the player
+    public final static int ACTION_UNASSIGNED = -1;
     public final static int ACTION_PLAY = 0;
     public final static int ACTION_STOP = 1;
     public final static int ACTION_PAUSE = 2;
@@ -46,6 +36,7 @@ public class RadioPlayer {
     }
 
     // States the player can be in
+    public final static int STATE_UNASSIGNED = -1;
     public final static int STATE_STOPPED = 0;
     public final static int STATE_STARTED = 1;
     public final static int STATE_PAUSED = 2;
@@ -60,11 +51,11 @@ public class RadioPlayer {
         }
     }
 
-    //    MediaPlayer player;
+    // URL value when unassigned
+    public final static String URL_UNASSIGNED = null;
+
     ArrayList<OnPlaybackListener> listenerList = new ArrayList<>();
-//    int action = ACTION_STOP;
     private String url = URL_UNASSIGNED; // Keeps track of the url that was most recently set an action with
-//    PlayUrlTask task = null;
     Context context;
     RadioPlayerService service = null;
     boolean isBoundToService;
@@ -81,26 +72,10 @@ public class RadioPlayer {
         context.bindService(i, serviceConnection, Context.BIND_AUTO_CREATE); // ServiceConnection will assign service reference to our "service" variable
 
         // Register to receive messages.
-        // We are registering an observer (mMessageReceiver) to receive Intents
+        // We are registering an observer (messageReceiver) to receive Intents
         // with actions named "custom-event-name".
-        LocalBroadcastManager.getInstance(context).registerReceiver(mMessageReceiver, new IntentFilter(RadioPlayerService.BROADCAST_ID));
+        LocalBroadcastManager.getInstance(context).registerReceiver(messageReceiver, new IntentFilter(RadioPlayerService.BROADCAST_ID));
     }
-
-    // Our handler for received Intents. This will be called whenever an Intent
-    // with an action named "custom-event-name" is broadcasted.
-    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            // Get extra data included in the Intent
-            int state = intent.getIntExtra(RadioPlayerService.BROADCAST_STATE, STATE_UNASSIGNED);
-            String url = intent.getStringExtra(RadioPlayerService.BROADCAST_URL);
-            if (url == null) {
-                url = URL_UNASSIGNED;
-            }
-            Log.d("JJJ", "Got message: " + RadioPlayerService.BROADCAST_STATE + " " + getStateName(state) + " " + RadioPlayerService.BROADCAST_URL + " " + url);
-            callback(); // Callback to listeners that something happened
-        }
-    };
 
     public void cleanup() {
         Log.d("JJJ", "Cleanup RadioPlayer - stopping radio service");
@@ -111,7 +86,9 @@ public class RadioPlayer {
         }
 
         // Unregister since the activity is about to be closed.
-        LocalBroadcastManager.getInstance(context).unregisterReceiver(mMessageReceiver);
+        LocalBroadcastManager.getInstance(context).unregisterReceiver(messageReceiver);
+
+        listenerList.clear();
     }
 
     public String getUrl() {
@@ -217,17 +194,6 @@ public class RadioPlayer {
         pendingAction = action;
     }
 
-    public interface OnPlaybackListener {
-        public void OnBusy(RadioPlayer player);
-        public void OnStarted(RadioPlayer player);
-        public void OnStopped(RadioPlayer player);
-        public void OnPaused(RadioPlayer player);
-    }
-
-    public interface RadioPlayerProvider {
-        public RadioPlayer getRadioPlayer();
-    }
-
     /** Defines callbacks for service binding, passed to bindService() */
     private ServiceConnection serviceConnection = new ServiceConnection() {
 
@@ -242,6 +208,8 @@ public class RadioPlayer {
             if (isPendingAction()) {
                 Log.d("JJJ", "Executing pending action " + getActionName(pendingAction) + " url " + pendingUrl);
                 setAction(pendingUrl, pendingAction);
+            } else {
+                callback(); // Make a callback to all listeners about the state of the player service
             }
         }
 
@@ -251,4 +219,32 @@ public class RadioPlayer {
             isBoundToService = false;
         }
     };
+
+    // Our handler for received Intents. This will be called whenever an Intent
+    // with an action named "custom-event-name" is broadcasted.
+    private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // Get extra data included in the Intent
+            int state = intent.getIntExtra(RadioPlayerService.BROADCAST_STATE, STATE_UNASSIGNED);
+            String url = intent.getStringExtra(RadioPlayerService.BROADCAST_URL);
+            if (url == null) {
+                url = URL_UNASSIGNED;
+            }
+            Log.d("JJJ", "Got message: " + RadioPlayerService.BROADCAST_STATE + " " + getStateName(state) + " " + RadioPlayerService.BROADCAST_URL + " " + url);
+
+            callback(); // Callback to listeners that something happened
+        }
+    };
+
+    public interface OnPlaybackListener {
+        public void OnBusy(RadioPlayer player);
+        public void OnStarted(RadioPlayer player);
+        public void OnStopped(RadioPlayer player);
+        public void OnPaused(RadioPlayer player);
+    }
+
+    public interface RadioPlayerProvider {
+        public RadioPlayer getRadioPlayer();
+    }
 }
