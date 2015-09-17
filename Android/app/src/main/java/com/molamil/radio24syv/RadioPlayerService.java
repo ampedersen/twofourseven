@@ -267,11 +267,8 @@ public class RadioPlayerService extends Service implements
         }
     }
 
-    private void updateAudioFocus() {
-        if (state == RadioPlayer.STATE_STARTED) {
-            AudioManager a = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-            a.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-        }
+    public String getUrl() {
+        return url;
     }
 
     public int getState() {
@@ -289,18 +286,18 @@ public class RadioPlayerService extends Service implements
         updateAudioFocus();
     }
 
-    public String getUrl() {
-        return url;
+    private void updateAudioFocus() {
+        if (state == RadioPlayer.STATE_STARTED) {
+            AudioManager a = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+            a.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        }
     }
 
     public void onAudioFocusChange(int focusChange) {
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
-                Log.d("JJJ", "Audiofocus gain");
-//                // resume playback
-//                if (mMediaPlayer == null) initMediaPlayer();
-//                else if (!mMediaPlayer.isPlaying()) mMediaPlayer.start();
-//                mMediaPlayer.setVolume(1.0f, 1.0f);
+                Log.d("JJJ", "Audio focus gained");
+                // Resume playback
                 if (action == RadioPlayer.ACTION_PAUSE) {
                     setAction(url, RadioPlayer.ACTION_PLAY);
                 }
@@ -310,11 +307,8 @@ public class RadioPlayerService extends Service implements
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS:
-                Log.d("JJJ", "Audiofocus loss");
+                Log.d("JJJ", "Audio focus lost");
                 // Lost focus for an unbounded amount of time: stop playback and release media player
-//                if (mMediaPlayer.isPlaying()) mMediaPlayer.stop();
-//                mMediaPlayer.release();
-//                mMediaPlayer = null;
                 if (action == RadioPlayer.ACTION_PLAY) {
                     setAction(url, RadioPlayer.ACTION_PAUSE);
                 } else {
@@ -323,19 +317,14 @@ public class RadioPlayerService extends Service implements
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                Log.d("JJJ", "Audiofocus loss transient");
-                // Lost focus for a short time, but we have to stop
-                // playback. We don't release the media player because playback
-                // is likely to resume
-//                if (mMediaPlayer.isPlaying()) mMediaPlayer.pause();
+                Log.d("JJJ", "Audio focus lost temporarily");
+                // Lost focus for a short time, but we have to stop playback. We don't release the media player because playback is likely to resume.
                 setAction(url, RadioPlayer.ACTION_PAUSE);
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                Log.d("JJJ", "Audiofocus duck");
-                // Lost focus for a short time, but it's ok to keep playing
-                // at an attenuated level
-//                if (mMediaPlayer.isPlaying()) mMediaPlayer.setVolume(0.1f, 0.1f);
+                Log.d("JJJ", "Audio focus duck");
+                // Lost focus for a short time, but it's ok to keep playing at an attenuated level
                 if (player != null) {
                     player.setVolume(0.2f, 0.2f);
                 }
@@ -382,7 +371,7 @@ public class RadioPlayerService extends Service implements
                 }
                 player.reset(); // Reset before changing data source
             }
-            player.setVolume(1, 1);
+            player.setVolume(1, 1); // Always play at full volume when pressing play
             try {
                 player.setDataSource(web.toString());
             } catch (IOException e) {
