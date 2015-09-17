@@ -7,9 +7,11 @@ import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
+import android.os.PowerManager;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
@@ -43,11 +45,14 @@ public class RadioPlayerService extends Service implements
     private MediaPlayer player;
     private int action = RadioPlayer.ACTION_STOP;
     private PlayUrlTask task = null;
+    private WifiManager.WifiLock wifiLock; // Used to keeps wifi running while streaming
 
     @Override
     public void onCreate() {
         // The service is being created
         // TODO start as foreground + notifications on lock screen
+        wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "playerLock");
+        wifiLock.setReferenceCounted(false); // For convenience, do not keep track of how many times the lock has been required. Release it when release() is called no matter what.
     }
 
     @Override
@@ -68,13 +73,15 @@ public class RadioPlayerService extends Service implements
         // TODO cleanup
     }
 
+    private boolean isLocalUrl(final String url) {
+        return !url.startsWith("http://");
+    }
     private boolean isConnectedToInternetIfNeeded(final String url, int action) {
         if (action == RadioPlayer.ACTION_STOP) {
             return true; // Does not need internet
         }
 
-        boolean isLocal = !url.startsWith("http://");
-        if (isLocal) {
+        if (isLocalUrl(url)) {
             return true; // Does not need internet
         } else {
             ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -232,6 +239,7 @@ public class RadioPlayerService extends Service implements
             Log.d("JJJ", urls[0]);
 
             setState(RadioPlayer.STATE_BUSY);
+            url = urls[0];
 
             // Validate URL
             URL web;
@@ -248,6 +256,7 @@ public class RadioPlayerService extends Service implements
             if (player == null) {
                 player = new MediaPlayer();
                 player.setAudioStreamType(AudioManager.STREAM_MUSIC);
+                player.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK); // Keep CPU awake while playback is started and release the CPU when stopped/paused
             } else {
                 if (player.isPlaying()) {
                     player.stop();
@@ -263,6 +272,13 @@ public class RadioPlayerService extends Service implements
                 return null; // Return, data source error
             }
 
+            // Keep wifi awake if streaming
+            if (isLocalUrl(url)) {
+                wifiLock.release();
+            } else {
+                wifiLock.acquire();
+            }
+
             // Play URL
             if (action == RadioPlayer.ACTION_PLAY) {
                 try {
@@ -270,7 +286,7 @@ public class RadioPlayerService extends Service implements
                     player.start();
                     setState(RadioPlayer.STATE_STARTED);
                 } catch (IOException e) {
-                    Log.e("JJJ", "Unable to actually play URL because of some playback error " + url);
+                    Log.e("JJJ", "Unable to play URL because of some playback error " + url);
                     e.printStackTrace();
                     setAction(url, RadioPlayer.ACTION_STOP);
                     return null; // Return, playback error
