@@ -1,17 +1,28 @@
 package com.molamil.radio24syv;
 
 import android.content.BroadcastReceiver;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
+import android.content.ServiceConnection;
+import android.os.IBinder;
 import android.util.Log;
 
 public class AudioIntentReceiver extends BroadcastReceiver {
+
     @Override
-    public void onReceive(Context ctx, Intent intent) {
+    public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
-            // signal your service to stop playback
-            // (via an Intent, for instance)
-            Log.d("JJJ", "TODO signal service to pause playback because headphones got unplugged");
+            Log.d("JJJ", "Headphones unplugged");
+            Intent i = new Intent(context, RadioPlayerService.class);
+            RadioPlayerService.RadioPlayerServiceBinder binder = (RadioPlayerService.RadioPlayerServiceBinder) peekService(context, i);
+            if (binder != null) {
+                Log.d("JJJ", "Pausing playback");
+                RadioPlayerService player = binder.getService();
+                player.setAction(player.getUrl(), RadioPlayer.ACTION_PAUSE);
+            } else {
+                Log.d("JJJ", "Unable to pause playback because the service is not started (null)");
+            }
         }
     }
 }

@@ -403,6 +403,11 @@ public class RadioPlayerService extends Service implements
                     e.printStackTrace();
                     setAction(url, RadioPlayer.ACTION_STOP);
                     return null; // Return, playback error
+                } catch (IllegalStateException e) {
+                    Log.e("JJJ", "Unable to play URL because player is in an unexpected state (maybe headphones got unplugged while buffering?) " + url);
+                    e.printStackTrace();
+                    setAction(url, RadioPlayer.ACTION_STOP);
+                    return null; // Return, playback error
                 }
             }
 
