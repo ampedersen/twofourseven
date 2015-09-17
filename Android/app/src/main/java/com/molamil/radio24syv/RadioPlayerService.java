@@ -1,10 +1,16 @@
 package com.molamil.radio24syv;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.drawable.BitmapDrawable;
+import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
@@ -14,12 +20,15 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.security.acl.NotOwnerException;
 
 /**
  * Encapsulates MediaPlayer and makes it possible to keep playing audio even when app is sent to background.
@@ -218,22 +227,50 @@ public class RadioPlayerService extends Service implements
             // to ensure that users are aware of the running service and allow them to open an activity that can interact with the service.
             String audioTitle = "Live radio"; // TODO get audio title from AudioInfo class thingy
             String audioDescription = "This is an audio description"; // TODO audio description
-            int iconId = R.drawable.tab_icon; // TODO icon for player state
+//            String audioInfo = null; // TODO audio info (not needed, remove it if unwanted)
+            int smallIconId = R.drawable.tab_icon; // TODO icon for player state
 
             // Start MainActivity when notification is touched
-            PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
+            PendingIntent intent = PendingIntent.getActivity(getApplicationContext(), 0,
                     new Intent(getApplicationContext(), MainActivity.class),
                     PendingIntent.FLAG_UPDATE_CURRENT);
 
-            Notification notification = new Notification();
-            notification.tickerText = audioDescription;
-            notification.icon = iconId;
-            notification.flags |= Notification.FLAG_ONGOING_EVENT;
-            notification.setLatestEventInfo(getApplicationContext(), "MusicPlayerSample", audioTitle, pi);
+            // Get app icon
+            Bitmap largeIcon;
+            try {
+                largeIcon = ((BitmapDrawable) getPackageManager().getApplicationIcon(getApplicationContext().getPackageName())).getBitmap(); // Get app icon
+            } catch (PackageManager.NameNotFoundException e) {
+                largeIcon = null; // Null means only the action icon will be used (e.g. play symbol). This will not happen anyway, our app always exists.
+                Log.d("JJJ", "Unable to get app icon because of " + e.getMessage());
+                e.printStackTrace();
+            }
+
+            // Create lock screen widget thingy
+            Notification notification = new NotificationCompat.Builder(getApplicationContext())
+                    .setContentTitle(audioTitle)
+                    .setContentText(audioDescription)
+//                    .setContentInfo(audioInfo)
+                    .setSmallIcon(smallIconId)
+                    .setLargeIcon(largeIcon)
+                    .setOngoing(true)
+                    .setShowWhen(false) // No timestamp (Android 5)
+                    .setWhen(0) // No timestamp (Android 4)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC) // Show everywhere
+                    .setPriority(Notification.PRIORITY_MAX) // Show at top in list
+                    .setContentIntent(intent)
+                    .build();
+
             startForeground(NOTIFICATION_ID, notification);
         } else {
             Log.d("JJJ", "Run in background " + RadioPlayer.getActionName(action));
             stopForeground(true); // TODO keep notification if paused?
+        }
+    }
+
+    private void updateAudioFocus() {
+        if (state == RadioPlayer.STATE_STARTED) {
+            AudioManager a = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+            a.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         }
     }
 
@@ -248,6 +285,8 @@ public class RadioPlayerService extends Service implements
 
         state = newState;
         sendMessage();
+
+        updateAudioFocus();
     }
 
     public String getUrl() {
@@ -255,34 +294,53 @@ public class RadioPlayerService extends Service implements
     }
 
     public void onAudioFocusChange(int focusChange) {
-//        switch (focusChange) {
-//            case AudioManager.AUDIOFOCUS_GAIN:
+        switch (focusChange) {
+            case AudioManager.AUDIOFOCUS_GAIN:
+                Log.d("JJJ", "Audiofocus gain");
 //                // resume playback
 //                if (mMediaPlayer == null) initMediaPlayer();
 //                else if (!mMediaPlayer.isPlaying()) mMediaPlayer.start();
 //                mMediaPlayer.setVolume(1.0f, 1.0f);
-//                break;
-//
-//            case AudioManager.AUDIOFOCUS_LOSS:
-//                // Lost focus for an unbounded amount of time: stop playback and release media player
+                if (action == RadioPlayer.ACTION_PAUSE) {
+                    setAction(url, RadioPlayer.ACTION_PLAY);
+                }
+                if (player != null) {
+                    player.setVolume(1, 1);
+                }
+                break;
+
+            case AudioManager.AUDIOFOCUS_LOSS:
+                Log.d("JJJ", "Audiofocus loss");
+                // Lost focus for an unbounded amount of time: stop playback and release media player
 //                if (mMediaPlayer.isPlaying()) mMediaPlayer.stop();
 //                mMediaPlayer.release();
 //                mMediaPlayer = null;
-//                break;
-//
-//            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-//                // Lost focus for a short time, but we have to stop
-//                // playback. We don't release the media player because playback
-//                // is likely to resume
+                if (action == RadioPlayer.ACTION_PLAY) {
+                    setAction(url, RadioPlayer.ACTION_PAUSE);
+                } else {
+                    setAction(url, RadioPlayer.ACTION_STOP);
+                }
+                break;
+
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
+                Log.d("JJJ", "Audiofocus loss transient");
+                // Lost focus for a short time, but we have to stop
+                // playback. We don't release the media player because playback
+                // is likely to resume
 //                if (mMediaPlayer.isPlaying()) mMediaPlayer.pause();
-//                break;
-//
-//            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-//                // Lost focus for a short time, but it's ok to keep playing
-//                // at an attenuated level
+                setAction(url, RadioPlayer.ACTION_PAUSE);
+                break;
+
+            case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
+                Log.d("JJJ", "Audiofocus duck");
+                // Lost focus for a short time, but it's ok to keep playing
+                // at an attenuated level
 //                if (mMediaPlayer.isPlaying()) mMediaPlayer.setVolume(0.1f, 0.1f);
-//                break;
-//        }
+                if (player != null) {
+                    player.setVolume(0.2f, 0.2f);
+                }
+                break;
+        }
     }
 
     // Send an Intent with an action named BROADCAST_ID. The Intent sent can be received by connected clients (which is just the RadioPlayer for now).
@@ -324,6 +382,7 @@ public class RadioPlayerService extends Service implements
                 }
                 player.reset(); // Reset before changing data source
             }
+            player.setVolume(1, 1);
             try {
                 player.setDataSource(web.toString());
             } catch (IOException e) {

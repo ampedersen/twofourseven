@@ -25,6 +25,7 @@
             </intent-filter>
         </activity>
 
+        <!-- launchMode="singleTop" tells Android to not launch a new instance of MainActivity when it is activated by pressing the lock screen widget -->
         <activity
             android:name=".MainActivity"
             android:label="@string/title_activity_main"
