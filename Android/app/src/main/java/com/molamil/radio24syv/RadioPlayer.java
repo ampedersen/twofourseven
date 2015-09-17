@@ -81,8 +81,11 @@ public class RadioPlayer {
         Log.d("JJJ", "Cleanup RadioPlayer - stopping radio service");
         if (isBoundToService) {
             context.unbindService(serviceConnection);
-            Intent i = new Intent(context, RadioPlayerService.class);
-            context.stopService(i);
+            if (getState() != STATE_STARTED) {
+                Log.d("JJJ", "calling stopService() because nothing is playing");
+                Intent i = new Intent(context, RadioPlayerService.class);
+                context.stopService(i);
+            }
         }
 
         // Unregister since the activity is about to be closed.

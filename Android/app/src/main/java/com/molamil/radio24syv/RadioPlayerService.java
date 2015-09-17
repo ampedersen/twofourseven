@@ -1,5 +1,7 @@
 package com.molamil.radio24syv;
 
+import android.app.Notification;
+import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
@@ -37,6 +39,8 @@ public class RadioPlayerService extends Service implements
     public final static String BROADCAST_STATE = "State";
     public final static String BROADCAST_URL = "Url";
 
+    private final static int NOTIFICATION_ID = 1; // Lock screen notification ID. Must not be 0.
+
     private final IBinder binder = new RadioPlayerServiceBinder(); // Binder given to clients
 
     private int state = RadioPlayer.STATE_STOPPED;
@@ -68,13 +72,30 @@ public class RadioPlayerService extends Service implements
     }
 
     @Override
+    public boolean onUnbind (Intent intent) {
+        Log.d("JJJ", "service onUnbind");
+//        setAction(url, RadioPlayer.ACTION_STOP);
+//        cleanup();
+        return super.onUnbind(intent);
+    }
+
+    @Override
     public void onDestroy() {
         // The service is no longer used and is being destroyed
         // TODO cleanup
+        Log.d("JJJ", "service onDestroy");
+        cleanup();
+    }
+
+    private void cleanup() {
+        if (player != null) {
+            player.release();
+            player = null;
+        }
     }
 
     private boolean isLocalUrl(final String url) {
-        return !url.startsWith("http://");
+        return (url == RadioPlayer.URL_UNASSIGNED) || (!url.startsWith("http://"));
     }
     private boolean isConnectedToInternetIfNeeded(final String url, int action) {
         if (action == RadioPlayer.ACTION_STOP) {
@@ -97,7 +118,7 @@ public class RadioPlayerService extends Service implements
     }
 
     public void setAction(final String url, int newAction) {
-        Log.d("JJJ", "setAction " + newAction + " (was " + action + ") + audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
+        Log.d("JJJ", "service setAction " + RadioPlayer.getActionName(newAction) + " (was " + RadioPlayer.getActionName(action) + ") + audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
 
         if (!isActionAllowed(newAction)) {
             Log.d("JJJ", "Unable to perform action " + newAction + " because it is not allowed while doing action " + action);
@@ -157,6 +178,9 @@ public class RadioPlayerService extends Service implements
         }
 
         action = newAction;
+
+        updateWifiLock();
+        updateRunInForeground();
     }
 
     private boolean isActionAllowed(int newAction) {
@@ -173,6 +197,43 @@ public class RadioPlayerService extends Service implements
                 return (action == RadioPlayer.ACTION_PLAY) || (action == RadioPlayer.ACTION_STOP) || (action == RadioPlayer.ACTION_PAUSE);
             default:
                 return true;
+        }
+    }
+
+    private void updateWifiLock() {
+        boolean isPlayingOnlineStream = (action == RadioPlayer.ACTION_PLAY) && (!isLocalUrl(url));
+        if (isPlayingOnlineStream) {
+            Log.d("JJJ", "Wifi lock on");
+            wifiLock.acquire();
+        } else {
+            Log.d("JJJ", "Wifi lock off");
+            wifiLock.release();
+        }
+    }
+
+    private void updateRunInForeground() {
+        if (action == RadioPlayer.ACTION_PLAY) {
+            Log.d("JJJ", "Run in foreground " + RadioPlayer.getActionName(action));
+            // When running in the foreground, the service also must provide a status bar notification
+            // to ensure that users are aware of the running service and allow them to open an activity that can interact with the service.
+            String audioTitle = "Live radio"; // TODO get audio title from AudioInfo class thingy
+            String audioDescription = "This is an audio description"; // TODO audio description
+            int iconId = R.drawable.tab_icon; // TODO icon for player state
+
+            // Start MainActivity when notification is touched
+            PendingIntent pi = PendingIntent.getActivity(getApplicationContext(), 0,
+                    new Intent(getApplicationContext(), MainActivity.class),
+                    PendingIntent.FLAG_UPDATE_CURRENT);
+
+            Notification notification = new Notification();
+            notification.tickerText = audioDescription;
+            notification.icon = iconId;
+            notification.flags |= Notification.FLAG_ONGOING_EVENT;
+            notification.setLatestEventInfo(getApplicationContext(), "MusicPlayerSample", audioTitle, pi);
+            startForeground(NOTIFICATION_ID, notification);
+        } else {
+            Log.d("JJJ", "Run in background " + RadioPlayer.getActionName(action));
+            stopForeground(true); // TODO keep notification if paused?
         }
     }
 
@@ -270,13 +331,6 @@ public class RadioPlayerService extends Service implements
                 e.printStackTrace();
                 setAction(url, RadioPlayer.ACTION_STOP);
                 return null; // Return, data source error
-            }
-
-            // Keep wifi awake if streaming
-            if (isLocalUrl(url)) {
-                wifiLock.release();
-            } else {
-                wifiLock.acquire();
             }
 
             // Play URL
