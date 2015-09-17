@@ -18,7 +18,7 @@ import java.net.MalformedURLException;
 import java.net.URL;
 
 /**
- * Encapsulates MediaPlayer and keeps playing audio even when app is sent to background.
+ * Encapsulates MediaPlayer and makes it possible to keep playing audio even when app is sent to background.
  * Created by jens on 15/09/15.
  */
 public class RadioPlayerService extends Service implements
@@ -30,13 +30,15 @@ public class RadioPlayerService extends Service implements
 //        MediaPlayer.OnSeekCompleteListener,
         AudioManager.OnAudioFocusChangeListener {
 
+    // Broadcast IDs used when sending messages to connected clients
     public final static String BROADCAST_ID = "RadioPlayerServiceEvent";
     public final static String BROADCAST_STATE = "State";
     public final static String BROADCAST_URL = "Url";
 
+    private final IBinder binder = new RadioPlayerServiceBinder(); // Binder given to clients
+
     private int state = RadioPlayer.STATE_STOPPED;
     private String url = RadioPlayer.URL_UNASSIGNED;
-    private final IBinder binder = new RadioPlayerServiceBinder(); // Binder given to clients
 
     private MediaPlayer player;
     private int action = RadioPlayer.ACTION_STOP;
@@ -64,19 +66,6 @@ public class RadioPlayerService extends Service implements
     public void onDestroy() {
         // The service is no longer used and is being destroyed
         // TODO cleanup
-    }
-
-    public int getState() {
-//        if (task != null) {
-//            return State.BUSY;
-//        } else if (action == ACTION_PLAY) {
-//            return State.STARTED;
-//        } else if (action == ACTION_STOP) {
-//            return State.STOPPED;
-//        } else if (action == ACTION_PAUSE) {
-//            return State.PAUSED;
-//        }
-        return state;
     }
 
     private boolean isConnectedToInternetIfNeeded(final String url, int action) {
@@ -180,6 +169,10 @@ public class RadioPlayerService extends Service implements
         }
     }
 
+    public int getState() {
+        return state;
+    }
+
     private void setState(int newState) {
         if (newState == state) {
             return; // Return, no change in state
@@ -187,6 +180,10 @@ public class RadioPlayerService extends Service implements
 
         state = newState;
         sendMessage();
+    }
+
+    public String getUrl() {
+        return url;
     }
 
     public void onAudioFocusChange(int focusChange) {
@@ -220,21 +217,14 @@ public class RadioPlayerService extends Service implements
 //        }
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    // Send an Intent with an action named "custom-event-name". The Intent sent should
-    // be received by the ReceiverActivity.
+    // Send an Intent with an action named BROADCAST_ID. The Intent sent can be received by connected clients (which is just the RadioPlayer for now).
     private void sendMessage() {
-        Log.d("JJJ", "Broadcasting message");
+        Log.d("JJJ", "Sending message: " + RadioPlayerService.BROADCAST_STATE + " " + RadioPlayer.getStateName(state) + " " + RadioPlayerService.BROADCAST_URL + " " + url);
         Intent intent = new Intent(BROADCAST_ID);
-        // You can also include some extra data.
         intent.putExtra(BROADCAST_STATE, state);
         intent.putExtra(BROADCAST_URL, url);
-        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent); // Use LocalBroadcastManager to send messages to listeners within our own process. It is fast and we do not need to specify all sorts of intents & actions in the manifest when using this.
     }
-
 
     private class PlayUrlTask extends AsyncTask<String, Void, Void> {
         @Override

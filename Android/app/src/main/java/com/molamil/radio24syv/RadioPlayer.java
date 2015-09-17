@@ -194,7 +194,7 @@ public class RadioPlayer {
         pendingAction = action;
     }
 
-    /** Defines callbacks for service binding, passed to bindService() */
+    // Defines callbacks for service binding, passed to bindService()
     private ServiceConnection serviceConnection = new ServiceConnection() {
 
         @Override
@@ -220,11 +220,11 @@ public class RadioPlayer {
         }
     };
 
-    // Our handler for received Intents. This will be called whenever an Intent
-    // with an action named "custom-event-name" is broadcasted.
+    // Our handler for received Intents. This will be called whenever an Intent with an action named BROADCAST_ID is broadcasted.
     private BroadcastReceiver messageReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+
             // Get extra data included in the Intent
             int state = intent.getIntExtra(RadioPlayerService.BROADCAST_STATE, STATE_UNASSIGNED);
             String url = intent.getStringExtra(RadioPlayerService.BROADCAST_URL);
