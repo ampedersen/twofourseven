@@ -21,7 +21,7 @@
 
     <!-- Main -->
     <string name="tab_live">Live radio</string>
-    <string name="tab_programs">Programs</string>
+    <string name="tab_programs">Programmer</string>
     <string name="tab_news">Sidste nyt</string>
     <string name="tab_offline">Lyt offline</string>
 
