@@ -181,11 +181,13 @@ public class RadioPlayerService extends Service implements
                 break;
 
             case RadioPlayer.ACTION_NEXT:
-                Log.d("JJJ", "TODO implement ACTION_NEXT");
+                Log.d("JJJ", "TODO implement ACTION_NEXT - ignoring");
+                newAction = action; // Ignore new action
                 break;
 
             case RadioPlayer.ACTION_PREVIOUS:
-                Log.d("JJJ", "TODO implement ACTION_PREVIOUS");
+                Log.d("JJJ", "TODO implement ACTION_PREVIOUS - ignoring");
+                newAction = action; // Ignore new action
                 break;
         }
 
