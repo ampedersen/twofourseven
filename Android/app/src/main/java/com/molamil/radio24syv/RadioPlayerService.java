@@ -97,6 +97,9 @@ public class RadioPlayerService extends Service implements
     }
 
     private void cleanup() {
+        if (task != null) {
+            task.cancel(true);
+        }
         if (player != null) {
             player.release();
             player = null;

@@ -9,8 +9,17 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 
+import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.api.model.Broadcast;
+
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
+
+import java.util.List;
+
+import retrofit.Call;
+import retrofit.Callback;
+import retrofit.Response;
 
 public class MainActivity extends FragmentActivity implements
         RadioPlayer.RadioPlayerProvider,
@@ -48,6 +57,45 @@ public class MainActivity extends FragmentActivity implements
 
         // Hockeyapp
         checkForUpdates();
+
+        RestClient rest = new RestClient();
+        List<Broadcast> list = null;
+//        try {
+//            list = rest.getApi().getBroadcasts().execute().body();
+//        } catch (IOException e) {
+//            Log.d("JJJ", "Rest fail: " + e.getMessage());
+//            e.printStackTrace();
+//        }
+
+//        rest.getApi().getBroadcasts(new Callback<List<Broadcast>>() {
+//            @Override
+//            public void onResponse(Response<List<Broadcast>> response) {
+//                for (Broadcast b : response.body()) {
+//                    Log.d("JJJ", b.getDescriptionText());
+//                }
+//            }
+//
+//            @Override
+//            public void onFailure(Throwable t) {
+//                Log.d("JJJ", "Rest fail " + t.getMessage());
+//                t.printStackTrace();
+//            }
+//        });
+        Call<List<Broadcast>> call = rest.getApi().getBroadcasts();
+        call.enqueue(new Callback<List<Broadcast>>() {
+            @Override
+            public void onResponse(Response<List<Broadcast>> response) {
+                for (Broadcast b : response.body()) {
+                    Log.d("JJJ", b.getDescriptionText());
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                Log.d("JJJ", "Rest fail " + t.getMessage());
+                t.printStackTrace();
+            }
+        });
     }
 
     @Override
