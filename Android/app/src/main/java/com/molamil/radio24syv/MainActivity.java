@@ -9,6 +9,9 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
 
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.UpdateManager;
+
 public class MainActivity extends FragmentActivity implements
         RadioPlayer.RadioPlayerProvider,
         MainFragment.OnMainFragmentInteractionListener,
@@ -42,6 +45,9 @@ public class MainActivity extends FragmentActivity implements
         pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
 
         radioPlayer = new RadioPlayer(this);
+
+        // Hockeyapp
+        checkForUpdates();
     }
 
     @Override
@@ -53,6 +59,22 @@ public class MainActivity extends FragmentActivity implements
                 radioPlayer.cleanup();
             }
         }
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        // Hockeyapp
+        if (BuildConfig.HOCKEYAPP_UPDATES_ENABLED) {
+            UpdateManager.unregister();
+        }
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        // Hockeyapp
+        checkForCrashes();
     }
 
     @Override
@@ -95,12 +117,18 @@ public class MainActivity extends FragmentActivity implements
         switch (side) {
             case HIDE:
                 pager.setCurrentItem(mainPagePosition);
+                mainFragment.setTabSize(MainFragment.TabSize.NORMAL);
                 break;
             case SHOW_LEFT:
                 pager.setCurrentItem(mainPagePosition - 1);
+                mainFragment.setTabSize(MainFragment.TabSize.SMALL);
                 break;
             case SHOW_RIGHT:
                 pager.setCurrentItem(mainPagePosition + 1);
+                mainFragment.setTabSize(MainFragment.TabSize.SMALL);
+                break;
+            case SHOW_SUB_PAGE:
+                mainFragment.setTabSize(MainFragment.TabSize.SMALL);
                 break;
         }
     }
@@ -179,11 +207,27 @@ public class MainActivity extends FragmentActivity implements
         if (playerFragment.getSize() == PlayerFragment.PlayerSize.BIG) {
             playerFragment.setSize(PlayerFragment.PlayerSize.SMALL);
         }
+
+        // Normal tab size
+        mainFragment.setTabSize(MainFragment.TabSize.NORMAL);
     }
 
     @Override
     public RadioPlayer getRadioPlayer() {
         return radioPlayer;
+    }
+
+    // Hockeyapp
+    private void checkForCrashes() {
+        CrashManager.register(this, BuildConfig.HOCKEYAPP_APP_ID);
+    }
+
+    // Hockeyapp
+    private void checkForUpdates() {
+        // Remove this for store / production builds!
+        if (BuildConfig.HOCKEYAPP_UPDATES_ENABLED) {
+            UpdateManager.register(this, BuildConfig.HOCKEYAPP_APP_ID);
+        }
     }
 
     /*

@@ -10,7 +10,10 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TabHost;
+import android.widget.TabWidget;
 import android.widget.TextView;
+
+import java.util.ArrayList;
 
 public class MainFragment extends Fragment {
 
@@ -22,6 +25,10 @@ public class MainFragment extends Fragment {
     public enum Dimming { NONE, DIM }
     static final long DIMMING_DURATION_MS = 500;
     Dimming dimming = Dimming.NONE;
+
+    public enum TabSize { NORMAL, SMALL }
+    TabSize tabSize = TabSize.NORMAL;
+    ArrayList<ImageView> tabIcons;
 
     OnMainFragmentInteractionListener listener;
     FragmentTabHost tabHost;
@@ -50,6 +57,7 @@ public class MainFragment extends Fragment {
         });
 
         tabHost.setCurrentTab(0);
+        updateTabSize();
 
 //        if (playerFragment == null) {
 //            playerFragment = new PlayerFragment();
@@ -165,6 +173,30 @@ public class MainFragment extends Fragment {
             dimmer.animate().alpha(targetAlpha).setDuration(DIMMING_DURATION_MS);
         } else {
             dimmer.setAlpha(targetAlpha);
+        }
+    }
+
+    public void setTabSize(TabSize tabSize) {
+        if (tabSize == this.tabSize) {
+            return; // Return, already sized like that
+        }
+
+        this.tabSize = tabSize;
+        updateTabSize();
+    }
+
+    private void updateTabSize() {
+        int iconVisibility;
+        if (tabSize == TabSize.NORMAL) {
+            iconVisibility = View.VISIBLE; // Show icon for normal tab size
+        } else {
+            iconVisibility = View.GONE; // Hide icon for small tab size
+        }
+
+        TabWidget tabs = tabHost.getTabWidget();
+        for (int i = 0; i < tabs.getTabCount(); i++) {
+            View indicator = tabs.getChildTabViewAt(i);
+            indicator.findViewById(R.id.tab_indicator_icon).setVisibility(iconVisibility);
         }
     }
 

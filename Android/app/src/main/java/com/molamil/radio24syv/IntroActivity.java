@@ -8,7 +8,8 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-
+import net.hockeyapp.android.CrashManager;
+import net.hockeyapp.android.UpdateManager;
 
 public class IntroActivity extends Activity {
 
@@ -37,4 +38,5 @@ public class IntroActivity extends Activity {
         startActivity(i);
         finish(); // Stop this activity
     }
+
 }

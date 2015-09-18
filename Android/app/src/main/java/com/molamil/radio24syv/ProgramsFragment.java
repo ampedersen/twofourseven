@@ -15,7 +15,7 @@ import android.view.ViewGroup;
 
 public class ProgramsFragment extends PageFragment {
 
-    OnFragmentInteractionListener mListener;
+    OnFragmentInteractionListener listener;
 
     RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
     SidePageTransformer pageTransformer;
@@ -50,13 +50,15 @@ public class ProgramsFragment extends PageFragment {
             public void onPageSelected(int position) {
                 switch (position) {
                     case 0:
-                        if (mListener != null) {
-                            mListener.onEnableSidePageInteraction(true);
+                        if (listener != null) {
+                            listener.onEnableSidePageInteraction(true);
+                            listener.onShowSidePage(PageFragment.OnFragmentInteractionListener.Side.HIDE); // No side page shown
                         }
                         break;
                     case 1:
-                        if (mListener != null) {
-                            mListener.onEnableSidePageInteraction(false);
+                        if (listener != null) {
+                            listener.onEnableSidePageInteraction(false);
+                            listener.onShowSidePage(PageFragment.OnFragmentInteractionListener.Side.SHOW_SUB_PAGE); // Showing sub page
                         }
                         break;
                 }
@@ -85,7 +87,7 @@ public class ProgramsFragment extends PageFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            listener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -95,7 +97,7 @@ public class ProgramsFragment extends PageFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public boolean isShowingDetails() {
