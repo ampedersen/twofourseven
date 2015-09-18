@@ -25,8 +25,14 @@
     <string name="tab_news">Sidste nyt</string>
     <string name="tab_offline">Lyt offline</string>
 
-    <!-- Live Radio -->
+    <!-- Live radio -->
     <string name="live_schedule_button">Se sendeplan</string>
+    <string name="live_header">Radio24syv Live</string>
+    <string name="playing_now">Playing now</string> <!-- TODO Lige nu -->
+    <string name="expand_text">Udvid</string> <!-- TODO Mere -->
+    <string name="contract_text">Fold sammen</string> <!-- TODO Mindre -->
 
+    <!-- URLs -->
     <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>
+    <string name="url_api">http://api.radio24syv.dk</string>
 </resources>

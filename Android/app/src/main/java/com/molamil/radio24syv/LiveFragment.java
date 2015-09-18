@@ -7,6 +7,22 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
+
+import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.api.model.Broadcast;
+
+import org.joda.time.DateTime;
+import org.joda.time.JodaTimePermission;
+import org.joda.time.LocalDateTime;
+import org.joda.time.LocalTime;
+import org.w3c.dom.Text;
+
+import java.text.DateFormat;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.Response;
 
 
 /**
@@ -18,49 +34,13 @@ import android.widget.Button;
  * create an instance of this fragment.
  */
 public class LiveFragment extends PageFragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener listener;
     private PlayerFragment.OnFragmentInteractionListener playerListener;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment LiveFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static LiveFragment newInstance(String param1, String param2) {
-        LiveFragment fragment = new LiveFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
     public LiveFragment() {
         // Required empty public constructor
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-
     }
 
     @Override
@@ -77,6 +57,25 @@ public class LiveFragment extends PageFragment {
             }
         });
 
+        RestClient.getApi().getNextBroadcasts(1, 0).enqueue(new Callback<List<Broadcast>>() {
+            @Override
+            public void onResponse(Response<List<Broadcast>> response) {
+                Broadcast b = response.body().get(0);
+                View v = getView();
+
+                if (v == null ) return; // We are still assigned as a callback to the previous instance of the fragment. TODO store the call in a variable, cancel it in onDestroy to get rid of callbacks.
+                ((TextView) v.findViewById(R.id.program_title)).setText(b.getProgramName());
+                ((TextView) v.findViewById(R.id.program_time_begin)).setText(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
+                ((TextView) v.findViewById(R.id.program_time_end)).setText(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
+                ((TextView) v.findViewById(R.id.program_category)).setText(b.getTopic());
+                ((TextView) v.findViewById(R.id.program_description)).setText(b.getDescriptionText());
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+
+            }
+        });
         return v;
     }
 

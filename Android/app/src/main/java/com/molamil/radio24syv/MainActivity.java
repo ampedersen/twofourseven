@@ -58,16 +58,10 @@ public class MainActivity extends FragmentActivity implements
         // Hockeyapp
         checkForUpdates();
 
-        RestClient rest = new RestClient();
-        List<Broadcast> list = null;
-//        try {
-//            list = rest.getApi().getBroadcasts().execute().body();
-//        } catch (IOException e) {
-//            Log.d("JJJ", "Rest fail: " + e.getMessage());
-//            e.printStackTrace();
-//        }
+        RestClient.initialize(getResources().getString(R.string.url_api)); // Initialize singleton
 
-//        rest.getApi().getBroadcasts(new Callback<List<Broadcast>>() {
+//        Call<List<Broadcast>> call = RestClient.getApi().getLatestBroadcasts(4, 0);
+//        call.enqueue(new Callback<List<Broadcast>>() {
 //            @Override
 //            public void onResponse(Response<List<Broadcast>> response) {
 //                for (Broadcast b : response.body()) {
@@ -81,21 +75,6 @@ public class MainActivity extends FragmentActivity implements
 //                t.printStackTrace();
 //            }
 //        });
-        Call<List<Broadcast>> call = rest.getApi().getBroadcasts();
-        call.enqueue(new Callback<List<Broadcast>>() {
-            @Override
-            public void onResponse(Response<List<Broadcast>> response) {
-                for (Broadcast b : response.body()) {
-                    Log.d("JJJ", b.getDescriptionText());
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                Log.d("JJJ", "Rest fail " + t.getMessage());
-                t.printStackTrace();
-            }
-        });
     }
 
     @Override
@@ -169,11 +148,11 @@ public class MainActivity extends FragmentActivity implements
                 break;
             case SHOW_LEFT:
                 pager.setCurrentItem(mainPagePosition - 1);
-                mainFragment.setTabSize(MainFragment.TabSize.SMALL);
+                mainFragment.setTabSize(MainFragment.TabSize.NORMAL);
                 break;
             case SHOW_RIGHT:
                 pager.setCurrentItem(mainPagePosition + 1);
-                mainFragment.setTabSize(MainFragment.TabSize.SMALL);
+                mainFragment.setTabSize(MainFragment.TabSize.NORMAL);
                 break;
             case SHOW_SUB_PAGE:
                 mainFragment.setTabSize(MainFragment.TabSize.SMALL);
