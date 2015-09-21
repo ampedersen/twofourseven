@@ -17,7 +17,7 @@ import retrofit.Retrofit;
  * The model classes have been generated like this:
  * 1) Execute each API call (e.g. http://api.radio24syv.dk/Broadcasts.html)
  *    in a browser and copy the JSON response clipboard.
- * 2) Open http://www.jsonschema2pojo.org
+ * 2) Open http://www.jsonschema2pojo.org (works with Chrome)
  *    - Paste into the box.
  *    - Select: Source type "JSON"
  *    - Select: Annotation style "Gson"
@@ -61,8 +61,9 @@ public class RestClient
         return instance.api;
     }
 
-    public static String getLocalTime(String zuluTime) {
-        LocalDateTime time = new DateTime(zuluTime).toLocalDateTime();
+    // The local o'clock converted from a date with time zone. Uses Joda-time library to ensure consistent time zone conversion across Android versions.
+    public static String getLocalTime(String dateWithTimeZone) {
+        LocalDateTime time = new DateTime(dateWithTimeZone).toLocalDateTime();
         return time.toString("HH.mm");
     }
 }

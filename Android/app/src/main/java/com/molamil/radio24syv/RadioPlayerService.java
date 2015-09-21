@@ -313,7 +313,7 @@ public class RadioPlayerService extends Service implements
 
             case AudioManager.AUDIOFOCUS_LOSS:
                 Log.d("JJJ", "Audio focus lost");
-                // Lost focus for an unbounded amount of time: stop playback and release media player
+                // Lost focus for an unbounded amount of time
                 if (action == RadioPlayer.ACTION_PLAY) {
                     setAction(url, RadioPlayer.ACTION_PAUSE);
                 } else {
@@ -323,7 +323,7 @@ public class RadioPlayerService extends Service implements
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 Log.d("JJJ", "Audio focus lost temporarily");
-                // Lost focus for a short time, but we have to stop playback. We don't release the media player because playback is likely to resume.
+                // Lost focus for a short time, but we have to stop playback. Playback is likely to resume.
                 setAction(url, RadioPlayer.ACTION_PAUSE);
                 break;
 

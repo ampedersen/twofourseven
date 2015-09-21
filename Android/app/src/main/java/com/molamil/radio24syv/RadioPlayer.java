@@ -73,7 +73,7 @@ public class RadioPlayer {
 
         // Register to receive messages.
         // We are registering an observer (messageReceiver) to receive Intents
-        // with actions named "custom-event-name".
+        // with actions named BROADCAST_ID.
         LocalBroadcastManager.getInstance(context).registerReceiver(messageReceiver, new IntentFilter(RadioPlayerService.BROADCAST_ID));
     }
 
