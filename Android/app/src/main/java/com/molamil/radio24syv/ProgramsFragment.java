@@ -12,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.molamil.radio24syv.view.RadioViewPager;
+
 
 public class ProgramsFragment extends PageFragment {
 

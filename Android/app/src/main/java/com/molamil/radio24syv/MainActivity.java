@@ -10,16 +10,10 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 import com.molamil.radio24syv.api.RestClient;
-import com.molamil.radio24syv.api.model.Broadcast;
+import com.molamil.radio24syv.view.RadioViewPager;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
-
-import java.util.List;
-
-import retrofit.Call;
-import retrofit.Callback;
-import retrofit.Response;
 
 public class MainActivity extends FragmentActivity implements
         RadioPlayer.RadioPlayerProvider,

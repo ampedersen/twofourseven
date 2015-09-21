@@ -44,11 +44,12 @@ public class ProgramListFragment extends PageFragment {
             }
         });
         Button someProgramButton = (Button)v.findViewById(R.id.some_program_button);
+        someProgramButton.setTag(R.id.action_bar, "3843763"); // TODO custom button for this instead of tag ugliness
         someProgramButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mListener != null) {
-                    mListener.onProgramSelected(((Button)v).getText().toString());
+                    mListener.onProgramSelected((String) v.getTag(R.id.action_bar));
                 }
             }
         });

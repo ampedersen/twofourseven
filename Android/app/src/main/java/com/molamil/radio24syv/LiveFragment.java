@@ -11,14 +11,8 @@ import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Broadcast;
+import com.molamil.radio24syv.view.MediaPlayerButton;
 
-import org.joda.time.DateTime;
-import org.joda.time.JodaTimePermission;
-import org.joda.time.LocalDateTime;
-import org.joda.time.LocalTime;
-import org.w3c.dom.Text;
-
-import java.text.DateFormat;
 import java.util.List;
 
 import retrofit.Callback;
@@ -76,6 +70,7 @@ public class LiveFragment extends PageFragment {
 
             }
         });
+
         return v;
     }
 

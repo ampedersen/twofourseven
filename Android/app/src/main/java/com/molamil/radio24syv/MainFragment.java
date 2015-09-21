@@ -133,7 +133,7 @@ public class MainFragment extends Fragment {
     }
 
     private void addTab(LayoutInflater inflater, String tag, int textId, int iconId, Class<?> fragment) {
-        View indicator = inflater.inflate(R.layout.tab_indicator, tabHost.getTabWidget(), false);
+        View indicator = inflater.inflate(R.layout.view_tab_indicator, tabHost.getTabWidget(), false);
         ((ImageView) indicator.findViewById(R.id.tab_indicator_icon)).setImageResource(android.R.drawable.btn_star);
         ((TextView) indicator.findViewById(R.id.tab_indicator_text)).setText(getResources().getText(textId));
 

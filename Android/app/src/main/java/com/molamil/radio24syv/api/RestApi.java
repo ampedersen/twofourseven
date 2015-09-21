@@ -11,6 +11,7 @@ import java.util.List;
 import retrofit.Call;
 import retrofit.http.GET;
 import retrofit.http.Path;
+import retrofit.http.Query;
 
 /**
  * Created by jens on 18/09/15.
@@ -20,10 +21,10 @@ public interface RestApi {
     // Broadcasts
 
     @GET("/broadcasts/latest/{limit}/{offset}")
-    Call<List<Broadcast>> getLatestBroadcasts(@Path("limit") Integer limit, @Path("offset") Integer offsetHours);
+    Call<List<Broadcast>> getLatestBroadcasts(@Path("limit") Integer amount, @Path("offset") Integer offsetHours);
 
     @GET("/broadcasts/next/{limit}/{offset}")
-    Call<List<Broadcast>> getNextBroadcasts(@Path("limit") Integer limit, @Path("offset") Integer offsetHours);
+    Call<List<Broadcast>> getNextBroadcasts(@Path("limit") Integer amount, @Path("offset") Integer offsetHours);
 
     // Hosts
 
@@ -43,14 +44,17 @@ public interface RestApi {
 
     // Podcasts
 
-    @GET("/podcasts/{id}")
-    Call<Podcast> getPodcast(@Path("id") Integer id);
+//    @GET("/podcasts/program/{id}?size={size}&p={p}&year={year}&month={month}")
+//    Call<List<Podcast>> getPodcasts(@Path("id") String programId, @Path("size") Integer amount, @Path("p") Integer pageOffset, @Path("year") Integer year, @Path("month") Integer month);
 
-//    @GET("/podcasts/metadata/{start}")
-//    Call<MetaInfo> getPodcastMetaInfo(@Path("start") String timestamp);
-//
-//    @GET("/podcasts/permalink/{id}")
-//    Call<MetaInfo> getPodcastPermalink(@Path("id") int id);
+//    @GET("/podcasts/program/{id}")
+//    Call<List<Podcast>> getPodcasts(@Path("id") String programId);
+
+//    @GET("/podcasts/program/{id}")
+//    Call<List<Podcast>> getPodcasts(@Path("id") String programId, @Query("size") Integer amount, @Query("p") Integer pageOffset);
+
+    @GET("/podcasts/program/{id}")
+    Call<List<Podcast>> getPodcasts(@Path("id") String programId, @Query("size") Integer amount, @Query("p") Integer pageOffset);
 
     // Programs
 

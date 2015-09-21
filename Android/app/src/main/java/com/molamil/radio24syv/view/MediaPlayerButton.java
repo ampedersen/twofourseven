@@ -1,4 +1,4 @@
-package com.molamil.radio24syv;
+package com.molamil.radio24syv.view;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -9,6 +9,9 @@ import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
+
+import com.molamil.radio24syv.R;
+import com.molamil.radio24syv.RadioPlayer;
 
 /**
  * Created by jens on 11/09/15.
