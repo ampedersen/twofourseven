@@ -34,6 +34,8 @@ public class MainFragment extends Fragment {
     FragmentTabHost tabHost;
     PlayerFragment playerFragment;
 
+    String startupTabTag = TAG_TAB_LIVE;
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
@@ -46,6 +48,8 @@ public class MainFragment extends Fragment {
         addTab(inflater, TAG_TAB_NEWS, R.string.tab_news, android.R.drawable.btn_star, NewsFragment.class);
         addTab(inflater, TAG_TAB_OFFLINE, R.string.tab_offline, android.R.drawable.btn_star, OfflineFragment.class);
 
+        tabHost.setCurrentTabByTag(startupTabTag);
+
         tabHost.getTabWidget().setDividerDrawable(null);
         tabHost.setOnTabChangedListener(new TabHost.OnTabChangeListener() {
             @Override
@@ -56,7 +60,6 @@ public class MainFragment extends Fragment {
             }
         });
 
-        tabHost.setCurrentTab(0);
         updateTabSize();
 
 //        if (playerFragment == null) {
@@ -198,6 +201,10 @@ public class MainFragment extends Fragment {
             View indicator = tabs.getChildTabViewAt(i);
             indicator.findViewById(R.id.tab_indicator_icon).setVisibility(iconVisibility);
         }
+    }
+
+    public void setStartupTab(String startupTabTag) {
+        this.startupTabTag = startupTabTag;
     }
 
     public interface OnMainFragmentInteractionListener {

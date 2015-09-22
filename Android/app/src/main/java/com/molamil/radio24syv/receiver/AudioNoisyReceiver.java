@@ -1,4 +1,4 @@
-package com.molamil.radio24syv;
+package com.molamil.radio24syv.receiver;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;
@@ -8,7 +8,10 @@ import android.content.ServiceConnection;
 import android.os.IBinder;
 import android.util.Log;
 
-public class AudioIntentReceiver extends BroadcastReceiver {
+import com.molamil.radio24syv.RadioPlayer;
+import com.molamil.radio24syv.RadioPlayerService;
+
+public class AudioNoisyReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {

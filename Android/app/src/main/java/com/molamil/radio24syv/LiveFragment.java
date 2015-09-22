@@ -11,7 +11,7 @@ import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Broadcast;
-import com.molamil.radio24syv.view.MediaPlayerButton;
+import com.molamil.radio24syv.view.RadioPlayerButton;
 
 import java.util.List;
 
@@ -57,7 +57,7 @@ public class LiveFragment extends PageFragment {
                 Broadcast b = response.body().get(0);
                 View v = getView();
 
-                if (v == null ) return; // We are still assigned as a callback to the previous instance of the fragment. TODO store the call in a variable, cancel it in onDestroy to get rid of callbacks.
+                if (v == null ) return; // We are still assigned as a callback to the previous instance of the fragment. TODO store the call in a variable, cancel it in onDestroy to getInstance rid of callbacks.
                 ((TextView) v.findViewById(R.id.program_title)).setText(b.getProgramName());
                 ((TextView) v.findViewById(R.id.program_time_begin)).setText(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
                 ((TextView) v.findViewById(R.id.program_time_end)).setText(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
@@ -78,7 +78,7 @@ public class LiveFragment extends PageFragment {
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
 
-        MediaPlayerButton playButton = (MediaPlayerButton)getView().findViewById(R.id.play_button);
+        RadioPlayerButton playButton = (RadioPlayerButton)getView().findViewById(R.id.play_button);
         playButton.setRadioPlayer(radioPlayerProvider.getRadioPlayer()); // Setup play button. Must do this in onActivityCreated() to be sure our host activity is up and running.
     }
 

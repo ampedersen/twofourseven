@@ -35,4 +35,5 @@
     <!-- URLs -->
     <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>
     <string name="url_api">http://api.radio24syv.dk</string>
+    <string name="url_offline_radio">http://arkiv.radio24syv.dk/</string>
 </resources>

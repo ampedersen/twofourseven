@@ -230,7 +230,7 @@ public class RadioPlayerService extends Service implements
             Log.d("JJJ", "Run in foreground " + RadioPlayer.getActionName(action));
             // When running in the foreground, the service also must provide a status bar notification
             // to ensure that users are aware of the running service and allow them to open an activity that can interact with the service.
-            String audioTitle = "Live radio"; // TODO get audio title from AudioInfo class thingy
+            String audioTitle = "Live radio"; // TODO getInstance audio title from AudioInfo class thingy
             String audioDescription = "This is an audio description"; // TODO audio description
 //            String audioInfo = null; // TODO audio info (not needed, remove it if unwanted)
             int smallIconId = R.drawable.tab_icon; // TODO icon for player state
@@ -246,7 +246,7 @@ public class RadioPlayerService extends Service implements
                 largeIcon = ((BitmapDrawable) getPackageManager().getApplicationIcon(getApplicationContext().getPackageName())).getBitmap(); // Get app icon
             } catch (PackageManager.NameNotFoundException e) {
                 largeIcon = null; // Null means only the action icon will be used (e.g. play symbol). This will not happen anyway, our app always exists.
-                Log.d("JJJ", "Unable to get app icon because of " + e.getMessage());
+                Log.d("JJJ", "Unable to getInstance app icon because of " + e.getMessage());
                 e.printStackTrace();
             }
 
@@ -424,7 +424,7 @@ public class RadioPlayerService extends Service implements
      * runs in the same process as its clients, we don't need to deal with IPC.
      */
     public class RadioPlayerServiceBinder extends Binder {
-        RadioPlayerService getService() {
+        public RadioPlayerService getService() {
             // Return this instance of RadioPlayerService so clients can call public methods
             return RadioPlayerService.this;
         }

@@ -2,12 +2,17 @@ package com.molamil.radio24syv.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
+import com.molamil.radio24syv.RadioLibrary;
+import com.molamil.radio24syv.RadioPlayer;
+
+import java.util.Locale;
 
 /**
  * Created by jens on 21/09/15.
@@ -17,6 +22,10 @@ public class PodcastEpisodeView extends LinearLayout {
     public enum Size { UNASSIGNED, CONTRACTED, EXPANDED }
     private Size size = Size.UNASSIGNED;
     private OnPodcastEpisodeViewUpdatedListener listener = null;
+
+    private String title;
+    private String podcastUrl;
+    private int podcastId;
 
     public PodcastEpisodeView(Context context) {
         super(context);
@@ -33,28 +42,44 @@ public class PodcastEpisodeView extends LinearLayout {
         initializeViews(context);
     }
 
-    private void initializeViews(Context context) {
+    private void initializeViews(final Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.view_podcast_episode, this);
 
-        View expandButton = findViewById(R.id.contracted_layout);
-        expandButton.setOnClickListener(new OnClickListener() {
+//        View expandButton = findViewById(R.id.contracted_layout);
+//        expandButton.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                setSize(Size.EXPANDED);
+//            }
+//        });
+//
+//        View contractButton = findViewById(R.id.contract_button);
+//        contractButton.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                setSize(Size.CONTRACTED);
+//            }
+//        });
+//
+//        TextView descriptionText = (TextView) findViewById(R.id.description_text);
+//        descriptionText.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                setSize(Size.CONTRACTED);
+//            }
+//        });
+
+        View contractedLayout = findViewById(R.id.contracted_layout);
+        contractedLayout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 setSize(Size.EXPANDED);
             }
         });
 
-        View contractButton = findViewById(R.id.contract_button);
-        contractButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                setSize(Size.CONTRACTED);
-            }
-        });
-
-        TextView descriptionText = (TextView) findViewById(R.id.description_text);
-        descriptionText.setOnClickListener(new OnClickListener() {
+        View expandedLayout = findViewById(R.id.expanded_layout);
+        expandedLayout.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 setSize(Size.CONTRACTED);
@@ -72,6 +97,7 @@ public class PodcastEpisodeView extends LinearLayout {
     }
 
     public void setTitle(String title) {
+        this.title = title;
         TextView titleText = (TextView) findViewById(R.id.title_text);
         titleText.setText(title);
     }
@@ -79,6 +105,22 @@ public class PodcastEpisodeView extends LinearLayout {
     public void setDescription(String description) {
         TextView descriptionText = (TextView) findViewById(R.id.description_text);
         descriptionText.setText(description);
+    }
+
+    public void setPodcastId(int podcastId) {
+        this.podcastId = podcastId;
+        updateLibraryStatus();
+    }
+
+    public void setPodcastUrl(String podcastUrl) {
+        this.podcastUrl = podcastUrl;
+        RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
+        playButton.setUrl(RadioLibrary.getInstance().getUrl(getContext(), podcastUrl));
+    }
+
+    public void setRadioPlayer(RadioPlayer player) {
+        RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
+        playButton.setRadioPlayer(player);
     }
 
     public void setSize(Size size) {
@@ -103,11 +145,31 @@ public class PodcastEpisodeView extends LinearLayout {
         }
     }
 
+    private void updateLibraryStatus() {
+        RadioLibrary.Status status = RadioLibrary.getInstance().getStatus(getContext(), podcastId);
+
+        TextView downloadedImage = (TextView) findViewById(R.id.downloaded_image);
+        downloadedImage.setText(status.getDownloadStatusText());
+
+        TextView downloadButton = (TextView) findViewById(R.id.download_image);
+        downloadButton.setText(status.getDownloadStatusText() + " " + status.getDownloadProgressText());
+
+        downloadButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                RadioLibrary.getInstance().download(getContext(), podcastId, podcastUrl, title);
+//                updateLibraryStatus();
+            }
+        });
+
+    }
+
     public void setOnPodcastEpisodeViewUpdatedListener(OnPodcastEpisodeViewUpdatedListener listener) {
         this.listener = listener;
     }
 
     public interface OnPodcastEpisodeViewUpdatedListener {
         void onPodcastEpisodeViewSizeChanged(PodcastEpisodeView view, Size size);
+//        void onPodcastEpisodeViewRadioPlayerAction(PodcastEpisodeView view, int action);
     }
 }

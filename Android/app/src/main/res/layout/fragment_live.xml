@@ -84,7 +84,7 @@
                 android:text="@string/expand_text"
                 />
 
-            <com.molamil.radio24syv.view.MediaPlayerButton
+            <com.molamil.radio24syv.view.RadioPlayerButton
                 android:id="@+id/play_button"
                 android:layout_width="100dp"
                 android:layout_height="100dp"

@@ -33,35 +33,35 @@
             android:layout_centerInParent="true"
             />
 
-        <com.molamil.radio24syv.view.MediaPlayerButton
+        <com.molamil.radio24syv.view.RadioPlayerButton
             android:id="@+id/next_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_alignParentRight="true"
             app:action="next"
             />
-        <com.molamil.radio24syv.view.MediaPlayerButton
+        <com.molamil.radio24syv.view.RadioPlayerButton
             android:id="@+id/previous_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_toLeftOf="@id/next_button"
             app:action="previous"
             />
-        <com.molamil.radio24syv.view.MediaPlayerButton
+        <com.molamil.radio24syv.view.RadioPlayerButton
             android:id="@+id/pause_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_toLeftOf="@id/previous_button"
             app:action="pause"
             />
-        <com.molamil.radio24syv.view.MediaPlayerButton
+        <com.molamil.radio24syv.view.RadioPlayerButton
             android:id="@+id/stop_button"
             android:layout_width="50dp"
             android:layout_height="50dp"
             android:layout_toLeftOf="@id/pause_button"
             app:action="stop"
             />
-        <com.molamil.radio24syv.view.MediaPlayerButton
+        <com.molamil.radio24syv.view.RadioPlayerButton
             android:id="@+id/play_button"
             android:layout_width="50dp"
             android:layout_height="50dp"

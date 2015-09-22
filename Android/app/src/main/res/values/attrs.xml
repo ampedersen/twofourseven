@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <declare-styleable name="MediaPlayerButton">
+    <declare-styleable name="RadioPlayerButton">
         <attr name="action" format="enum">
             <enum name="play" value="0"/>
             <enum name="stop" value="1"/>

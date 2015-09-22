@@ -9,7 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
-import com.molamil.radio24syv.view.MediaPlayerButton;
+import com.molamil.radio24syv.view.RadioPlayerButton;
 
 
 /**
@@ -149,7 +149,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     }
 
     private void linkButton(RadioPlayer player, View parentView, int buttonId) {
-        MediaPlayerButton b = (MediaPlayerButton)parentView.findViewById(buttonId);
+        RadioPlayerButton b = (RadioPlayerButton)parentView.findViewById(buttonId);
         b.setUrl(player.getUrl());
         b.setRadioPlayer(player);
     }

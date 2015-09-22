@@ -60,7 +60,7 @@ public class RadioPlayer {
     RadioPlayerService service = null;
     boolean isBoundToService;
 
-    int pendingAction = ACTION_UNASSIGNED; // If the service is not yet bound this action will get performed once bound
+    int pendingAction = ACTION_UNASSIGNED; // If the service is not yet bound this action will getInstance performed once bound
     String pendingUrl = URL_UNASSIGNED;
 
     public RadioPlayer(Context context) {
@@ -98,7 +98,7 @@ public class RadioPlayer {
         if (isBoundToService) {
             return service.getUrl(); // The actual playing url. Might be different from this.url if the call has not gone through yet.
         } else {
-            Log.d("JJJ", "Unable to get URL from service because it is not connected");
+            Log.d("JJJ", "Unable to getInstance URL from service because it is not connected");
             return URL_UNASSIGNED;
         }
     }
@@ -107,7 +107,7 @@ public class RadioPlayer {
         if (isBoundToService) {
             return service.getState();
         } else {
-            Log.d("JJJ", "Unable to get state from service because it is not connected");
+            Log.d("JJJ", "Unable to getInstance state from service because it is not connected");
             return STATE_UNASSIGNED;
         }
     }
@@ -157,6 +157,11 @@ public class RadioPlayer {
 
     public void play(String url) {
         this.url = url;
+        boolean isOfflineUrl = url.startsWith(context.getResources().getString(R.string.url_offline_radio));
+        if (isOfflineUrl) {
+            // TODO Play from local storage if the file is already downloaded
+
+        }
         setAction(url, ACTION_PLAY);
     }
 
@@ -178,7 +183,7 @@ public class RadioPlayer {
             service.setAction(url, action);
             clearPendingAction(); // We got hole through to the service, clear pending action
         } else {
-            Log.d("JJJ", "Unable to set action for service because service is not bound - will set the action when it get bound");
+            Log.d("JJJ", "Unable to set action for service because service is not bound - will set the action when it getInstance bound");
             setPendingAction(url, action);
         }
     }
@@ -203,7 +208,7 @@ public class RadioPlayer {
         @Override
         public void onServiceConnected(ComponentName className, IBinder service) {
             Log.d("JJJ", "Service bound");
-            // We've bound to RadioPlayerService, cast the IBinder and get RadioPlayerService instance
+            // We've bound to RadioPlayerService, cast the IBinder and getInstance RadioPlayerService instance
             RadioPlayerService.RadioPlayerServiceBinder binder = (RadioPlayerService.RadioPlayerServiceBinder) service;
             RadioPlayer.this.service = binder.getService();
             isBoundToService = true;

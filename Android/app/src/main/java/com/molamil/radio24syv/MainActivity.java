@@ -1,5 +1,6 @@
 package com.molamil.radio24syv;
 
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -10,6 +11,7 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.receiver.DownloadReceiver;
 import com.molamil.radio24syv.view.RadioViewPager;
 
 import net.hockeyapp.android.CrashManager;
@@ -54,21 +56,13 @@ public class MainActivity extends FragmentActivity implements
 
         RestClient.initialize(getResources().getString(R.string.url_api)); // Initialize singleton
 
-//        Call<List<Broadcast>> call = RestClient.getApi().getLatestBroadcasts(4, 0);
-//        call.enqueue(new Callback<List<Broadcast>>() {
-//            @Override
-//            public void onResponse(Response<List<Broadcast>> response) {
-//                for (Broadcast b : response.body()) {
-//                    Log.d("JJJ", b.getDescriptionText());
-//                }
-//            }
-//
-//            @Override
-//            public void onFailure(Throwable t) {
-//                Log.d("JJJ", "Rest fail " + t.getMessage());
-//                t.printStackTrace();
-//            }
-//        });
+        // Start on "Offline" tab if started by DownloadReceiver
+        Intent callingIntent = getIntent();
+        long[] downloadIds = callingIntent.getLongArrayExtra(DownloadReceiver.EXTRA_DOWNLOAD_IDS);
+        if (downloadIds != null) {
+            Log.d("JJJ", "MainActivity got started with " + downloadIds.length + " downloadIds as a parameter");
+            mainFragment.setStartupTab(MainFragment.TAG_TAB_OFFLINE);
+        }
     }
 
     @Override
@@ -79,6 +73,7 @@ public class MainActivity extends FragmentActivity implements
             if (radioPlayer != null) {
                 radioPlayer.cleanup();
             }
+
         }
     }
 

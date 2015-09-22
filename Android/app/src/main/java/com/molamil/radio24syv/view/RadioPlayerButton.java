@@ -16,7 +16,7 @@ import com.molamil.radio24syv.RadioPlayer;
 /**
  * Created by jens on 11/09/15.
  */
-public class MediaPlayerButton extends Button implements
+public class RadioPlayerButton extends Button implements
         View.OnClickListener,
         RadioPlayer.OnPlaybackListener {
 
@@ -26,18 +26,18 @@ public class MediaPlayerButton extends Button implements
     private RadioPlayer player;
     private boolean isAvailable = true;
 
-    public MediaPlayerButton(Context context, AttributeSet attrs) {
+    public RadioPlayerButton(Context context, AttributeSet attrs) {
         super(context, attrs);
 
         // Apply attributes from XML
         TypedArray a = context.getTheme().obtainStyledAttributes(
                 attrs,
-                R.styleable.MediaPlayerButton,
+                R.styleable.RadioPlayerButton,
                 0, 0);
 
         try {
-            action = a.getInteger(R.styleable.MediaPlayerButton_action, RadioPlayer.ACTION_PLAY);
-            setUrl(a.getString(R.styleable.MediaPlayerButton_url));
+            action = a.getInteger(R.styleable.RadioPlayerButton_action, RadioPlayer.ACTION_PLAY);
+            setUrl(a.getString(R.styleable.RadioPlayerButton_url));
         } finally {
             a.recycle();
         }
@@ -158,7 +158,23 @@ public class MediaPlayerButton extends Button implements
 
     @Override
     public void OnBusy(RadioPlayer player) {
-        setIsAvailable(false);
+        switch (action) {
+            case RadioPlayer.ACTION_PLAY:
+                setIsAvailable(false);
+                break;
+            case RadioPlayer.ACTION_STOP:
+                setIsAvailable(false); // TODO true
+                break;
+            case RadioPlayer.ACTION_PAUSE:
+                setIsAvailable(false);
+                break;
+            case RadioPlayer.ACTION_NEXT:
+                setIsAvailable(false);
+                break;
+            case RadioPlayer.ACTION_PREVIOUS:
+                setIsAvailable(false);
+                break;
+        }
     }
 
     @Override

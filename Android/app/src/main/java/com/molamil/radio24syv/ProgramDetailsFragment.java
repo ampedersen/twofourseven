@@ -30,8 +30,10 @@ public class ProgramDetailsFragment extends PageFragment implements
 
     private OnFragmentInteractionListener mListener;
     private PodcastEpisodeView expandedView = null;
+    private DateTime lastPodcastDate = null;
 
     private String programId;
+    private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
 
     public static ProgramDetailsFragment newInstance(String programId) {
         ProgramDetailsFragment fragment = new ProgramDetailsFragment();
@@ -75,8 +77,6 @@ public class ProgramDetailsFragment extends PageFragment implements
         return v;
     }
 
-    DateTime lastDate = null;
-
     private void getPodcasts(final ViewGroup content, final int amount, final int batch) {
         Log.d("JJJ", "getPodcasts id " + programId + " content " + content + " amount " + amount + " batch " + batch);
         final ViewGroup parent = (ViewGroup) content.getParent();
@@ -94,23 +94,26 @@ public class ProgramDetailsFragment extends PageFragment implements
                     Podcast p = response.body().get(i);
 
                     DateTime date = DateTime.parse(p.getPublishInfo().getCreatedAt());
-                    boolean isNewMonth = (lastDate == null) || (!date.monthOfYear().equals(lastDate.monthOfYear())) || (!date.year().equals(lastDate.year()));
+                    boolean isNewMonth = (lastPodcastDate == null) || (!date.monthOfYear().equals(lastPodcastDate.monthOfYear())) || (!date.year().equals(lastPodcastDate.year()));
                     if (isNewMonth) {
-                        lastDate = date;
+                        lastPodcastDate = date;
                         DateLineView separator = new DateLineView(content.getContext());
                         separator.setDate(date.monthOfYear().getAsText(Locale.getDefault()), date.year().getAsText(Locale.getDefault()));
                         content.addView(separator);
                     }
 
                     PodcastEpisodeView v = new PodcastEpisodeView(content.getContext());
-//                    PodcastEpisodeView v = (PodcastEpisodeView) getLayoutInflater(getArguments()).inflate(R.layout.view_podcast_episode, content);
                     v.setTitle(p.getTitle());
                     v.setDescription(p.getDescription().getText());
+                    v.setPodcastId(p.getVideoPodcastId());
+                    v.setPodcastUrl(p.getAudioInfo().getUrl());
+                    v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
                     v.setOnPodcastEpisodeViewUpdatedListener(ProgramDetailsFragment.this);
                     content.addView(v);
                 }
 
-                if (response.body().size() == amount) {
+                boolean isBatchFull = (response.body().size() == amount);
+                if (isBatchFull) {
                     loadButton.setVisibility(View.VISIBLE);
                     loadButton.setOnClickListener(new View.OnClickListener() {
                         @Override
@@ -140,6 +143,12 @@ public class ProgramDetailsFragment extends PageFragment implements
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
+        }
+        try {
+            radioPlayerProvider = (RadioPlayer.RadioPlayerProvider) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement PlayerFragment.RadioPlayerProvider");
         }
     }
 
