@@ -36,14 +36,6 @@ public class PodcastEpisodeView extends LinearLayout {
     private void initializeViews(Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.view_podcast_episode, this);
-    }
-
-    @Override
-    protected void onFinishInflate() {
-        super.onFinishInflate();
-
-        TextView descriptionText = (TextView) findViewById(R.id.description_text);
-        descriptionText.setTextIsSelectable(true); // TODO make description text selectable everywhere (or nowhere)
 
         View expandButton = findViewById(R.id.contracted_layout);
         expandButton.setOnClickListener(new OnClickListener() {
@@ -61,6 +53,7 @@ public class PodcastEpisodeView extends LinearLayout {
             }
         });
 
+        TextView descriptionText = (TextView) findViewById(R.id.description_text);
         descriptionText.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -69,6 +62,13 @@ public class PodcastEpisodeView extends LinearLayout {
         });
 
         setSize(Size.CONTRACTED);
+    }
+
+    @Override
+    protected void onFinishInflate() {
+        super.onFinishInflate();
+        // This is never called when instantiating with: myView = new MyView()
+        // It is only called when instantiating in XML: <com.bla.bla.MyView />
     }
 
     public void setTitle(String title) {

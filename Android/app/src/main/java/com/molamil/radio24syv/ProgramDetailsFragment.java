@@ -11,9 +11,13 @@ import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Podcast;
+import com.molamil.radio24syv.view.DateLineView;
 import com.molamil.radio24syv.view.PodcastEpisodeView;
 
+import org.joda.time.DateTime;
+
 import java.util.List;
+import java.util.Locale;
 
 import retrofit.Callback;
 import retrofit.Response;
@@ -71,6 +75,8 @@ public class ProgramDetailsFragment extends PageFragment implements
         return v;
     }
 
+    DateTime lastDate = null;
+
     private void getPodcasts(final ViewGroup content, final int amount, final int batch) {
         Log.d("JJJ", "getPodcasts id " + programId + " content " + content + " amount " + amount + " batch " + batch);
         final ViewGroup parent = (ViewGroup) content.getParent();
@@ -86,7 +92,18 @@ public class ProgramDetailsFragment extends PageFragment implements
                 //for (Podcast p : response.body().iterator) { // For some reason this does not work neither
                 for (int i = 0; i < response.body().size(); i++) {
                     Podcast p = response.body().get(i);
+
+                    DateTime date = DateTime.parse(p.getPublishInfo().getCreatedAt());
+                    boolean isNewMonth = (lastDate == null) || (!date.monthOfYear().equals(lastDate.monthOfYear())) || (!date.year().equals(lastDate.year()));
+                    if (isNewMonth) {
+                        lastDate = date;
+                        DateLineView separator = new DateLineView(content.getContext());
+                        separator.setDate(date.monthOfYear().getAsText(Locale.getDefault()), date.year().getAsText(Locale.getDefault()));
+                        content.addView(separator);
+                    }
+
                     PodcastEpisodeView v = new PodcastEpisodeView(content.getContext());
+//                    PodcastEpisodeView v = (PodcastEpisodeView) getLayoutInflater(getArguments()).inflate(R.layout.view_podcast_episode, content);
                     v.setTitle(p.getTitle());
                     v.setDescription(p.getDescription().getText());
                     v.setOnPodcastEpisodeViewUpdatedListener(ProgramDetailsFragment.this);
@@ -135,10 +152,13 @@ public class ProgramDetailsFragment extends PageFragment implements
     @Override
     public void onPodcastEpisodeViewSizeChanged(PodcastEpisodeView view, PodcastEpisodeView.Size size) {
         if (size == PodcastEpisodeView.Size.EXPANDED) {
+            View oldExpandedView = expandedView;
             if (expandedView != null) {
                 expandedView.setSize(PodcastEpisodeView.Size.CONTRACTED); // Make sure only one view is expanded at a time
             }
-            expandedView = view;
+            if (oldExpandedView != view) {
+                expandedView = view; // If the same view was clicked, it has just been contracted and expandedView set to null. Do not assign it again.
+            }
         } else {
             expandedView = null;
         }
