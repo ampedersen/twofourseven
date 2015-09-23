@@ -29,8 +29,12 @@
     <string name="live_schedule_button">Se sendeplan</string>
     <string name="live_header">Radio24syv Live</string>
     <string name="playing_now">Playing now</string> <!-- TODO Lige nu -->
-    <string name="expand_text">Udvid</string> <!-- TODO Mere -->
-    <string name="contract_text">Fold sammen</string> <!-- TODO Mindre -->
+    <string name="expand_text">Se mere</string>
+    <string name="contract_text">Se mindre</string>
+
+    <!-- Offline -->
+    <string name="download_podcast">Gem til offline</string>
+    <string name="remove_podcast">Fjern fra offline</string>
 
     <!-- URLs -->
     <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>

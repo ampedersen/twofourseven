@@ -105,8 +105,7 @@ public class ProgramDetailsFragment extends PageFragment implements
                     PodcastEpisodeView v = new PodcastEpisodeView(content.getContext());
                     v.setTitle(p.getTitle());
                     v.setDescription(p.getDescription().getText());
-                    v.setPodcastId(p.getVideoPodcastId());
-                    v.setPodcastUrl(p.getAudioInfo().getUrl());
+                    v.setPodcastIdAndUrl(p.getVideoPodcastId(), RadioLibrary.getUrl(content.getContext(), p.getAudioInfo().getUrl()));
                     v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
                     v.setOnPodcastEpisodeViewUpdatedListener(ProgramDetailsFragment.this);
                     content.addView(v);
