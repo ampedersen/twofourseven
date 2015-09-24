@@ -52,22 +52,6 @@ public class PodcastEpisodeView extends LinearLayout implements
 //            }
 //        });
 //
-//        View contractButton = findViewById(R.id.contract_button);
-//        contractButton.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                setSize(Size.CONTRACTED);
-//            }
-//        });
-//
-//        TextView descriptionText = (TextView) findViewById(R.id.description_text);
-//        descriptionText.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                setSize(Size.CONTRACTED);
-//            }
-//        });
-
         View topLayout = findViewById(R.id.top_layout);
         topLayout.setOnClickListener(new OnClickListener() {
             @Override
@@ -88,8 +72,25 @@ public class PodcastEpisodeView extends LinearLayout implements
             }
         });
 
-        View expandedLayout = findViewById(R.id.expanded_layout);
-        expandedLayout.setOnClickListener(new OnClickListener() {
+        // Download button is a child of this and the clicks interferes with each other if expanded_layout is assigned a click handler. Instead assign one for each of expanded_layout's other children.
+//        View expandedLayout = findViewById(R.id.expanded_layout);
+//        expandedLayout.setOnClickListener(new OnClickListener() {
+//            @Override
+//            public void onClick(View v) {
+//                setSize(Size.CONTRACTED);
+//            }
+//        });
+
+        View contractButton = findViewById(R.id.contract_button);
+        contractButton.setOnClickListener(new OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                setSize(Size.CONTRACTED);
+            }
+        });
+
+        TextView descriptionText = (TextView) findViewById(R.id.description_text);
+        descriptionText.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View v) {
                 setSize(Size.CONTRACTED);
@@ -222,6 +223,8 @@ public class PodcastEpisodeView extends LinearLayout implements
                 break;
         }
    }
+
+    //"TODO remove virker ikke, implementer broadcastreceiver for DownloadMAnager.ACTION:DOWNLAOD_CON;LAMTE som kalder listeners" +
 
     private final OnClickListener downloadOnClick = new OnClickListener() {
         @Override
