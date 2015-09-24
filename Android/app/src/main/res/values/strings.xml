@@ -36,8 +36,8 @@
     <string name="download_podcast">Gem til offline</string>
     <string name="remove_podcast">Fjern fra offline</string>
 
-    <!-- URLs -->
+    <!-- URLs (no slash at the end please) -->
     <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>
     <string name="url_api">http://api.radio24syv.dk</string>
-    <string name="url_offline_radio">http://arkiv.radio24syv.dk/</string>
+    <string name="url_offline_radio">http://arkiv.radio24syv.dk</string>
 </resources>

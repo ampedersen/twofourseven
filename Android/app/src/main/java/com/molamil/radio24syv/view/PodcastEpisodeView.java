@@ -72,7 +72,7 @@ public class PodcastEpisodeView extends LinearLayout implements
             }
         });
 
-        // Download button is a child of this and the clicks interferes with each other if expanded_layout is assigned a click handler. Instead assign one for each of expanded_layout's other children.
+        // Download button is a child of this and the clicks interfere with each other if expanded_layout is assigned a click handler. Instead assign one for each of expanded_layout's other children.
 //        View expandedLayout = findViewById(R.id.expanded_layout);
 //        expandedLayout.setOnClickListener(new OnClickListener() {
 //            @Override
@@ -103,7 +103,7 @@ public class PodcastEpisodeView extends LinearLayout implements
     @Override
     protected void onFinishInflate() {
         super.onFinishInflate();
-        // This is never called when instantiating with: myView = new MyView()
+        // This is never called when instantiating with: myView = new MyView();
         // It is only called when instantiating in XML: <com.bla.bla.MyView />
     }
 
@@ -223,8 +223,6 @@ public class PodcastEpisodeView extends LinearLayout implements
                 break;
         }
    }
-
-    //"TODO remove virker ikke, implementer broadcastreceiver for DownloadMAnager.ACTION:DOWNLAOD_CON;LAMTE som kalder listeners" +
 
     private final OnClickListener downloadOnClick = new OnClickListener() {
         @Override

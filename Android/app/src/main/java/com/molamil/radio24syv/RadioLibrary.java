@@ -14,14 +14,13 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Set;
 
 /**
+ * Podcast download manager. Uses Android's built-in download manager for file download and local file management.
  * Created by jens on 22/09/15.
  */
 public class RadioLibrary {
-
-    private final long DOWNLOAD_ID_UNKNOWN = -1;
-    private final int PODCAST_ID_UNKNOWN = -1;
 
     public static final int DOWNLOAD_STATUS_UNKNOWN = 0;
     public static final int DOWNLOAD_STATUS_FAILED = 1;
@@ -39,6 +38,9 @@ public class RadioLibrary {
         }
     }
 
+//    private final long DOWNLOAD_ID_UNKNOWN = -1;
+//    private final int PODCAST_ID_UNKNOWN = -1;
+//
     private static RadioLibrary instance = null;
 
     public static RadioLibrary getInstance() {
@@ -67,19 +69,19 @@ public class RadioLibrary {
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         long downloadId = manager.enqueue(request);
 
-        writeIds(context, podcastId, downloadId);
+//        writeIds(context, podcastId, downloadId);
+        Settings.get().writeLibraryIds(podcastId, downloadId);
         callback(context, podcastId);
     }
 
     // Deletes the downloaded file or cancels its download and cleans up.
     public void remove(Context context, int podcastId) {
         boolean isRemoved;
-        long downloadId = readDownloadId(context, podcastId);
-        boolean isDownloaded = (downloadId != DOWNLOAD_ID_UNKNOWN);
+//        long downloadId = readDownloadId(context, podcastId);
+        long downloadId = Settings.get().readLibraryDownloadId(podcastId);
+        boolean isDownloaded = (downloadId != Settings.DOWNLOAD_ID_UNKNOWN);
         if (isDownloaded) {
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-            Status status = getStatus(context, podcastId);
-            Log.d("JJJ", "status " + status.getDownloadProgressText() + " " + status.getDownloadStatusText());
             isRemoved = (manager.remove(downloadId) == 1);
         } else {
             isRemoved = false;
@@ -87,110 +89,59 @@ public class RadioLibrary {
 
         if (isRemoved) {
             Log.d("JJJ", "Removed podcastId " + podcastId);
-            removeIds(context, podcastId, downloadId); // Remove entries for the now non-existing download
-            callback(context, podcastId);
+//            removeIds(context, podcastId, downloadId); // Remove entries for the now non-existing download
+            Settings.get().removeLibraryIds(podcastId); // Remove entries for the now non-existing download
         } else {
-            Log.d("JJJ", "Unable to remove podcastId " + podcastId);
-        }
-    }
-
-    private Status getStatus(Context context, int podcastId) {
-        long downloadId = readDownloadId(context, podcastId);
-        return getStatus(context, downloadId);
-    }
-
-    private Status getStatus(Context context, long downloadId) {
-        Status status = new Status();
-
-        if (downloadId == DOWNLOAD_ID_UNKNOWN) {
-            return status; // Return, podcast has not been downloaded
+            // Something is funky
+            Status status = getStatus(context, podcastId);
+            Log.w("JJJ", "Unable to remove podcastId " + podcastId + " status " + status.getDownloadProgressText() + " " + status.getDownloadStatusText());
         }
 
-        // Query download manager
-        DownloadManager.Query q = new DownloadManager.Query();
-        q.setFilterById(downloadId);
-        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
-        Cursor c = manager.query(q);
-
-        if (c.moveToFirst()) {
-            int statusValue = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
-            float progress = c.getFloat(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
-            float total = c.getFloat(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
-            String localUrl = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
-
-            switch (statusValue) {
-                case DownloadManager.STATUS_FAILED:
-                    status.downloadStatus = DOWNLOAD_STATUS_FAILED;
-                    break;
-                case DownloadManager.STATUS_PAUSED:
-                    status.downloadStatus = DOWNLOAD_STATUS_PAUSED;
-                    break;
-                case DownloadManager.STATUS_PENDING:
-                    status.downloadStatus = DOWNLOAD_STATUS_PENDING;
-                    break;
-                case DownloadManager.STATUS_RUNNING:
-                    status.downloadStatus = DOWNLOAD_STATUS_RUNNING;
-                    break;
-                case DownloadManager.STATUS_SUCCESSFUL:
-                    status.downloadStatus = DOWNLOAD_STATUS_SUCCESSFUL;
-                    break;
-            }
-
-            if (total > 0) {
-                status.downloadProgress = progress/total;
-            }
-
-            status.localPodcastUrl = localUrl;
-
-            Log.d("JJJ", getDownloadStatusName(status.downloadStatus) + " " + progress + " of " + total + " bytes " + localUrl);
-        } else {
-            Log.d("JJJ", "Unable to query downloadmanager about downloadId " + downloadId);
-        }
-
-        c.close();
-
-        return status;
+        callback(context, podcastId);
     }
 
-    // TODO nicer settings implementation
-    private void writeIds(Context context, int podcastId, long downloadId) {
-        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
-        settings.edit()
-                .putLong("downloadId-" + podcastId, downloadId)
-                .putInt("podcastId-" + downloadId, podcastId)
-                .apply();
-        //Log.d("JJJ", "write downloadId "+ downloadId + " for podcastId " + podcastId);
-    }
-
-    private long readDownloadId(Context context, int podcastId) {
-        // Get download ID for podcast
-        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
-        long downloadId = settings.getLong("downloadId-" + podcastId, DOWNLOAD_ID_UNKNOWN);
-        //Log.d("JJJ", "read downloadId " + downloadId + " for podcastId " + podcastId);
-        return downloadId;
-    }
-
-    private int readPodcastId(Context context, long downloadId) {
-        // Get podcast ID for download
-        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
-        int podcastId = settings.getInt("podcastId-" + downloadId, PODCAST_ID_UNKNOWN);
-        //Log.d("JJJ", "read podcastId " + podcastId + " for downloadId " + downloadId);
-        return podcastId;
-    }
-
-    private void removeIds(Context context, int podcastId, long downloadId) {
-        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
-        settings.edit()
-                .remove("downloadId-" + podcastId)
-                .remove("podcastId-" + downloadId)
-                .apply();
-        //Log.d("JJJ", "remove downloadId " + downloadId + " and podcastId " + podcastId);
-    }
+//    // TODO nicer settings implementation
+//    // Writes podcast ID and download ID to settings file so we can look them up later.
+//    private void writeIds(Context context, int podcastId, long downloadId) {
+//        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
+//        settings.edit()
+//                .putLong("downloadId-" + podcastId, downloadId)
+//                .putInt("podcastId-" + downloadId, podcastId)
+//                .apply();
+//        //Log.d("JJJ", "write downloadId "+ downloadId + " for podcastId " + podcastId);
+//    }
+//
+//    // Look up download ID for a podcast ID. Returns DOWNLOAD_ID_UNKNOWN if not found.
+//    private long readDownloadId(Context context, int podcastId) {
+//        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
+//        long downloadId = settings.getLong("downloadId-" + podcastId, DOWNLOAD_ID_UNKNOWN);
+//        //Log.d("JJJ", "read downloadId " + downloadId + " for podcastId " + podcastId);
+//        return downloadId;
+//    }
+//
+//    // Look up podcast ID for a download ID. Returns PODCAST_ID_UNKNOWN if not found.
+//    private int readPodcastId(Context context, long downloadId) {
+//        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
+//        int podcastId = settings.getInt("podcastId-" + downloadId, PODCAST_ID_UNKNOWN);
+//        //Log.d("JJJ", "read podcastId " + podcastId + " for downloadId " + downloadId);
+//        return podcastId;
+//    }
+//
+//    // Removes podcast ID and download ID from settings file.
+//    private void removeIds(Context context, int podcastId, long downloadId) {
+//        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
+//        settings.edit()
+//                .remove("downloadId-" + podcastId)
+//                .remove("podcastId-" + downloadId)
+//                .apply();
+//        //Log.d("JJJ", "remove downloadId " + downloadId + " and podcastId " + podcastId);
+//    }
 
     private static String getFilename(final String path) {
         if (path == null) {
             return ""; // Return empty string, path is null
         }
+
         int pathEndIndex = path.lastIndexOf('/');
         if (pathEndIndex < path.length() - 1) {
             return path.substring(pathEndIndex + 1); // Return everything after the last slash
@@ -227,11 +178,69 @@ public class RadioLibrary {
         }
     }
 
+    private Status getStatus(Context context, int podcastId) {
+//        long downloadId = readDownloadId(context, podcastId);
+        long downloadId = Settings.get().readLibraryDownloadId(podcastId);
+        return getStatus(context, downloadId);
+    }
+
+    private Status getStatus(Context context, long downloadId) {
+        Status status = new Status();
+
+        if (downloadId == Settings.DOWNLOAD_ID_UNKNOWN) {
+            return status; // Return, podcast has not been downloaded
+        }
+
+        // Query download manager
+        DownloadManager.Query q = new DownloadManager.Query();
+        q.setFilterById(downloadId);
+        DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
+        Cursor c = manager.query(q);
+
+        if (c.moveToFirst()) {
+            int statusValue = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+            float progress = c.getFloat(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
+            float total = c.getFloat(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
+            String localUrl = c.getString(c.getColumnIndex(DownloadManager.COLUMN_LOCAL_URI));
+
+            switch (statusValue) {
+                case DownloadManager.STATUS_FAILED:
+                    status.downloadStatus = DOWNLOAD_STATUS_FAILED;
+                    break;
+                case DownloadManager.STATUS_PAUSED:
+                    status.downloadStatus = DOWNLOAD_STATUS_PAUSED;
+                    break;
+                case DownloadManager.STATUS_PENDING:
+                    status.downloadStatus = DOWNLOAD_STATUS_PENDING;
+                    break;
+                case DownloadManager.STATUS_RUNNING:
+                    status.downloadStatus = DOWNLOAD_STATUS_RUNNING;
+                    break;
+                case DownloadManager.STATUS_SUCCESSFUL:
+                    status.downloadStatus = DOWNLOAD_STATUS_SUCCESSFUL;
+                    break;
+            }
+
+            if (total > 0) {
+                status.downloadProgress = progress / total;
+            }
+
+            status.localPodcastUrl = localUrl;
+
+            Log.d("JJJ", getDownloadStatusName(status.downloadStatus) + " " + progress + " of " + total + " bytes " + localUrl);
+        } else {
+            Log.d("JJJ", "Unable to query downloadmanager about downloadId " + downloadId);
+        }
+
+        c.close();
+
+        return status;
+    }
+
     public void addListener(Context context, int podcastId, OnRadioLibraryStatusUpdatedListener listener) {
-        // Create "download complete" listener
         boolean isInitialized = (listenersByPodcastId.size() != 0);
         if (!isInitialized) {
-            context.registerReceiver(downloadCompleteReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+            context.registerReceiver(downloadCompleteReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)); // Create "download complete" listener
         }
 
         if (!listenersByPodcastId.containsKey(podcastId)) {
@@ -257,7 +266,7 @@ public class RadioLibrary {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
-            long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, DOWNLOAD_ID_UNKNOWN);
+            long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, Settings.DOWNLOAD_ID_UNKNOWN);
             boolean isVerified = verifyDownload(context, downloadId);
             if (isVerified) {
                 Log.d("JJJ", "Download complete and verified " + downloadId);
@@ -266,8 +275,8 @@ public class RadioLibrary {
             }
             Log.d("JJJ", "Got message: " + DownloadManager.ACTION_DOWNLOAD_COMPLETE + " downloadId " + downloadId + " isVerified " + isVerified);
 
-            int podcastId = readPodcastId(context, downloadId);
-            if (podcastId != PODCAST_ID_UNKNOWN) {
+            int podcastId = Settings.get().readLibraryPodcastId(downloadId);
+            if (podcastId != Settings.PODCAST_ID_UNKNOWN) {
                 callback(context, podcastId); // Callback to listeners that something happened
             } else {
                 Log.d("JJJ", "Download complete but no podcastId is linked to that downloadId " + downloadId + " - is it our download at all (are we even notified about other downloads?) and if it is - is settings file up to date?");

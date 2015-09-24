@@ -54,7 +54,9 @@ public class MainActivity extends FragmentActivity implements
         // Hockeyapp
         checkForUpdates();
 
-        RestClient.initialize(getResources().getString(R.string.url_api)); // Initialize singleton
+        // Initialize singletons
+        Settings.initialize(this);
+        RestClient.initialize(getResources().getString(R.string.url_api));
 
         // Start on "Offline" tab if started by DownloadReceiver
         Intent callingIntent = getIntent();
