@@ -1,9 +1,6 @@
 package com.molamil.radio24syv;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 /**
@@ -33,16 +30,16 @@ public class Settings {
         settings = new SettingsDatabase(context);
     }
 
-    public void writeLibraryIds(int podcastId, long downloadId) {
-        settings.writeLibraryIds(podcastId, downloadId);
+    public void addLibraryIds(int podcastId, long downloadId) {
+        settings.addLibraryIds(podcastId, downloadId);
     }
 
-    public long readLibraryDownloadId(int podcastId) {
-        return settings.readLibraryDownloadId(podcastId);
+    public long getLibraryDownloadId(int podcastId) {
+        return settings.getLibraryDownloadId(podcastId);
     }
 
-    public int readLibraryPodcastId(long downloadId) {
-        return settings.readLibraryPodcastId(downloadId);
+    public int getLibraryPodcastId(long downloadId) {
+        return settings.getLibraryPodcastId(downloadId);
     }
 
     public void removeLibraryIds(int podcastId) {

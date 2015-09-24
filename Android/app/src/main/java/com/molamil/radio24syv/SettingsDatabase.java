@@ -8,6 +8,8 @@ import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 import com.molamil.radio24syv.Settings;
 
+import java.util.Locale;
+
 /**
  * Created by jens on 24/09/15.
  */
@@ -59,14 +61,16 @@ public class SettingsDatabase extends SQLiteOpenHelper {
         onCreate(db);
     }
 
-    public void writeLibraryIds(int podcastId, long downloadId) {
+    public void addLibraryIds(int podcastId, long downloadId) {
         ContentValues values = new ContentValues();
         values.put(KEY_PODCAST_ID, podcastId);
         values.put(KEY_DOWNLOAD_ID, downloadId);
         getWritableDatabase().replace(TABLE_LIBRARY, null, values);
     }
 
-    public long readLibraryDownloadId(int podcastId) {
+    public long getLibraryDownloadId(int podcastId) {
+        // Better performance but unreadable
+        //String query = String.format(Locale.US, "SELECT %s FROM %s WHERE %s = %d", KEY_DOWNLOAD_ID, TABLE_LIBRARY,KEY_PODCAST_ID, podcastId );
         String query = "SELECT " + KEY_DOWNLOAD_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_PODCAST_ID + " = " + podcastId;
         Log.d("JJJ", query);
 
@@ -81,19 +85,19 @@ public class SettingsDatabase extends SQLiteOpenHelper {
         }
     }
 
-    public int readLibraryPodcastId(long downloadId) {
+    public int getLibraryPodcastId(long downloadId) {
         String query = "SELECT " + KEY_PODCAST_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_DOWNLOAD_ID + " = " + downloadId;
         Log.d("JJJ", query);
 
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             int podcastId = c.getInt(c.getColumnIndex(KEY_PODCAST_ID));
+            c.close();
             Log.d("JJJ", "podcastId " + podcastId);
             return podcastId;
-        } else {
-            Log.d("JJJ", "podcastId unknown");
-            return Settings.PODCAST_ID_UNKNOWN;
         }
+        Log.d("JJJ", "podcastId unknown");
+        return Settings.PODCAST_ID_UNKNOWN;
     }
 
     public void removeLibraryIds(int podcastId) {

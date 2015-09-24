@@ -5,7 +5,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.Environment;
@@ -14,7 +13,6 @@ import android.util.Log;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
-import java.util.Set;
 
 /**
  * Podcast download manager. Uses Android's built-in download manager for file download and local file management.
@@ -38,9 +36,6 @@ public class RadioLibrary {
         }
     }
 
-//    private final long DOWNLOAD_ID_UNKNOWN = -1;
-//    private final int PODCAST_ID_UNKNOWN = -1;
-//
     private static RadioLibrary instance = null;
 
     public static RadioLibrary getInstance() {
@@ -69,16 +64,14 @@ public class RadioLibrary {
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         long downloadId = manager.enqueue(request);
 
-//        writeIds(context, podcastId, downloadId);
-        Settings.get().writeLibraryIds(podcastId, downloadId);
+        Settings.get().addLibraryIds(podcastId, downloadId);
         callback(context, podcastId);
     }
 
     // Deletes the downloaded file or cancels its download and cleans up.
     public void remove(Context context, int podcastId) {
         boolean isRemoved;
-//        long downloadId = readDownloadId(context, podcastId);
-        long downloadId = Settings.get().readLibraryDownloadId(podcastId);
+        long downloadId = Settings.get().getLibraryDownloadId(podcastId);
         boolean isDownloaded = (downloadId != Settings.DOWNLOAD_ID_UNKNOWN);
         if (isDownloaded) {
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
@@ -89,7 +82,6 @@ public class RadioLibrary {
 
         if (isRemoved) {
             Log.d("JJJ", "Removed podcastId " + podcastId);
-//            removeIds(context, podcastId, downloadId); // Remove entries for the now non-existing download
             Settings.get().removeLibraryIds(podcastId); // Remove entries for the now non-existing download
         } else {
             // Something is funky
@@ -99,43 +91,6 @@ public class RadioLibrary {
 
         callback(context, podcastId);
     }
-
-//    // TODO nicer settings implementation
-//    // Writes podcast ID and download ID to settings file so we can look them up later.
-//    private void writeIds(Context context, int podcastId, long downloadId) {
-//        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
-//        settings.edit()
-//                .putLong("downloadId-" + podcastId, downloadId)
-//                .putInt("podcastId-" + downloadId, podcastId)
-//                .apply();
-//        //Log.d("JJJ", "write downloadId "+ downloadId + " for podcastId " + podcastId);
-//    }
-//
-//    // Look up download ID for a podcast ID. Returns DOWNLOAD_ID_UNKNOWN if not found.
-//    private long readDownloadId(Context context, int podcastId) {
-//        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
-//        long downloadId = settings.getLong("downloadId-" + podcastId, DOWNLOAD_ID_UNKNOWN);
-//        //Log.d("JJJ", "read downloadId " + downloadId + " for podcastId " + podcastId);
-//        return downloadId;
-//    }
-//
-//    // Look up podcast ID for a download ID. Returns PODCAST_ID_UNKNOWN if not found.
-//    private int readPodcastId(Context context, long downloadId) {
-//        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
-//        int podcastId = settings.getInt("podcastId-" + downloadId, PODCAST_ID_UNKNOWN);
-//        //Log.d("JJJ", "read podcastId " + podcastId + " for downloadId " + downloadId);
-//        return podcastId;
-//    }
-//
-//    // Removes podcast ID and download ID from settings file.
-//    private void removeIds(Context context, int podcastId, long downloadId) {
-//        SharedPreferences settings = context.getSharedPreferences("Test", Context.MODE_PRIVATE);
-//        settings.edit()
-//                .remove("downloadId-" + podcastId)
-//                .remove("podcastId-" + downloadId)
-//                .apply();
-//        //Log.d("JJJ", "remove downloadId " + downloadId + " and podcastId " + podcastId);
-//    }
 
     private static String getFilename(final String path) {
         if (path == null) {
@@ -179,8 +134,7 @@ public class RadioLibrary {
     }
 
     private Status getStatus(Context context, int podcastId) {
-//        long downloadId = readDownloadId(context, podcastId);
-        long downloadId = Settings.get().readLibraryDownloadId(podcastId);
+        long downloadId = Settings.get().getLibraryDownloadId(podcastId);
         return getStatus(context, downloadId);
     }
 
@@ -240,7 +194,7 @@ public class RadioLibrary {
     public void addListener(Context context, int podcastId, OnRadioLibraryStatusUpdatedListener listener) {
         boolean isInitialized = (listenersByPodcastId.size() != 0);
         if (!isInitialized) {
-            context.registerReceiver(downloadCompleteReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)); // Create "download complete" listener
+            context.registerReceiver(downloadCompleteReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)); // Create broadcast receiver for "download complete" messages
         }
 
         if (!listenersByPodcastId.containsKey(podcastId)) {
@@ -275,7 +229,7 @@ public class RadioLibrary {
             }
             Log.d("JJJ", "Got message: " + DownloadManager.ACTION_DOWNLOAD_COMPLETE + " downloadId " + downloadId + " isVerified " + isVerified);
 
-            int podcastId = Settings.get().readLibraryPodcastId(downloadId);
+            int podcastId = Settings.get().getLibraryPodcastId(downloadId);
             if (podcastId != Settings.PODCAST_ID_UNKNOWN) {
                 callback(context, podcastId); // Callback to listeners that something happened
             } else {
@@ -297,9 +251,10 @@ public class RadioLibrary {
     }
 
     /**
-     * From http://stackoverflow.com/questions/8937817/downloadmanager-action-download-complete-broadcast-receiver-receiving-same-downl
      * Check if download was valid, see issue
      * http://code.google.com/p/android/issues/detail?id=18462
+     * From
+     * http://stackoverflow.com/questions/8937817/downloadmanager-action-download-complete-broadcast-receiver-receiving-same-downl
      */
     private boolean verifyDownload(Context context, long downloadId) {
         Log.d("JJJ", "Verifying file for downloadId " + downloadId);
@@ -340,7 +295,7 @@ public class RadioLibrary {
         }
 
         public String getDownloadProgressText() {
-            return String.format(Locale.getDefault(), "%d%%", (int)(100 * downloadProgress)); // "%%" is converted to "%" (Java secret)
+            return String.format(Locale.getDefault(), "%d%%", (int)(100 * downloadProgress)); // "%%" is converted to "%" (secret!)
         }
 
         @Override
