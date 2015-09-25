@@ -68,15 +68,19 @@ public class LiveFragment extends PageFragment {
                     ((TextView) v.findViewById(R.id.program_category)).setText(b.getTopic());
                     ((TextView) v.findViewById(R.id.program_description)).setText(b.getDescriptionText());
                 } else {
-                    listener.onError(response.message());
+                    if (listener != null) {
+                        listener.onError(response.message());
+                    }
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-                listener.onError(t.getLocalizedMessage());
                 Log.d("JJJ", "fail " + t.getMessage());
                 t.printStackTrace();
+                if (listener != null) {
+                    listener.onError(t.getLocalizedMessage());
+                }
             }
         });
 

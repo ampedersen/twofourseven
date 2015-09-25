@@ -46,8 +46,8 @@ public class SettingsDatabase extends SQLiteOpenHelper {
             + KEY_TITLE + " TEXT, " + KEY_DESCRIPTION + " TEXT, " + KEY_AUDIO_URL + " TEXT, " + KEY_DATE + " TEXT " + ")"; // "DATE" type is not supported by Cursor so have to use "TEXT" for KEY_DATE, yay
 
     // If you change the database schema, you must increment the database version.
-    public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "Settings.db";
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "Settings.db";
 
     public SettingsDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
@@ -58,8 +58,8 @@ public class SettingsDatabase extends SQLiteOpenHelper {
     }
 
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
-        // For now, discard the data and start over.
         // Upgrade existing table to new format if table version is upgraded in a later app version.
+        // For now, discard the data and start over.
         dropTables(db);
         createTables(db);
     }
@@ -130,9 +130,7 @@ public class SettingsDatabase extends SQLiteOpenHelper {
     }
 
     public void removeLibraryIds(int podcastId) {
-        String query = "DELETE FROM " + TABLE_LIBRARY + " WHERE " + KEY_PODCAST_ID + " = " + podcastId;
-        Log.d("JJJ", query);
-        getWritableDatabase().rawQuery(query, null); // TODO error handling?
+        deleteRow(TABLE_LIBRARY, KEY_PODCAST_ID + " = " + podcastId);
     }
 
     public void addProgram(ProgramInfo program) {
@@ -166,7 +164,7 @@ public class SettingsDatabase extends SQLiteOpenHelper {
     }
 
     public List<ProgramInfo> getPrograms() {
-        String query = "SELECT * FROM " + TABLE_PROGRAM;
+        String query = "SELECT * FROM " + TABLE_PROGRAM + " ORDER BY " + KEY_NAME;
         Log.d("JJJ", query);
 
         ArrayList<ProgramInfo> programs = new ArrayList<>();
@@ -191,9 +189,7 @@ public class SettingsDatabase extends SQLiteOpenHelper {
     }
 
     public void removeProgram(int programId) {
-        String query = "DELETE FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " = " + programId;
-        Log.d("JJJ", query);
-        getWritableDatabase().rawQuery(query, null); // TODO error handling?
+        deleteRow(TABLE_PROGRAM, KEY_PROGRAM_ID + " = " + programId);
     }
 
     public void addPodcast(PodcastInfo podcast) {
@@ -255,7 +251,7 @@ public class SettingsDatabase extends SQLiteOpenHelper {
     }
 
     public List<PodcastInfo> getPodcasts(int programId) {
-        String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId;
+        String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " ORDER BY " + KEY_DATE + " DESC";
         Log.d("JJJ", query);
 
         ArrayList<PodcastInfo> podcasts = new ArrayList<>();
@@ -270,7 +266,7 @@ public class SettingsDatabase extends SQLiteOpenHelper {
                 podcast.setDate(c.getString(c.getColumnIndex(KEY_DATE)));
                 podcast.setAudioUrl(c.getString(c.getColumnIndex(KEY_AUDIO_URL)));
                 podcasts.add(podcast);
-                Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
+                Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId() + " date " + podcast.getDate());
             } while (c.moveToNext());
             c.close();
         }
@@ -295,9 +291,12 @@ public class SettingsDatabase extends SQLiteOpenHelper {
     }
 
     public void removePodcast(int podcastId) {
-        String query = "DELETE FROM " + TABLE_PODCAST + " WHERE " + KEY_PODCAST_ID + " = " + podcastId;
-        Log.d("JJJ", query);
-        getWritableDatabase().rawQuery(query, null); // TODO error handling?
+        deleteRow(TABLE_PODCAST, KEY_PODCAST_ID + " = " + podcastId);
+    }
+
+    private void deleteRow(String table, String whereSelector) {
+        int rows = getWritableDatabase().delete(table, whereSelector, null);
+        Log.d("JJJ", "DELETE FROM " + table + " WHERE " + whereSelector + " (" + rows + " row(s) deleted)");
     }
 
 }

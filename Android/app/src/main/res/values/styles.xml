@@ -2,7 +2,8 @@
 
     <!-- Base application theme. -->
     <style name="AppTheme" parent="Theme.AppCompat.NoActionBar">
-        <!-- Customize your theme here. -->
+        <!-- Instead of white background color on startup -->
+        <item name="android:windowBackground">@color/radio_black</item>
     </style>
 
     <style name="PageTitleText" >

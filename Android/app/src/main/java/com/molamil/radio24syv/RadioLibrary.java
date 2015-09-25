@@ -308,7 +308,7 @@ public class RadioLibrary {
         }
 
         public String getDownloadProgressText() {
-            return String.format(Locale.getDefault(), "%d%%", (int)(100 * downloadProgress)); // "%%" is converted to "%" (secret!)
+            return String.format("%d%%", (int)(100 * downloadProgress)); // "%%" is converted to "%" (secret!)
         }
 
         @Override

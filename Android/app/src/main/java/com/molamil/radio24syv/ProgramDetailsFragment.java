@@ -67,7 +67,7 @@ public class ProgramDetailsFragment extends PageFragment implements
         View v = inflater.inflate(R.layout.fragment_program_details, container, false);
 
         ((TextView) v.findViewById(R.id.program_id_text)).setText(Integer.toString(program.getProgramId()));
-        ((TextView) v.findViewById(R.id.title_text)).setText(program.getName());
+        ((TextView) v.findViewById(R.id.name_text)).setText(program.getName());
         ((TextView) v.findViewById(R.id.topic_text)).setText(program.getTopic());
         ((TextView) v.findViewById(R.id.description_text)).setText(program.getDescription());
         ((TextView) v.findViewById(R.id.image)).setText(program.getImageUrl());
@@ -115,9 +115,7 @@ public class ProgramDetailsFragment extends PageFragment implements
                     }
 
                     PodcastEpisodeView v = new PodcastEpisodeView(content.getContext());
-                    v.setTitle(p.getTitle());
-                    v.setDescription(p.getDescription());
-                    v.setPodcastIdAndUrl(p.getPodcastId(), RadioLibrary.getUrl(content.getContext(), p.getAudioUrl()));
+                    v.setPodcast(p);
                     v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
                     v.setOnPodcastEpisodeViewUpdatedListener(ProgramDetailsFragment.this);
                     content.addView(v);
@@ -191,8 +189,8 @@ public class ProgramDetailsFragment extends PageFragment implements
     }
 
     @Override
-    public void onPodcastEpisodeViewRemoveClicked(PodcastEpisodeView view, int podcastId) {
-        RadioLibrary.getInstance().remove(getActivity(), podcastById.get(podcastId));
+    public void onPodcastEpisodeViewRemoveClicked(PodcastEpisodeView view, PodcastInfo podcast) {
+        RadioLibrary.getInstance().remove(getActivity(), podcast);
     }
 
     public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {

@@ -5,13 +5,13 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.RadioLibrary;
 import com.molamil.radio24syv.RadioPlayer;
+import com.molamil.radio24syv.settings.Settings;
 import com.molamil.radio24syv.settings.model.PodcastInfo;
 import com.molamil.radio24syv.settings.model.ProgramInfo;
 
@@ -20,11 +20,14 @@ import java.util.List;
 /**
  * Created by jens on 25/09/15.
  */
-public class PodcastProgramView extends LinearLayout {
+public class PodcastProgramView extends LinearLayout implements
+    PodcastEpisodeView.OnPodcastEpisodeViewUpdatedListener {
 
     public enum Size { UNASSIGNED, CONTRACTED, EXPANDED }
     private Size size = Size.UNASSIGNED;
 //    private OnPodcastEpisodeViewUpdatedListener listener = null;
+    private PodcastEpisodeView expandedView = null;
+    private ProgramInfo program;
 
     private RadioPlayer radioPlayer;
 
@@ -100,7 +103,9 @@ public class PodcastProgramView extends LinearLayout {
     }
 
     public void setProgram(ProgramInfo program) {
-        TextView titleText = (TextView) findViewById(R.id.title_text);
+        this.program = program;
+
+        TextView titleText = (TextView) findViewById(R.id.name_text);
         titleText.setText(program.getName());
     }
 
@@ -112,16 +117,17 @@ public class PodcastProgramView extends LinearLayout {
         ViewGroup expandedLayout = (ViewGroup) findViewById(R.id.expanded_layout);
         for (PodcastInfo p : podcasts) {
             PodcastEpisodeView v = new PodcastEpisodeView(getContext());
-            v.setTitle(p.getTitle());
-            v.setDescription(p.getDescription());
-            v.setPodcastIdAndUrl(p.getPodcastId(), RadioLibrary.getUrl(getContext(), p.getAudioUrl()));
+            v.setPodcast(p);
             v.setRadioPlayer(radioPlayer);
-//            v.setOnPodcastEpisodeViewUpdatedListener(ProgramDetailsFragment.this);
+            v.setOnPodcastEpisodeViewUpdatedListener(this);
             expandedLayout.addView(v); // Add podcast as a child
         }
 
+        updatePodcastCount(podcasts.size());
+    }
+
+    private void updatePodcastCount(int count) {
         TextView countText = (TextView) findViewById(R.id.count_text);
-        int count = podcasts.size();
         int countTextId;
         if (count == 1) {
             countTextId = R.string.episode_count;
@@ -159,4 +165,40 @@ public class PodcastProgramView extends LinearLayout {
 //            listener.onPodcastEpisodeViewSizeChanged(this, size);
 //        }
     }
+
+    @Override
+    public void onPodcastEpisodeViewSizeChanged(PodcastEpisodeView view, PodcastEpisodeView.Size size) {
+        if (size == PodcastEpisodeView.Size.EXPANDED) {
+            View oldExpandedView = expandedView;
+            if (expandedView != null) {
+                expandedView.setSize(PodcastEpisodeView.Size.CONTRACTED); // Make sure only one view is expanded at a time
+            }
+            if (oldExpandedView != view) {
+                expandedView = view; // If the same view was clicked, it has just been contracted and expandedView set to null. Do not assign it again.
+            }
+        } else {
+            expandedView = null;
+        }
+    }
+
+    @Override
+    public void onPodcastEpisodeViewDownloadClicked(PodcastEpisodeView view, int podcastId) {
+        // Not used. Download button is only visible if the podcast is not downloaded, and only downloaded podcasts are shown here.
+    }
+
+    @Override
+    public void onPodcastEpisodeViewRemoveClicked(PodcastEpisodeView view, PodcastInfo podcast) {
+        ViewGroup expandedLayout = (ViewGroup) findViewById(R.id.expanded_layout);
+        expandedLayout.removeView(view);
+        RadioLibrary.getInstance().remove(getContext(), podcast);
+
+        int count = Settings.get().getPodcastCount(program.getProgramId());
+        if (count > 0) {
+            updatePodcastCount(count);
+        } else {
+            ((ViewGroup) getParent()).removeView(this); // Remove self when all podcasts are removed
+        }
+    }
+
+
 }

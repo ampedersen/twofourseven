@@ -37,8 +37,9 @@
                 android:id="@+id/error_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/radio_red"
-                android:textColor="@color/radio_white"
+                android:background="@color/radio_yellow"
+                android:textColor="@color/radio_black"
+                android:layout_gravity="bottom|center_horizontal"
                 android:visibility="gone"
                 />
 

@@ -10,6 +10,7 @@ import android.widget.TextView;
 import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.RadioLibrary;
 import com.molamil.radio24syv.RadioPlayer;
+import com.molamil.radio24syv.settings.model.PodcastInfo;
 
 /**
  * Created by jens on 21/09/15.
@@ -21,9 +22,8 @@ public class PodcastEpisodeView extends LinearLayout implements
     private Size size = Size.UNASSIGNED;
     private OnPodcastEpisodeViewUpdatedListener listener = null;
 
-    private String title;
+    private PodcastInfo podcast;
     private String podcastUrl;
-    private int podcastId;
 
     public PodcastEpisodeView(Context context) {
         super(context);
@@ -117,24 +117,21 @@ public class PodcastEpisodeView extends LinearLayout implements
     protected void onDetachedFromWindow() {
         super.onDetachedFromWindow();
         // View is now detached, and about to be destroyed
-        RadioLibrary.getInstance().removeListener(podcastId, this);
+        if (podcast != null) {
+            RadioLibrary.getInstance().removeListener(podcast.getPodcastId(), this);
+        }
     }
 
-    public void setTitle(String title) {
-        this.title = title;
-        TextView titleText = (TextView) findViewById(R.id.title_text);
-        titleText.setText(title);
-    }
+    public void setPodcast(PodcastInfo podcast) {
+        this.podcast = podcast;
+        this.podcastUrl = RadioLibrary.getUrl(getContext(), podcast.getAudioUrl());
 
-    public void setDescription(String description) {
+        TextView titleText = (TextView) findViewById(R.id.name_text);
+        titleText.setText(podcast.getTitle());
         TextView descriptionText = (TextView) findViewById(R.id.description_text);
-        descriptionText.setText(description);
-    }
+        descriptionText.setText(podcast.getDescription());
 
-    public void setPodcastIdAndUrl(int podcastId, String podcastUrl) {
-        this.podcastId = podcastId;
-        this.podcastUrl = podcastUrl;
-        RadioLibrary.getInstance().addListener(getContext(), podcastId, this); // Listen for updates for this podcast ID
+        RadioLibrary.getInstance().addListener(getContext(), podcast.getPodcastId(), this); // Listen for updates for this podcast ID
     }
 
     public void setRadioPlayer(RadioPlayer player) {
@@ -227,14 +224,14 @@ public class PodcastEpisodeView extends LinearLayout implements
     private final OnClickListener downloadOnClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            listener.onPodcastEpisodeViewDownloadClicked(PodcastEpisodeView.this, podcastId);
+            listener.onPodcastEpisodeViewDownloadClicked(PodcastEpisodeView.this, podcast.getPodcastId());
         }
     };
 
     private final OnClickListener removeOnClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            listener.onPodcastEpisodeViewRemoveClicked(PodcastEpisodeView.this, podcastId);
+            listener.onPodcastEpisodeViewRemoveClicked(PodcastEpisodeView.this, podcast);
         }
     };
 
@@ -245,6 +242,6 @@ public class PodcastEpisodeView extends LinearLayout implements
     public interface OnPodcastEpisodeViewUpdatedListener {
         void onPodcastEpisodeViewSizeChanged(PodcastEpisodeView view, Size size);
         void onPodcastEpisodeViewDownloadClicked(PodcastEpisodeView view, int podcastId);
-        void onPodcastEpisodeViewRemoveClicked(PodcastEpisodeView view, int podcastId);
+        void onPodcastEpisodeViewRemoveClicked(PodcastEpisodeView view, PodcastInfo podcast);
     }
 }
