@@ -30,6 +30,7 @@
             android:layout_height="wrap_content"
             android:textColor="@drawable/tab_text"
             android:textSize="12sp"
+            android:textStyle="bold"
             />
 
     </LinearLayout>
