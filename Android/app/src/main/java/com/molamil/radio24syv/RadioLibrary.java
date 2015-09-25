@@ -10,6 +10,10 @@ import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
+import com.molamil.radio24syv.settings.Settings;
+import com.molamil.radio24syv.settings.model.PodcastInfo;
+import com.molamil.radio24syv.settings.model.ProgramInfo;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
@@ -47,16 +51,18 @@ public class RadioLibrary {
 
     private HashMap<Integer, ArrayList<OnRadioLibraryStatusUpdatedListener>> listenersByPodcastId = new HashMap<>();
 
-    public void download(Context context, int podcastId, String podcastUrl, String title) {
+    public void download(Context context, ProgramInfo program, PodcastInfo podcast) {
+        int podcastId = podcast.getPodcastId();
+        String podcastUrl = podcast.getAudioUrl();
+
         String url = getUrl(context, podcastUrl);
-        //String filename = getFilename(url);
         String filename = getFilename(url, podcastId);
 
         Log.d("JJJ", "download " + filename + " " + url);
 
         DownloadManager.Request request = new DownloadManager.Request(Uri.parse(url));
         request.setDestinationInExternalFilesDir(context, Environment.DIRECTORY_PODCASTS, filename);
-        request.setTitle(title);
+        request.setTitle(podcast.getTitle());
         request.setDescription(context.getResources().getString(R.string.app_name));
         request.setNotificationVisibility(DownloadManager.Request.VISIBILITY_VISIBLE);
 
@@ -64,14 +70,16 @@ public class RadioLibrary {
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         long downloadId = manager.enqueue(request);
 
+        Settings.get().addProgram(program);
+        Settings.get().addPodcast(podcast);
         Settings.get().addLibraryIds(podcastId, downloadId);
         callback(context, podcastId);
     }
 
     // Deletes the downloaded file or cancels its download and cleans up.
-    public void remove(Context context, int podcastId) {
+    public void remove(Context context, PodcastInfo podcast) {
         boolean isRemoved;
-        long downloadId = Settings.get().getLibraryDownloadId(podcastId);
+        long downloadId = Settings.get().getLibraryDownloadId(podcast.getPodcastId());
         boolean isDownloaded = (downloadId != Settings.DOWNLOAD_ID_UNKNOWN);
         if (isDownloaded) {
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
@@ -81,29 +89,34 @@ public class RadioLibrary {
         }
 
         if (isRemoved) {
-            Log.d("JJJ", "Removed podcastId " + podcastId);
-            Settings.get().removeLibraryIds(podcastId); // Remove entries for the now non-existing download
+            Log.d("JJJ", "Removed podcastId " + podcast.getPodcastId() + " " + podcast.getTitle());
+            // Remove entries for the now non-existing download
+            Settings.get().removePodcast(podcast.getPodcastId());
+            Settings.get().removeLibraryIds(podcast.getPodcastId());
+            if (Settings.get().getPodcastCount(podcast.getProgramId()) == 0) {
+                Settings.get().removeProgram(podcast.getProgramId()); // Remove program if it has no downloaded podcasts left
+            }
         } else {
             // Something is funky
-            Status status = getStatus(context, podcastId);
-            Log.w("JJJ", "Unable to remove podcastId " + podcastId + " status " + status.getDownloadProgressText() + " " + status.getDownloadStatusText());
+            Status status = getStatus(context, podcast.getPodcastId());
+            Log.w("JJJ", "Unable to remove podcastId " + podcast.getPodcastId() + " status " + status.getDownloadProgressText() + " " + status.getDownloadStatusText());
         }
 
-        callback(context, podcastId);
+        callback(context, podcast.getPodcastId());
     }
 
-    private static String getFilename(final String path) {
-        if (path == null) {
-            return ""; // Return empty string, path is null
-        }
-
-        int pathEndIndex = path.lastIndexOf('/');
-        if (pathEndIndex < path.length() - 1) {
-            return path.substring(pathEndIndex + 1); // Return everything after the last slash
-        } else {
-            return ""; // Return empty string, there is no filename when the path ends with a slash
-        }
-    }
+//    private static String getFilename(final String path) {
+//        if (path == null) {
+//            return ""; // Return empty string, path is null
+//        }
+//
+//        int pathEndIndex = path.lastIndexOf('/');
+//        if (pathEndIndex < path.length() - 1) {
+//            return path.substring(pathEndIndex + 1); // Return everything after the last slash
+//        } else {
+//            return ""; // Return empty string, there is no filename when the path ends with a slash
+//        }
+//    }
 
     private static String getFilename(final String path, int podcastId) {
         if (path == null) {
@@ -119,9 +132,9 @@ public class RadioLibrary {
         }
 
         if (extension != null) {
-            return String.format(Locale.US, "%d.%s", podcastId, extension);
+            return String.format(Locale.US, "%d.%s", podcastId, extension); // "1234.mp3"
         } else {
-            return String.format(Locale.US, "%d", podcastId);
+            return String.format(Locale.US, "%d", podcastId); // "1234" (no extension)
         }
     }
 
@@ -129,7 +142,7 @@ public class RadioLibrary {
         if (!podcastUrl.startsWith(context.getResources().getString(R.string.url_offline_radio))) {
             return context.getResources().getString(R.string.url_offline_radio) + podcastUrl;
         } else {
-            return podcastUrl; // Return same URL because it has already been prepended
+            return podcastUrl; // Return same URL because it has already been prepended (just in case)
         }
     }
 
@@ -233,7 +246,7 @@ public class RadioLibrary {
             if (podcastId != Settings.PODCAST_ID_UNKNOWN) {
                 callback(context, podcastId); // Callback to listeners that something happened
             } else {
-                Log.d("JJJ", "Download complete but no podcastId is linked to that downloadId " + downloadId + " - is it our download at all (are we even notified about other downloads?) and if it is - is settings file up to date?");
+                Log.d("JJJ", "Download complete but no podcastId is linked to that downloadId " + downloadId + " - is settings database up to date (or are we just getting this callback from Android a little late?)");
             }
         }
     };

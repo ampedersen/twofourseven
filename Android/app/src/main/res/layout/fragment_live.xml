@@ -6,11 +6,6 @@
     tools:context="com.molamil.radio24syv.LiveFragment"
     android:background="@color/radio_black">
 
-    <!--<TextView-->
-    <!--android:layout_width="wrap_content"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="@string/title_fragment_live" />-->
-
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -27,6 +22,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/live_header"
+                style="@style/PageTitleText"
                 />
 
             <TextView

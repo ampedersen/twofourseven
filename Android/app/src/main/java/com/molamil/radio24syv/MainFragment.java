@@ -13,6 +13,8 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
+import org.w3c.dom.Text;
+
 import java.util.ArrayList;
 
 public class MainFragment extends Fragment {
@@ -205,6 +207,21 @@ public class MainFragment extends Fragment {
 
     public void setStartupTab(String startupTabTag) {
         this.startupTabTag = startupTabTag;
+    }
+
+    public void setError(String message) {
+        View v = getView();
+        if (v != null) {
+            TextView error = (TextView) v.findViewById(R.id.error_text);
+            if ((message != null) && !message.equals("")) {
+                error.setText(message);
+                error.setVisibility(View.VISIBLE);
+            } else {
+                error.setVisibility(View.GONE);
+            }
+        } else {
+            Log.e("JJJ", "Unable to show error message because I have no view yet: " + message); // TODO store error message in variable and update ErrorView on onCreateView according to variable contents
+        }
     }
 
     public interface OnMainFragmentInteractionListener {

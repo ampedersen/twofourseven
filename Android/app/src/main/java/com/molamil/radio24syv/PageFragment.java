@@ -62,5 +62,6 @@ public abstract class PageFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         public enum Side { HIDE, SHOW_LEFT, SHOW_RIGHT, SHOW_SUB_PAGE };
         public void onShowSidePage(Side side);
+        void onError(String message);
     }
 }

@@ -12,6 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.molamil.radio24syv.settings.model.ProgramInfo;
 import com.molamil.radio24syv.view.RadioViewPager;
 
 
@@ -112,8 +113,8 @@ public class ProgramsFragment extends PageFragment {
         }
     }
 
-    public void showDetails(String programId) {
-        pager.setAdapter(new DetailsPagerAdapter(getChildFragmentManager(), programId));
+    public void showDetails(ProgramInfo program) {
+        pager.setAdapter(new DetailsPagerAdapter(getChildFragmentManager(), program));
         //pager.setCurrentItem(1, true); // This changes page instantly even though told otherwise. It happens when setCurrentItem() is called straight after changing adapter.
         new Handler().post(new Runnable() {
             @Override
@@ -147,11 +148,11 @@ public class ProgramsFragment extends PageFragment {
 
     // Adapter for shows program list page and program details page
     private class DetailsPagerAdapter extends FragmentStatePagerAdapter {
-        final String programId;
+        final ProgramInfo program;
 
-        public DetailsPagerAdapter(FragmentManager fm, String programId) {
+        public DetailsPagerAdapter(FragmentManager fm, ProgramInfo program) {
             super(fm);
-            this.programId = programId;
+            this.program = program;
         }
 
         @Override
@@ -160,7 +161,7 @@ public class ProgramsFragment extends PageFragment {
                 case 0:
                     return programListFragment;
                 case 1:
-                    return ProgramDetailsFragment.newInstance(programId);
+                    return ProgramDetailsFragment.newInstance(program);
             }
             Log.e("JJJ", "Unable to determine a fragment for page " + position + " - returning null");
             return null;

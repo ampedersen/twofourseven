@@ -8,6 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.molamil.radio24syv.settings.Settings;
+import com.molamil.radio24syv.settings.model.ProgramInfo;
+import com.molamil.radio24syv.view.PodcastProgramView;
+
+import java.util.List;
+
 
 /**
  * A simple {@link Fragment} subclass.
@@ -18,34 +24,11 @@ import android.view.ViewGroup;
  * create an instance of this fragment.
  */
 public class OfflineFragment extends PageFragment {
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
 
     private OnFragmentInteractionListener mListener;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment OfflineFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static OfflineFragment newInstance(String param1, String param2) {
-        OfflineFragment fragment = new OfflineFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
+    private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
+
 
     public OfflineFragment() {
         // Required empty public constructor
@@ -54,24 +37,29 @@ public class OfflineFragment extends PageFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-        // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_offline, container, false);
-    }
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View v = inflater.inflate(R.layout.fragment_offline, container, false);
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onFragmentInteraction(uri);
+        v.findViewById(R.id.delete_all_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Settings.get().deleteAll(getActivity());
+            }
+        });
+
+        ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
+        for (ProgramInfo program : Settings.get().getPrograms()) {
+            PodcastProgramView p = new PodcastProgramView(getActivity());
+            p.setProgram(program);
+            p.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
+            p.setPodcasts(Settings.get().getPodcasts(program.getProgramId()));
+            content.addView(p);
         }
+
+        return v;
     }
 
     @Override
@@ -82,6 +70,12 @@ public class OfflineFragment extends PageFragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
+        }
+        try {
+            radioPlayerProvider = (RadioPlayer.RadioPlayerProvider) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement PlayerFragment.RadioPlayerProvider");
         }
     }
 

@@ -11,6 +11,8 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.settings.Settings;
+import com.molamil.radio24syv.settings.model.ProgramInfo;
 import com.molamil.radio24syv.receiver.DownloadReceiver;
 import com.molamil.radio24syv.view.RadioViewPager;
 
@@ -152,19 +154,24 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
+    public void onError(String message) {
+        mainFragment.setError(message);
+    }
+
+    @Override
     public void onEnableSidePageInteraction(boolean enable) {
         Log.d("JJJ", "Enable side page interaction " + enable);
         pager.setPagingEnabled(enable);
     }
 
     @Override
-    public void onProgramSelected(String programId) {
+    public void onProgramSelected(ProgramInfo program) {
         ProgramsFragment f = (ProgramsFragment) mainFragment.getChildFragmentManager().findFragmentByTag(MainFragment.TAG_TAB_PROGRAMS);
         if (f == null) {
-            Log.d("JJJ", "OMG no programs fragment but a program was selected in its child ProgramListFragment.?!?!! " + programId);
+            Log.d("JJJ", "OMG no programs fragment but a program was selected in its child ProgramListFragment.?!?!! " + program.getProgramId() + " " + program.getName());
             return;
         }
-        f.showDetails(programId);
+        f.showDetails(program);
     }
 
     @Override
@@ -220,14 +227,14 @@ public class MainActivity extends FragmentActivity implements
 
         pager.setCurrentItem(mainPagePosition, false);
 
-        // Small player
+
         PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
         if (playerFragment.getSize() == PlayerFragment.PlayerSize.BIG) {
-            playerFragment.setSize(PlayerFragment.PlayerSize.SMALL);
+            playerFragment.setSize(PlayerFragment.PlayerSize.SMALL); // Small player
         }
 
-        // Normal tab size
-        mainFragment.setTabSize(MainFragment.TabSize.NORMAL);
+        mainFragment.setTabSize(MainFragment.TabSize.NORMAL); // Normal tab size
+        mainFragment.setError(null); // Clear error message
     }
 
     @Override

@@ -26,15 +26,24 @@
     <string name="tab_offline">Lyt offline</string>
 
     <!-- Live radio -->
-    <string name="live_schedule_button">Se sendeplan</string>
     <string name="live_header">Radio24syv Live</string>
+    <string name="live_schedule_button">Se sendeplan</string>
     <string name="playing_now">Playing now</string> <!-- TODO Lige nu -->
     <string name="expand_text">Se mere</string>
     <string name="contract_text">Se mindre</string>
 
+    <!-- Programs -->
+    <string name="programs_header">Programmer</string>
+
+    <!-- News -->
+    <string name="news_header">Sidste nyt</string>
+
     <!-- Offline -->
+    <string name="offline_header">Lyt offline</string>
     <string name="download_podcast">Gem til offline</string>
     <string name="remove_podcast">Fjern fra offline</string>
+    <string name="episode_count">%d episode</string> <!-- %d MUST be in text, is replaced with the number of episodes -->
+    <string name="episodes_count">%d episoder</string> <!-- %d MUST be in text, is replaced with the number of episodes -->
 
     <!-- URLs (no slash at the end please) -->
     <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>

@@ -4,7 +4,8 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
 
     <dimen name="page_sub_back_button_width">40dp</dimen>
-    <dimen name="page_title_text_size">25sp</dimen>
+    <dimen name="page_title_text_size">24sp</dimen>
 
     <dimen name="podcast_episode_title_text_size">16sp</dimen>
+    <dimen name="podcast_program_title_text_size">22sp</dimen>
 </resources>

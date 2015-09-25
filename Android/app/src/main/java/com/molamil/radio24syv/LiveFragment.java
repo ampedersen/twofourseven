@@ -3,6 +3,7 @@ package com.molamil.radio24syv;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -54,20 +55,28 @@ public class LiveFragment extends PageFragment {
         RestClient.getApi().getNextBroadcasts(1, 0).enqueue(new Callback<List<Broadcast>>() {
             @Override
             public void onResponse(Response<List<Broadcast>> response) {
-                Broadcast b = response.body().get(0);
-                View v = getView();
+                List<Broadcast> body = response.body();
+                if (body != null) {
+                    Broadcast b = body.get(0);
+                    View v = getView();
 
-                if (v == null ) return; // We are still assigned as a callback to the previous instance of the fragment. TODO store the call in a variable, cancel it in onDestroy to getInstance rid of callbacks.
-                ((TextView) v.findViewById(R.id.program_title)).setText(b.getProgramName());
-                ((TextView) v.findViewById(R.id.program_time_begin)).setText(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
-                ((TextView) v.findViewById(R.id.program_time_end)).setText(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
-                ((TextView) v.findViewById(R.id.program_category)).setText(b.getTopic());
-                ((TextView) v.findViewById(R.id.program_description)).setText(b.getDescriptionText());
+                    if (v == null)
+                        return; // We are still assigned as a callback to the previous instance of the fragment. TODO store the call in a variable, cancel it in onDestroy to getInstance rid of callbacks.
+                    ((TextView) v.findViewById(R.id.program_title)).setText(b.getProgramName());
+                    ((TextView) v.findViewById(R.id.program_time_begin)).setText(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
+                    ((TextView) v.findViewById(R.id.program_time_end)).setText(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
+                    ((TextView) v.findViewById(R.id.program_category)).setText(b.getTopic());
+                    ((TextView) v.findViewById(R.id.program_description)).setText(b.getDescriptionText());
+                } else {
+                    listener.onError(response.message());
+                }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                listener.onError(t.getLocalizedMessage());
+                Log.d("JJJ", "fail " + t.getMessage());
+                t.printStackTrace();
             }
         });
 

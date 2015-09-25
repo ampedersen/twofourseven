@@ -7,6 +7,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 
+import com.molamil.radio24syv.settings.model.ProgramInfo;
+
 
 public class ProgramListFragment extends PageFragment {
 
@@ -44,12 +46,18 @@ public class ProgramListFragment extends PageFragment {
             }
         });
         Button someProgramButton = (Button)v.findViewById(R.id.some_program_button);
-        someProgramButton.setTag(R.id.action_bar, "3843763"); // TODO custom button for this instead of tag ugliness
+        ProgramInfo p = new ProgramInfo();
+        p.setProgramId(3843763);
+        p.setName("Name");
+        p.setTopic("Topic");
+        p.setDescription("Description");
+        p.setImageUrl("ImageUrl");
+        someProgramButton.setTag(R.id.action_bar, p); // TODO custom button for this instead of tag ugliness
         someProgramButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mListener != null) {
-                    mListener.onProgramSelected((String) v.getTag(R.id.action_bar));
+                    mListener.onProgramSelected((ProgramInfo) v.getTag(R.id.action_bar));
                 }
             }
         });
@@ -75,6 +83,6 @@ public class ProgramListFragment extends PageFragment {
     }
 
     public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {
-        public void onProgramSelected(String programId);
+        public void onProgramSelected(ProgramInfo program);
     }
 }

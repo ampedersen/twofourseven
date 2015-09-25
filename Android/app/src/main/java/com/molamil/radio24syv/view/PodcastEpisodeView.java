@@ -227,15 +227,14 @@ public class PodcastEpisodeView extends LinearLayout implements
     private final OnClickListener downloadOnClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            RadioLibrary.getInstance().remove(getContext(), podcastId); // Remove podcast if it has been partially downloaded
-            RadioLibrary.getInstance().download(getContext(), podcastId, podcastUrl, title);
+            listener.onPodcastEpisodeViewDownloadClicked(PodcastEpisodeView.this, podcastId);
         }
     };
 
     private final OnClickListener removeOnClick = new OnClickListener() {
         @Override
         public void onClick(View v) {
-            RadioLibrary.getInstance().remove(getContext(), podcastId);
+            listener.onPodcastEpisodeViewRemoveClicked(PodcastEpisodeView.this, podcastId);
         }
     };
 
@@ -245,5 +244,7 @@ public class PodcastEpisodeView extends LinearLayout implements
 
     public interface OnPodcastEpisodeViewUpdatedListener {
         void onPodcastEpisodeViewSizeChanged(PodcastEpisodeView view, Size size);
+        void onPodcastEpisodeViewDownloadClicked(PodcastEpisodeView view, int podcastId);
+        void onPodcastEpisodeViewRemoveClicked(PodcastEpisodeView view, int podcastId);
     }
 }
