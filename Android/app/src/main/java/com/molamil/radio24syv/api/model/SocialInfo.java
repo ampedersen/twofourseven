@@ -3,20 +3,23 @@ package com.molamil.radio24syv.api.model;
 
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 @Generated("org.jsonschema2pojo")
 public class SocialInfo {
 
+    @SerializedName("email")
     @Expose
     private String email;
+    @SerializedName("facebook")
     @Expose
     private String facebook;
+    @SerializedName("twitter")
     @Expose
-    private String twitter;
+    private Object twitter;
+    @SerializedName("wikipedia")
     @Expose
-    private Boolean phoneIn;
-    @Expose
-    private Boolean textIn;
+    private Object wikipedia;
 
     /**
      * 
@@ -59,7 +62,7 @@ public class SocialInfo {
      * @return
      *     The twitter
      */
-    public String getTwitter() {
+    public Object getTwitter() {
         return twitter;
     }
 
@@ -68,44 +71,26 @@ public class SocialInfo {
      * @param twitter
      *     The twitter
      */
-    public void setTwitter(String twitter) {
+    public void setTwitter(Object twitter) {
         this.twitter = twitter;
     }
 
     /**
      * 
      * @return
-     *     The phoneIn
+     *     The wikipedia
      */
-    public Boolean getPhoneIn() {
-        return phoneIn;
+    public Object getWikipedia() {
+        return wikipedia;
     }
 
     /**
      * 
-     * @param phoneIn
-     *     The phoneIn
+     * @param wikipedia
+     *     The wikipedia
      */
-    public void setPhoneIn(Boolean phoneIn) {
-        this.phoneIn = phoneIn;
-    }
-
-    /**
-     * 
-     * @return
-     *     The textIn
-     */
-    public Boolean getTextIn() {
-        return textIn;
-    }
-
-    /**
-     * 
-     * @param textIn
-     *     The textIn
-     */
-    public void setTextIn(Boolean textIn) {
-        this.textIn = textIn;
+    public void setWikipedia(Object wikipedia) {
+        this.wikipedia = wikipedia;
     }
 
 }

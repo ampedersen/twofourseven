@@ -157,11 +157,6 @@ public class RadioPlayer {
 
     public void play(String url) {
         this.url = url;
-        boolean isOfflineUrl = url.startsWith(context.getResources().getString(R.string.url_offline_radio));
-        if (isOfflineUrl) {
-            // TODO Play from local storage if the file is already downloaded
-
-        }
         setAction(url, ACTION_PLAY);
     }
 

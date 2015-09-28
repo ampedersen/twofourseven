@@ -1,11 +1,14 @@
 package com.molamil.radio24syv.settings.model;
 
-import com.molamil.radio24syv.api.model.Program;
+import android.util.Log;
+
+import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.api.model.ConciseProgram;
 
 import java.io.Serializable;
 
 /**
- * Information about a Program from the API containing only the stuff needed.
+ * Information about a ConciseProgram from the API containing only the stuff needed.
  * Dependency on the API is handled through this class. And it is also lighter to pass as serializable.
  * Created by jens on 24/09/15.
  */
@@ -18,12 +21,12 @@ public class ProgramInfo implements Serializable {
 
     public ProgramInfo() {}
 
-    public ProgramInfo(Program program) {
-        programId = program.getVideoProgramId();
-        name = program.getName();
-        topic = program.getTopic();
-        description = program.getDescriptionText();
-        imageUrl = program.getImageUrl();
+    public ProgramInfo(ConciseProgram conciseProgram) {
+        programId = RestClient.getIntegerSafely(conciseProgram.getVideoProgramId(), 0);
+        name = conciseProgram.getName();
+        topic = conciseProgram.getTopic();
+        description = conciseProgram.getDescriptionText();
+        imageUrl = conciseProgram.getImageUrl();
     }
 
     public int getProgramId() {

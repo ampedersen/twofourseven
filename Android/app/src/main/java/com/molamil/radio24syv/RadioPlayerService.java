@@ -349,6 +349,11 @@ public class RadioPlayerService extends Service implements
     private class PlayUrlTask extends AsyncTask<String, Void, Void> {
         @Override
         protected Void doInBackground(String... urls) {
+            if ((urls == null) ||(urls.length == 0) || (urls[0] == null)) {
+                Log.e("JJJ", "Unable to play URL because it is empty " + url);
+                setAction(url, RadioPlayer.ACTION_STOP);
+                return null; // Return, no url to play
+            }
             Log.d("JJJ", urls[0]);
 
             setState(RadioPlayer.STATE_BUSY);

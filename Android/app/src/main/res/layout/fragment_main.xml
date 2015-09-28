@@ -40,6 +40,7 @@
                 android:background="@color/radio_yellow"
                 android:textColor="@color/radio_black"
                 android:layout_gravity="bottom|center_horizontal"
+                android:gravity="center"
                 android:visibility="gone"
                 />
 

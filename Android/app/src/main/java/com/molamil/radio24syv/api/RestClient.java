@@ -66,4 +66,12 @@ public class RestClient
         LocalDateTime time = new DateTime(dateWithTimeZone).toLocalDateTime();
         return time.toString("HH.mm");
     }
+
+    public static int getIntegerSafely(Integer i, int defaultValue) {
+        if (i != null) {
+            return i;
+        } else {
+            return defaultValue; // Horrible null pointer exception if Integer is null
+        }
+    }
 }

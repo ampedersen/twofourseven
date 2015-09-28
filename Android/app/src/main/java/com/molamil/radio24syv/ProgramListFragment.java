@@ -2,17 +2,35 @@ package com.molamil.radio24syv;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
+import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.api.model.ConciseProgram;
+import com.molamil.radio24syv.api.model.Podcast;
+import com.molamil.radio24syv.settings.model.PodcastInfo;
 import com.molamil.radio24syv.settings.model.ProgramInfo;
+import com.molamil.radio24syv.view.DateLineView;
+import com.molamil.radio24syv.view.PodcastEpisodeView;
+import com.molamil.radio24syv.view.ProgramButtonView;
+
+import org.joda.time.DateTime;
+
+import java.util.List;
+import java.util.Locale;
+
+import retrofit.Callback;
+import retrofit.Response;
 
 
 public class ProgramListFragment extends PageFragment {
 
-    OnFragmentInteractionListener mListener;
+    private OnFragmentInteractionListener mListener;
+    private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
 
     public ProgramListFragment() {
         // Required empty public constructor
@@ -62,7 +80,51 @@ public class ProgramListFragment extends PageFragment {
             }
         });
 
+        final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
+        getPrograms(content);
+
         return v;
+    }
+
+//    private void getPrograms(final ViewGroup content, final int amount, final int batch) {
+    private void getPrograms(final ViewGroup content) {
+//        Log.d("JJJ", "getPodcasts id " + program.getProgramId() + " content " + content + " amount " + amount + " batch " + batch);
+        final ViewGroup parent = (ViewGroup) content.getParent();
+
+        RestClient.getApi().getPrograms().enqueue(new Callback<List<ConciseProgram>>() {
+            @Override
+            public void onResponse(Response<List<ConciseProgram>> response) {
+                for (int i = 0; i < response.body().size(); i++) {
+                    ConciseProgram conciseProgram = response.body().get(i);
+                    boolean isActive = conciseProgram.getActive();
+//                    if (isActive) {
+                        final ProgramInfo p = new ProgramInfo(conciseProgram);
+
+                        ProgramButtonView v = new ProgramButtonView(content.getContext());
+                        v.setProgram(p);
+                        //v.setAudioUrl(); //TODO get audio url with different api call
+                        v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
+                        v.setOnProgramButtonViewListener(new ProgramButtonView.OnProgramButtonViewListener() {
+                            @Override
+                            public void OnProgramButtonViewClicked(ProgramButtonView view) {
+                                if (mListener != null) {
+                                    mListener.onProgramSelected(p);
+                                }
+                            }
+                        });
+                        content.addView(v);
+//                    }
+                }
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                ((MainActivity) getActivity()).onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
+                Log.d("JJJ", "fail " + t.getMessage());
+                t.printStackTrace();
+            }
+        });
     }
 
     @Override
@@ -73,6 +135,12 @@ public class ProgramListFragment extends PageFragment {
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
+        }
+        try {
+            radioPlayerProvider = (RadioPlayer.RadioPlayerProvider) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement PlayerFragment.RadioPlayerProvider");
         }
     }
 

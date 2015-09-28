@@ -3,16 +3,17 @@ package com.molamil.radio24syv.api.model;
 
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 @Generated("org.jsonschema2pojo")
 public class CoverImage {
 
+    @SerializedName("wideUrl")
     @Expose
     private String wideUrl;
+    @SerializedName("mobileUrl")
     @Expose
     private String mobileUrl;
-    @Expose
-    private Object photographer;
 
     /**
      * 
@@ -48,24 +49,6 @@ public class CoverImage {
      */
     public void setMobileUrl(String mobileUrl) {
         this.mobileUrl = mobileUrl;
-    }
-
-    /**
-     * 
-     * @return
-     *     The photographer
-     */
-    public Object getPhotographer() {
-        return photographer;
-    }
-
-    /**
-     * 
-     * @param photographer
-     *     The photographer
-     */
-    public void setPhotographer(Object photographer) {
-        this.photographer = photographer;
     }
 
 }

@@ -1,10 +1,12 @@
 package com.molamil.radio24syv.api;
 
 import com.molamil.radio24syv.api.model.Broadcast;
+import com.molamil.radio24syv.api.model.ConciseProgram;
 import com.molamil.radio24syv.api.model.Host;
 import com.molamil.radio24syv.api.model.MetaInfo;
 import com.molamil.radio24syv.api.model.Page;
 import com.molamil.radio24syv.api.model.Podcast;
+import com.molamil.radio24syv.api.model.Program;
 
 import java.util.List;
 
@@ -57,6 +59,21 @@ public interface RestApi {
     Call<List<Podcast>> getPodcasts(@Path("id") Integer programId, @Query("size") Integer amount, @Query("p") Integer pageOffset);
 
     // Programs
+
+    @GET("programs")
+    Call<List<ConciseProgram>> getPrograms();
+
+    @GET("programs/topic/{slug}")
+    Call<List<ConciseProgram>> getPrograms(@Path("slug") String topicSlug);
+
+    @GET("programs/topic/{slug}")
+    Call<List<ConciseProgram>> getPrograms(@Path("slug") Integer topicId);
+
+    @GET("programs/{slug}")
+    Call<List<Program>> getProgram(@Path("slug") String programSlug);
+
+    @GET("programs/{slug}")
+    Call<List<Program>> getProgram(@Path("slug") Integer programId);
 
     // Searches
 

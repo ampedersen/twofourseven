@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/program_button"
+    android:layout_width="match_parent"
+    android:layout_height="100dp"
+    android:background="@color/radio_gray_darker"
+    >
+
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@android:drawable/ic_search_category_default"
+        />
+
+    <TextView
+        android:id="@+id/name_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Program name that could be a long one with lots of text and interesting stuff blabla"
+        android:singleLine="true"
+        android:layout_alignParentTop="true"
+        />
+
+    <TextView
+        android:id="@+id/description_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Program description which certainly is long with lots of words and text and maybe on multiple lines? But no more than two lines thank you very much"
+        android:maxLines="2"
+        android:ellipsize="end"
+        android:layout_below="@id/name_text"
+        />
+
+    <TextView
+        android:id="@+id/category_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Category"
+        android:singleLine="true"
+        android:layout_alignParentBottom="true"
+        />
+
+    <com.molamil.radio24syv.view.RadioPlayerButton
+        android:id="@+id/play_button"
+        android:layout_width="50dp"
+        android:layout_height="50dp"
+        app:action="play"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentRight="true"
+        />
+
+</RelativeLayout>

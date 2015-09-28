@@ -28,7 +28,7 @@ import retrofit.Response;
 public class ProgramDetailsFragment extends PageFragment implements
         PodcastEpisodeView.OnPodcastEpisodeViewUpdatedListener {
 
-    public static final String ARGUMENT_PROGRAM = "Program";
+    public static final String ARGUMENT_PROGRAM = "ConciseProgram";
 
     private static final int BATCH_SIZE = 50; // Number of podcasts to load per batch
 
@@ -56,7 +56,7 @@ public class ProgramDetailsFragment extends PageFragment implements
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Create Program object from arguments
+        // Create ConciseProgram object from arguments
         program = (ProgramInfo) getArguments().getSerializable(ARGUMENT_PROGRAM);
 
         Log.d("JJJ", "my id " + getId() + " Rid " + R.layout.fragment_program_details);

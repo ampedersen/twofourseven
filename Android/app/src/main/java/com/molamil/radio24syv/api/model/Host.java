@@ -3,20 +3,27 @@ package com.molamil.radio24syv.api.model;
 
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 @Generated("org.jsonschema2pojo")
 public class Host {
 
+    @SerializedName("name")
     @Expose
     private String name;
+    @SerializedName("slug")
     @Expose
     private String slug;
+    @SerializedName("intro")
     @Expose
     private String intro;
+    @SerializedName("topic")
     @Expose
-    private String topic;
+    private Object topic;
+    @SerializedName("imageUrl")
     @Expose
     private String imageUrl;
+    @SerializedName("descriptionHtml")
     @Expose
     private String descriptionHtml;
 
@@ -79,7 +86,7 @@ public class Host {
      * @return
      *     The topic
      */
-    public String getTopic() {
+    public Object getTopic() {
         return topic;
     }
 
@@ -88,7 +95,7 @@ public class Host {
      * @param topic
      *     The topic
      */
-    public void setTopic(String topic) {
+    public void setTopic(Object topic) {
         this.topic = topic;
     }
 
