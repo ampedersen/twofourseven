@@ -79,6 +79,8 @@
         android:orientation="vertical"
         >
 
+        <!-- This is where the individual episodes are added -->
+
     </LinearLayout>
 
 </LinearLayout>

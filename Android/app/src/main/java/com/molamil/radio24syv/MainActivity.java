@@ -13,7 +13,7 @@ import android.util.Log;
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.settings.Settings;
 import com.molamil.radio24syv.settings.model.ProgramInfo;
-import com.molamil.radio24syv.receiver.DownloadReceiver;
+import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
 import com.molamil.radio24syv.view.RadioViewPager;
 
 import net.hockeyapp.android.CrashManager;
@@ -60,9 +60,9 @@ public class MainActivity extends FragmentActivity implements
         Settings.initialize(this);
         RestClient.initialize(getResources().getString(R.string.url_api));
 
-        // Start on "Offline" tab if started by DownloadReceiver
+        // Start on "Offline" tab if started by DownloadNotificationReceiver
         Intent callingIntent = getIntent();
-        long[] downloadIds = callingIntent.getLongArrayExtra(DownloadReceiver.EXTRA_DOWNLOAD_IDS);
+        long[] downloadIds = callingIntent.getLongArrayExtra(DownloadNotificationReceiver.EXTRA_DOWNLOAD_IDS);
         if (downloadIds != null) {
             Log.d("JJJ", "MainActivity got started with " + downloadIds.length + " downloadIds as a parameter");
             mainFragment.setStartupTab(MainFragment.TAG_TAB_OFFLINE);

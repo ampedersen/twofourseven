@@ -17,7 +17,7 @@ android {
         applicationId "com.molamil.radio24syv"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 2
+        versionCode 3
         versionName "0.1"
         signingConfig signingConfigs.release
     }
@@ -32,8 +32,8 @@ android {
         }
         release {
             // Hockeyapp
-            buildConfigField "String", "HOCKEYAPP_APP_ID", "\"d1b33bd456905d94da471cb4599e8c10\""
             // TODO different HOCKEYAPP_APP_ID for release
+            buildConfigField "String", "HOCKEYAPP_APP_ID", "\"d1b33bd456905d94da471cb4599e8c10\""
             buildConfigField "boolean", "HOCKEYAPP_UPDATES_ENABLED", "false"
 
             minifyEnabled false

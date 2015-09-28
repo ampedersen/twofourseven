@@ -11,7 +11,7 @@ import com.molamil.radio24syv.MainActivity;
 /**
  * Created by jens on 22/09/15.
  */
-public class DownloadReceiver extends BroadcastReceiver {
+public class DownloadNotificationReceiver extends BroadcastReceiver {
     public static final String EXTRA_DOWNLOAD_IDS = DownloadManager.EXTRA_NOTIFICATION_CLICK_DOWNLOAD_IDS;
 
     @Override
