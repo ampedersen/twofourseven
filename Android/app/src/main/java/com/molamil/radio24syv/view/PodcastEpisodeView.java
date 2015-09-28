@@ -10,7 +10,7 @@ import android.widget.TextView;
 import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.RadioLibrary;
 import com.molamil.radio24syv.RadioPlayer;
-import com.molamil.radio24syv.settings.model.PodcastInfo;
+import com.molamil.radio24syv.storage.model.PodcastInfo;
 
 /**
  * Created by jens on 21/09/15.

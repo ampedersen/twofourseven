@@ -11,8 +11,8 @@ import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Podcast;
-import com.molamil.radio24syv.settings.model.PodcastInfo;
-import com.molamil.radio24syv.settings.model.ProgramInfo;
+import com.molamil.radio24syv.storage.model.PodcastInfo;
+import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.view.DateLineView;
 import com.molamil.radio24syv.view.PodcastEpisodeView;
 
@@ -137,7 +137,8 @@ public class ProgramDetailsFragment extends PageFragment implements
 
             @Override
             public void onFailure(Throwable t) {
-                loadingText.setText("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
+                loadingText.setVisibility(View.GONE);
+                ((MainActivity) getActivity()).onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
                 Log.d("JJJ", "fail " + t.getMessage());
                 t.printStackTrace();
             }

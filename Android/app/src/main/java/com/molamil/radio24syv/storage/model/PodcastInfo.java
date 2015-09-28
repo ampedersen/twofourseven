@@ -1,6 +1,5 @@
-package com.molamil.radio24syv.settings.model;
+package com.molamil.radio24syv.storage.model;
 
-import com.molamil.radio24syv.RadioLibrary;
 import com.molamil.radio24syv.api.model.Podcast;
 
 import java.io.Serializable;

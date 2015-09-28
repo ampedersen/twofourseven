@@ -1,0 +1,469 @@
+package com.molamil.radio24syv.storage;
+
+import android.content.ContentValues;
+import android.content.Context;
+import android.database.Cursor;
+import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteOpenHelper;
+import android.util.Log;
+
+import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.storage.model.PodcastInfo;
+import com.molamil.radio24syv.storage.model.ProgramInfo;
+
+import java.util.ArrayList;
+import java.util.List;
+
+/**
+ * Created by jens on 24/09/15.
+ */
+public class StorageDatabase extends SQLiteOpenHelper {
+
+    private static final String TABLE_LIBRARY = "library";
+    private static final String TABLE_PROGRAM = "program";
+    private static final String TABLE_PODCAST = "podcast";
+    private static final String TABLE_PICTURE = "picture";
+    private static final String TABLE_CATEGORY = "category";
+    private static final String TABLE_TOPIC = "topic";
+    private static final String TABLE_PLAYER_HISTORY = "player_history";
+    private static final String TABLE_RELATED_PROGRAM = "related_program";
+
+    private static final String KEY_PODCAST_ID = "podcast_id";
+    private static final String KEY_DOWNLOAD_ID = "download_id";
+    private static final String KEY_PROGRAM_ID = "program_id";
+    private static final String KEY_NAME = "name";
+    private static final String KEY_TOPIC_ID = "topic_id";
+    private static final String KEY_DESCRIPTION = "description";
+    private static final String KEY_IMAGE_URL = "image_url";
+    private static final String KEY_TITLE = "title";
+    private static final String KEY_DATE = "date";
+    private static final String KEY_AUDIO_URL = "audio_url";
+    private static final String KEY_COLOR = "color";
+    private static final String KEY_PROGRAM_ID_RELATED = "program_id_related";
+
+    private static final String SQL_CREATE_TABLE_LIBRAY = "CREATE TABLE " + TABLE_LIBRARY + "(" + KEY_PODCAST_ID + " INTEGER PRIMARY KEY, "
+            + KEY_DOWNLOAD_ID + " BIGINT" + ")"; // TODO index on download_id
+
+    private static final String SQL_CREATE_TABLE_PROGRAM = "CREATE TABLE " + TABLE_PROGRAM + "(" + KEY_PROGRAM_ID + " INTEGER PRIMARY KEY, "
+            + KEY_NAME + " TEXT, " + KEY_TOPIC_ID + " TEXT, " + KEY_DESCRIPTION + " TEXT, " + KEY_IMAGE_URL + " TEXT" + ")";
+
+    private static final String SQL_CREATE_TABLE_PODCAST = "CREATE TABLE " + TABLE_PODCAST + "(" + KEY_PODCAST_ID + " INTEGER PRIMARY KEY, "
+            + KEY_PROGRAM_ID + " INTEGER, " // TODO index on program_id
+            + KEY_TITLE + " TEXT, " + KEY_DESCRIPTION + " TEXT, " + KEY_AUDIO_URL + " TEXT, " + KEY_DATE + " TEXT" + ")"; // "DATE" type is not supported by Cursor so have to use "TEXT" for KEY_DATE, yay
+
+    private static final String SQL_CREATE_TABLE_TOPIC = "CREATE TABLE " + TABLE_TOPIC + "(" + KEY_TOPIC_ID + " TEXT PRIMARY KEY, "
+            + KEY_COLOR + " TEXT" + ")";
+
+    private static final String SQL_CREATE_TABLE_PLAYER_HISTORY = "CREATE TABLE " + TABLE_PLAYER_HISTORY + "(" + KEY_DATE + " TEXT, "
+            + KEY_PROGRAM_ID + " INTEGER" + ")"; // TODO index on date
+
+    private static final String SQL_CREATE_TABLE_RELATED_PROGRAM = "CREATE TABLE " + TABLE_RELATED_PROGRAM + "(" + KEY_PROGRAM_ID + " INTEGER, "
+            + KEY_PROGRAM_ID_RELATED + " INTEGER" + ")"; // TODO index on program_id
+
+    private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS ";
+
+    // If you change the database schema, you must increment the database version.
+    private static final int DATABASE_VERSION = 1;
+    private static final String DATABASE_NAME = "Storage.db";
+
+    public StorageDatabase(Context context) {
+        super(context, DATABASE_NAME, null, DATABASE_VERSION);
+    }
+
+    public void onCreate(SQLiteDatabase db) {
+        createTables(db);
+    }
+
+    public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        // Upgrade existing table to new format if table version is upgraded in a later app version.
+        // For now, discard the data and start over.
+        dropTables(db);
+        createTables(db);
+    }
+
+    private void createTables(SQLiteDatabase db) {
+        execSQL(db, SQL_CREATE_TABLE_LIBRAY);
+        execSQL(db, SQL_CREATE_TABLE_PROGRAM);
+        execSQL(db, SQL_CREATE_TABLE_PODCAST);
+        execSQL(db, SQL_CREATE_TABLE_TOPIC);
+        execSQL(db, SQL_CREATE_TABLE_PLAYER_HISTORY);
+        execSQL(db, SQL_CREATE_TABLE_RELATED_PROGRAM);
+    }
+
+    private void dropTables(SQLiteDatabase db) {
+        execSQL(db, SQL_DROP_TABLE + TABLE_LIBRARY);
+        execSQL(db, SQL_DROP_TABLE + TABLE_PROGRAM);
+        execSQL(db, SQL_DROP_TABLE + TABLE_PODCAST);
+        execSQL(db, SQL_DROP_TABLE + TABLE_TOPIC);
+        execSQL(db, SQL_DROP_TABLE + TABLE_PLAYER_HISTORY);
+        execSQL(db, SQL_DROP_TABLE + TABLE_RELATED_PROGRAM);
+    }
+
+    private static void execSQL(SQLiteDatabase db, String query) {
+        Log.d("JJJ", query);
+        db.execSQL(query);
+    }
+
+    public void createTables() {
+        createTables(getWritableDatabase());
+    }
+
+    public void dropTables() {
+        dropTables(getWritableDatabase());
+    }
+
+    public void addLibraryIds(int podcastId, long downloadId) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_PODCAST_ID, podcastId);
+        values.put(KEY_DOWNLOAD_ID, downloadId);
+        getWritableDatabase().replace(TABLE_LIBRARY, null, values);
+    }
+
+    public long getLibraryDownloadId(int podcastId) {
+        // Better performance but unreadable:
+        //String query = String.format(Locale.US, "SELECT %s FROM %s WHERE %s = %d", KEY_DOWNLOAD_ID, TABLE_LIBRARY,KEY_PODCAST_ID, podcastId );
+        String query = "SELECT " + KEY_DOWNLOAD_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_PODCAST_ID + " = " + podcastId + " LIMIT 1";
+        Log.d("JJJ", query);
+
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            long downloadId = c.getLong(c.getColumnIndex(KEY_DOWNLOAD_ID));
+            c.close();
+            Log.d("JJJ", "downloadId " + downloadId);
+            return downloadId;
+        } else {
+            Log.d("JJJ", "downloadId unknown");
+            return Storage.DOWNLOAD_ID_UNKNOWN;
+        }
+    }
+
+    public int getLibraryPodcastId(long downloadId) {
+        String query = "SELECT " + KEY_PODCAST_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_DOWNLOAD_ID + " = " + downloadId + " LIMIT 1";
+        Log.d("JJJ", query);
+
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            int podcastId = c.getInt(c.getColumnIndex(KEY_PODCAST_ID));
+            c.close();
+            Log.d("JJJ", "podcastId " + podcastId);
+            return podcastId;
+        }
+        Log.d("JJJ", "podcastId unknown");
+        return Storage.PODCAST_ID_UNKNOWN;
+    }
+
+    public void removeLibraryIds(int podcastId) {
+        deleteRow(TABLE_LIBRARY, KEY_PODCAST_ID + " = " + podcastId);
+    }
+
+    public void addProgram(ProgramInfo program) {
+        addProgram(getWritableDatabase(), program);
+    }
+
+    public void addPrograms(List<ProgramInfo> programs) {
+        Log.d("JJJ", "Writing " + programs.size() + " programs to database");
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction(); // Use transaction because we will be adding lots of items (saves a lot of database operations)
+        try {
+            for (ProgramInfo p : programs) {
+                addProgram(db, p);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    private static void addProgram(SQLiteDatabase db, ProgramInfo program) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_PROGRAM_ID, program.getProgramId());
+        values.put(KEY_NAME, program.getName());
+        values.put(KEY_TOPIC_ID, program.getTopic());
+        values.put(KEY_DESCRIPTION, program.getDescription());
+        values.put(KEY_IMAGE_URL, program.getImageUrl());
+        db.replace(TABLE_PROGRAM, null, values);
+    }
+
+    public ProgramInfo getProgram(int programId) {
+        String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " LIMIT 1";
+        Log.d("JJJ", query);
+
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            ProgramInfo program = readProgramInfo(c);
+            c.close();
+            Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId());
+            return program;
+        }
+            Log.d("JJJ", "programId not found " + programId);
+        return new ProgramInfo();
+    }
+
+    public List<ProgramInfo> getPrograms() {
+        String query = "SELECT * FROM " + TABLE_PROGRAM + " ORDER BY " + KEY_NAME;
+        Log.d("JJJ", query);
+
+        ArrayList<ProgramInfo> programs = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                ProgramInfo program = readProgramInfo(c);
+                programs.add(program);
+                //Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId());
+            } while (c.moveToNext());
+            c.close();
+        }
+        if (programs.size() == 0) {
+            Log.d("JJJ", "no programs found");
+        }
+        return programs;
+    }
+
+    public List<ProgramInfo> getProgramsWithPodcastsInLibrary() {
+        //SELECT * FROM TABLE1 T1 WHERE ID IN (SELECT ID FROM TABLE2)
+        String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " IN (SELECT " + KEY_PROGRAM_ID + " FROM " + TABLE_PODCAST + ")";
+        Log.d("JJJ", query);
+
+        ArrayList<ProgramInfo> programs = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                ProgramInfo program = readProgramInfo(c);
+                programs.add(program);
+                //Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId());
+            } while (c.moveToNext());
+            c.close();
+        }
+        if (programs.size() == 0) {
+            Log.d("JJJ", "no programs found");
+        }
+        return programs;
+    }
+
+    public void removeProgram(int programId) {
+        deleteRow(TABLE_PROGRAM, KEY_PROGRAM_ID + " = " + programId);
+    }
+
+    public void addPodcast(PodcastInfo podcast) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_PODCAST_ID, podcast.getPodcastId());
+        values.put(KEY_PROGRAM_ID, podcast.getProgramId());
+        values.put(KEY_TITLE, podcast.getTitle());
+        values.put(KEY_DESCRIPTION, podcast.getDescription());
+        values.put(KEY_DATE, podcast.getDate());
+        values.put(KEY_AUDIO_URL, podcast.getAudioUrl());
+        getWritableDatabase().replace(TABLE_PODCAST, null, values);
+    }
+
+    public PodcastInfo getPodcast(int podcastId) {
+        String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_PODCAST_ID + " = " + podcastId + " LIMIT 1";
+        Log.d("JJJ", query);
+
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            PodcastInfo podcast = readPodcastInfo(c);
+            c.close();
+            Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
+            return podcast;
+        }
+        Log.d("JJJ", "podcastId not found " + podcastId);
+        return new PodcastInfo();
+    }
+
+    public List<PodcastInfo> getPodcasts() {
+        String query = "SELECT * FROM " + TABLE_PODCAST;
+        Log.d("JJJ", query);
+
+        ArrayList<PodcastInfo> podcasts = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                PodcastInfo podcast = readPodcastInfo(c);
+                podcasts.add(podcast);
+                Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
+            } while (c.moveToNext());
+            c.close();
+        }
+        if (podcasts.size() == 0) {
+            Log.d("JJJ", "no podcasts found");
+        }
+        return podcasts;
+    }
+
+    public List<PodcastInfo> getPodcasts(int programId) {
+        String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " ORDER BY " + KEY_DATE + " DESC";
+        Log.d("JJJ", query);
+
+        ArrayList<PodcastInfo> podcasts = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                PodcastInfo podcast = readPodcastInfo(c);
+                podcasts.add(podcast);
+                Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId() + " date " + podcast.getDate());
+            } while (c.moveToNext());
+            c.close();
+        }
+        if (podcasts.size() == 0) {
+            Log.d("JJJ", "no podcasts found");
+        }
+        return podcasts;
+    }
+
+    public int getPodcastCount(int programId) {
+        String query = "SELECT COUNT(*) FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId;
+        Log.d("JJJ", query);
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            int count = c.getInt(0);
+            c.close();
+            Log.d("JJJ", "podcast count " + count + " for programId " + programId);
+            return count;
+        }
+        Log.d("JJJ", "programId not found " + programId);
+        return 0;
+    }
+
+    public void removePodcast(int podcastId) {
+        deleteRow(TABLE_PODCAST, KEY_PODCAST_ID + " = " + podcastId);
+    }
+
+    public void addTopic(String topic) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_TOPIC_ID, topic); // Funny thing is that the key is also the actual topic text displayed...
+        values.put(KEY_COLOR, Storage.COLOR_UNKNOWN);
+        getWritableDatabase().replace(TABLE_TOPIC, null, values);
+    }
+
+    public void setTopicColor(String topic, String color) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_TOPIC_ID, topic);
+        values.put(KEY_COLOR, color);
+        getWritableDatabase().replace(TABLE_TOPIC, null, values);
+    }
+
+    public String getTopicColor(String topic) {
+        String query = "SELECT " + KEY_COLOR + " FROM " + TABLE_TOPIC + " WHERE " + KEY_TOPIC_ID + " = " + topic + " LIMIT 1";
+        Log.d("JJJ", query);
+
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            String color = c.getString(c.getColumnIndex(KEY_COLOR));
+            c.close();
+            Log.d("JJJ", "color " + color);
+            return color;
+        } else {
+            Log.d("JJJ", "color unknown");
+            return Storage.COLOR_UNKNOWN;
+        }
+    }
+
+    public List<String> getTopicNames() {
+        String query = "SELECT DISTINCT " + KEY_TOPIC_ID + " FROM " + TABLE_PROGRAM;
+        Log.d("JJJ", query);
+
+        ArrayList<String> names = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                String topic = c.getString(c.getColumnIndex(KEY_TOPIC_ID));
+                names.add(topic);
+                Log.d("JJJ", "topic " + topic);
+            } while (c.moveToNext());
+            c.close();
+            return names;
+        } else {
+            Log.d("JJJ", "topics unknown");
+            return names;
+        }
+    }
+
+    public void addPlayerHistory(int programId, String date) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_DATE, date);
+        values.put(KEY_PROGRAM_ID, programId);
+        getWritableDatabase().insert(TABLE_PLAYER_HISTORY, null, values);
+    }
+
+    public List<Integer> getPlayerHistory(int limit) {
+        String query = "SELECT DISTINCT " + KEY_PROGRAM_ID + " FROM " + TABLE_PLAYER_HISTORY + " ORDER BY " + KEY_DATE + " DESC LIMIT " + limit;
+        Log.d("JJJ", query);
+
+        List<Integer> programIds = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                int programId = c.getInt(c.getColumnIndex(KEY_PROGRAM_ID));
+                programIds.add(programId);
+                Log.d("JJJ", "programId " + programId);
+            } while (c.moveToNext());
+            c.close();
+            return programIds;
+        } else {
+            Log.d("JJJ", "player history unknown");
+            return programIds;
+        }
+    }
+
+    public void addRelatedPrograms(int programId, List<Integer> relatedProgramIds) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            for (int otherId : relatedProgramIds) {
+                ContentValues values = new ContentValues();
+                values.put(KEY_PROGRAM_ID, programId);
+                values.put(KEY_PROGRAM_ID_RELATED, otherId);
+                db.replace(TABLE_RELATED_PROGRAM, null, values); // Replace instead of insert to avoid duplicates
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+    }
+
+    public List<Integer> getRelatedPrograms(int programId, int limit) {
+        String query = "SELECT DISTINCT " + KEY_PROGRAM_ID_RELATED + " FROM " + TABLE_RELATED_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " LIMIT " + limit;
+        Log.d("JJJ", query);
+
+        List<Integer> relatedProgramIds = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                int relatedProgramId = c.getInt(c.getColumnIndex(KEY_PROGRAM_ID_RELATED));
+                relatedProgramIds.add(relatedProgramId);
+                Log.d("JJJ", "relatedProgramId " + relatedProgramId);
+            } while (c.moveToNext());
+            c.close();
+            return relatedProgramIds;
+        } else {
+            Log.d("JJJ", "related programs unknown");
+            return relatedProgramIds;
+        }
+    }
+
+    private void deleteRow(String table, String whereSelector) {
+        int rows = getWritableDatabase().delete(table, whereSelector, null);
+        Log.d("JJJ", "DELETE FROM " + table + " WHERE " + whereSelector + " (" + rows + " row(s) deleted)");
+    }
+
+    private static ProgramInfo readProgramInfo(Cursor c) {
+        ProgramInfo program = new ProgramInfo();
+        program.setProgramId(c.getInt(c.getColumnIndex(KEY_PROGRAM_ID)));
+        program.setName(c.getString(c.getColumnIndex(KEY_NAME)));
+        program.setTopic(c.getString(c.getColumnIndex(KEY_TOPIC_ID)));
+        program.setDescription(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
+        program.setImageUrl(c.getString(c.getColumnIndex(KEY_IMAGE_URL)));
+        return program;
+    }
+
+    private static PodcastInfo readPodcastInfo(Cursor c) {
+        PodcastInfo podcast = new PodcastInfo();
+        podcast.setPodcastId(c.getInt(c.getColumnIndex(KEY_PODCAST_ID)));
+        podcast.setProgramId(c.getInt(c.getColumnIndex(KEY_PROGRAM_ID)));
+        podcast.setTitle(c.getString(c.getColumnIndex(KEY_TITLE)));
+        podcast.setDescription(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
+        podcast.setDate(c.getString(c.getColumnIndex(KEY_DATE)));
+        podcast.setAudioUrl(c.getString(c.getColumnIndex(KEY_AUDIO_URL)));
+        return podcast;
+    }
+}

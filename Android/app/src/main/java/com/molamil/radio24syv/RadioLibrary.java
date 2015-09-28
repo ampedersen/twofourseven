@@ -10,9 +10,9 @@ import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
-import com.molamil.radio24syv.settings.Settings;
-import com.molamil.radio24syv.settings.model.PodcastInfo;
-import com.molamil.radio24syv.settings.model.ProgramInfo;
+import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.PodcastInfo;
+import com.molamil.radio24syv.storage.model.ProgramInfo;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -70,17 +70,17 @@ public class RadioLibrary {
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         long downloadId = manager.enqueue(request);
 
-        Settings.get().addProgram(program);
-        Settings.get().addPodcast(podcast);
-        Settings.get().addLibraryIds(podcastId, downloadId);
+        Storage.get().addProgram(program);
+        Storage.get().addPodcast(podcast);
+        Storage.get().addLibraryIds(podcastId, downloadId);
         callback(context, podcastId);
     }
 
     // Deletes the downloaded file or cancels its download and cleans up.
     public void remove(Context context, PodcastInfo podcast) {
         boolean isRemoved;
-        long downloadId = Settings.get().getLibraryDownloadId(podcast.getPodcastId());
-        boolean isDownloaded = (downloadId != Settings.DOWNLOAD_ID_UNKNOWN);
+        long downloadId = Storage.get().getLibraryDownloadId(podcast.getPodcastId());
+        boolean isDownloaded = (downloadId != Storage.DOWNLOAD_ID_UNKNOWN);
         if (isDownloaded) {
             DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
             isRemoved = (manager.remove(downloadId) == 1);
@@ -91,11 +91,12 @@ public class RadioLibrary {
         if (isRemoved) {
             Log.d("JJJ", "Removed podcastId " + podcast.getPodcastId() + " " + podcast.getTitle());
             // Remove entries for the now non-existing download
-            Settings.get().removePodcast(podcast.getPodcastId());
-            Settings.get().removeLibraryIds(podcast.getPodcastId());
-            if (Settings.get().getPodcastCount(podcast.getProgramId()) == 0) {
-                Settings.get().removeProgram(podcast.getProgramId()); // Remove program if it has no downloaded podcasts left
-            }
+            Storage.get().removePodcast(podcast.getPodcastId());
+            Storage.get().removeLibraryIds(podcast.getPodcastId());
+            // Keep program info in the database, so do not do this:
+            //if (Storage.get().getPodcastCount(podcast.getProgramId()) == 0) {
+            //    Storage.get().removeProgram(podcast.getProgramId()); // Remove program if it has no downloaded podcasts left
+            //}
         } else {
             // Something is funky
             Status status = getStatus(context, podcast.getPodcastId());
@@ -147,14 +148,14 @@ public class RadioLibrary {
     }
 
     private Status getStatus(Context context, int podcastId) {
-        long downloadId = Settings.get().getLibraryDownloadId(podcastId);
+        long downloadId = Storage.get().getLibraryDownloadId(podcastId);
         return getStatus(context, downloadId);
     }
 
     private Status getStatus(Context context, long downloadId) {
         Status status = new Status();
 
-        if (downloadId == Settings.DOWNLOAD_ID_UNKNOWN) {
+        if (downloadId == Storage.DOWNLOAD_ID_UNKNOWN) {
             return status; // Return, podcast has not been downloaded
         }
 
@@ -233,7 +234,7 @@ public class RadioLibrary {
         @Override
         public void onReceive(Context context, Intent intent) {
             // Get extra data included in the Intent
-            long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, Settings.DOWNLOAD_ID_UNKNOWN);
+            long downloadId = intent.getLongExtra(DownloadManager.EXTRA_DOWNLOAD_ID, Storage.DOWNLOAD_ID_UNKNOWN);
             boolean isVerified = verifyDownload(context, downloadId);
             if (isVerified) {
                 Log.d("JJJ", "Download complete and verified " + downloadId);
@@ -242,8 +243,8 @@ public class RadioLibrary {
             }
             Log.d("JJJ", "Got message: " + DownloadManager.ACTION_DOWNLOAD_COMPLETE + " downloadId " + downloadId + " isVerified " + isVerified);
 
-            int podcastId = Settings.get().getLibraryPodcastId(downloadId);
-            if (podcastId != Settings.PODCAST_ID_UNKNOWN) {
+            int podcastId = Storage.get().getLibraryPodcastId(downloadId);
+            if (podcastId != Storage.PODCAST_ID_UNKNOWN) {
                 callback(context, podcastId); // Callback to listeners that something happened
             } else {
                 Log.d("JJJ", "Download complete but no podcastId is linked to that downloadId " + downloadId + " - is settings database up to date (or are we just getting this callback from Android a little late?)");

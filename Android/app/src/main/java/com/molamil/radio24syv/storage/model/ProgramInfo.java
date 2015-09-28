@@ -1,6 +1,6 @@
-package com.molamil.radio24syv.settings.model;
+package com.molamil.radio24syv.storage.model;
 
-import android.util.Log;
+import android.database.Cursor;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.ConciseProgram;

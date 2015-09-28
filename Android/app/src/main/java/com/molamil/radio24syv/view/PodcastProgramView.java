@@ -11,9 +11,9 @@ import android.widget.TextView;
 import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.RadioLibrary;
 import com.molamil.radio24syv.RadioPlayer;
-import com.molamil.radio24syv.settings.Settings;
-import com.molamil.radio24syv.settings.model.PodcastInfo;
-import com.molamil.radio24syv.settings.model.ProgramInfo;
+import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.PodcastInfo;
+import com.molamil.radio24syv.storage.model.ProgramInfo;
 
 import java.util.List;
 
@@ -192,7 +192,7 @@ public class PodcastProgramView extends LinearLayout implements
         expandedLayout.removeView(view);
         RadioLibrary.getInstance().remove(getContext(), podcast);
 
-        int count = Settings.get().getPodcastCount(program.getProgramId());
+        int count = Storage.get().getPodcastCount(program.getProgramId());
         if (count > 0) {
             updatePodcastCount(count);
         } else {

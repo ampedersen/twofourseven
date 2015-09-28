@@ -48,11 +48,13 @@
                 android:text="Anbefalet"
                 android:textColor="@color/radio_red"/>
 
-            <Button
-                android:id="@+id/some_program_button"
+            <TextView
+                android:id="@+id/loading_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Bikinilinjen"
+                android:text="Indlæser..."
+                android:visibility="gone"
+                android:layout_gravity="center"
                 />
 
         </LinearLayout>

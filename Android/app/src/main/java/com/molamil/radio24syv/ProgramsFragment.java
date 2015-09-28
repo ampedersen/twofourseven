@@ -12,7 +12,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.molamil.radio24syv.settings.model.ProgramInfo;
+import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.view.RadioViewPager;
 
 

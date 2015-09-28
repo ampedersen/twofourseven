@@ -11,8 +11,8 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 
 import com.molamil.radio24syv.api.RestClient;
-import com.molamil.radio24syv.settings.Settings;
-import com.molamil.radio24syv.settings.model.ProgramInfo;
+import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
 import com.molamil.radio24syv.view.RadioViewPager;
 
@@ -57,8 +57,9 @@ public class MainActivity extends FragmentActivity implements
         checkForUpdates();
 
         // Initialize singletons
-        Settings.initialize(this);
+        Storage.initialize(this);
         RestClient.initialize(getResources().getString(R.string.url_api));
+//        ProgramLibrary.initialize(this);
 
         // Start on "Offline" tab if started by DownloadNotificationReceiver
         Intent callingIntent = getIntent();

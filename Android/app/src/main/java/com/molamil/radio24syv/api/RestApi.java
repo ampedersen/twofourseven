@@ -36,6 +36,11 @@ public interface RestApi {
     @GET("/hosts/{slug}")
     Call<Host> getHost(@Path("slug") String slug);
 
+    // Info
+
+    @GET("info/topics")
+    Call<String> getTopicColor(@Query("topic") String topic);
+
     // Pages
 
     @GET("/pages/frontpage")
@@ -78,4 +83,5 @@ public interface RestApi {
     // Searches
 
     // Stories (empty?)
+
 }

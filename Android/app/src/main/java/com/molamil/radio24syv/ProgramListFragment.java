@@ -11,17 +11,11 @@ import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.ConciseProgram;
-import com.molamil.radio24syv.api.model.Podcast;
-import com.molamil.radio24syv.settings.model.PodcastInfo;
-import com.molamil.radio24syv.settings.model.ProgramInfo;
-import com.molamil.radio24syv.view.DateLineView;
-import com.molamil.radio24syv.view.PodcastEpisodeView;
+import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.view.ProgramButtonView;
 
-import org.joda.time.DateTime;
-
 import java.util.List;
-import java.util.Locale;
 
 import retrofit.Callback;
 import retrofit.Response;
@@ -63,22 +57,6 @@ public class ProgramListFragment extends PageFragment {
                 }
             }
         });
-        Button someProgramButton = (Button)v.findViewById(R.id.some_program_button);
-        ProgramInfo p = new ProgramInfo();
-        p.setProgramId(3843763);
-        p.setName("Name");
-        p.setTopic("Topic");
-        p.setDescription("Description");
-        p.setImageUrl("ImageUrl");
-        someProgramButton.setTag(R.id.action_bar, p); // TODO custom button for this instead of tag ugliness
-        someProgramButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onProgramSelected((ProgramInfo) v.getTag(R.id.action_bar));
-                }
-            }
-        });
 
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
         getPrograms(content);
@@ -86,45 +64,72 @@ public class ProgramListFragment extends PageFragment {
         return v;
     }
 
-//    private void getPrograms(final ViewGroup content, final int amount, final int batch) {
     private void getPrograms(final ViewGroup content) {
-//        Log.d("JJJ", "getPodcasts id " + program.getProgramId() + " content " + content + " amount " + amount + " batch " + batch);
-        final ViewGroup parent = (ViewGroup) content.getParent();
+        // Read list instantly from local storage (if available).
+        final List<ProgramInfo> programs = Storage.get().getPrograms();
+        final boolean isCached = (programs != null) && (programs.size() > 0);
 
+        // Download updated list, save to local storage. Next time the UI is shown it will show the updated list (if it had time to complete download).
+        final ViewGroup parent = (ViewGroup) content.getParent();
+        final TextView loadingText = (TextView) parent.findViewById(R.id.loading_text);
+        if (!isCached) {
+            loadingText.setVisibility(View.VISIBLE);
+        }
+
+        Log.d("JJJ", "Updating program list");
         RestClient.getApi().getPrograms().enqueue(new Callback<List<ConciseProgram>>() {
             @Override
             public void onResponse(Response<List<ConciseProgram>> response) {
+                if (isCached) {
+                    programs.clear(); // Clear old values
+                }
                 for (int i = 0; i < response.body().size(); i++) {
                     ConciseProgram conciseProgram = response.body().get(i);
-                    boolean isActive = conciseProgram.getActive();
-//                    if (isActive) {
-                        final ProgramInfo p = new ProgramInfo(conciseProgram);
-
-                        ProgramButtonView v = new ProgramButtonView(content.getContext());
-                        v.setProgram(p);
-                        //v.setAudioUrl(); //TODO get audio url with different api call
-                        v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
-                        v.setOnProgramButtonViewListener(new ProgramButtonView.OnProgramButtonViewListener() {
-                            @Override
-                            public void OnProgramButtonViewClicked(ProgramButtonView view) {
-                                if (mListener != null) {
-                                    mListener.onProgramSelected(p);
-                                }
-                            }
-                        });
-                        content.addView(v);
-//                    }
+                    programs.add(new ProgramInfo(conciseProgram));
                 }
-
+                if (!isCached) {
+                    Log.d("JJJ", "TODO AWAITING API SERVER-SIDE Updating topic colors");
+                    //RestClient.getApi().getTopicColor() //TODO update topic colors before updating program list
+                    Log.d("JJJ", "Showing updated program list");
+                    showPrograms(content, programs);
+                    loadingText.setVisibility(View.GONE);
+                }
+                Storage.get().addPrograms(programs);
             }
 
             @Override
             public void onFailure(Throwable t) {
-                ((MainActivity) getActivity()).onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
-                Log.d("JJJ", "fail " + t.getMessage());
-                t.printStackTrace();
+                if (!isCached) {
+                    ((MainActivity) getActivity()).onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
+                    Log.d("JJJ", "fail " + t.getMessage());
+                    t.printStackTrace();
+                }
             }
         });
+
+        // Show cached program list while waiting for response.
+        if (isCached) {
+            Log.d("JJJ", "Showing cached program list");
+            showPrograms(content, programs);
+        }
+    }
+
+    private void showPrograms(final ViewGroup content, List<ProgramInfo> programs) {
+        for (final ProgramInfo p : programs) {
+            ProgramButtonView v = new ProgramButtonView(content.getContext());
+            v.setProgram(p);
+            //v.setAudioUrl(); //TODO get audio url with different api call
+            v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
+            v.setOnProgramButtonViewListener(new ProgramButtonView.OnProgramButtonViewListener() {
+                @Override
+                public void OnProgramButtonViewClicked(ProgramButtonView view) {
+                    if (mListener != null) {
+                        mListener.onProgramSelected(p);
+                    }
+                }
+            });
+            content.addView(v);
+        }
     }
 
     @Override

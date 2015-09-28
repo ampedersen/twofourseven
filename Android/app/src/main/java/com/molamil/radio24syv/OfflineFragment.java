@@ -8,11 +8,9 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.molamil.radio24syv.settings.Settings;
-import com.molamil.radio24syv.settings.model.ProgramInfo;
+import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.view.PodcastProgramView;
-
-import java.util.List;
 
 
 /**
@@ -46,16 +44,16 @@ public class OfflineFragment extends PageFragment {
         v.findViewById(R.id.delete_all_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Settings.get().deleteAll(getActivity());
+                Storage.get().deleteAll(getActivity());
             }
         });
 
         ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
-        for (ProgramInfo program : Settings.get().getPrograms()) {
+        for (ProgramInfo program : Storage.get().getProgramsWithPodcastsInLibrary()) {
             PodcastProgramView p = new PodcastProgramView(getActivity());
             p.setProgram(program);
             p.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
-            p.setPodcasts(Settings.get().getPodcasts(program.getProgramId()));
+            p.setPodcasts(Storage.get().getPodcasts(program.getProgramId()));
             content.addView(p);
         }
 
