@@ -59,7 +59,6 @@ public class MainActivity extends FragmentActivity implements
         // Initialize singletons
         Storage.initialize(this);
         RestClient.initialize(getResources().getString(R.string.url_api));
-//        ProgramLibrary.initialize(this);
 
         // Start on "Offline" tab if started by DownloadNotificationReceiver
         Intent callingIntent = getIntent();
@@ -292,7 +291,7 @@ public class MainActivity extends FragmentActivity implements
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new CategoriesFragment();
+                    return new ProgramCategoriesFragment();
                 case 1:
                     return mainFragment;
                 case 2:

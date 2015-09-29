@@ -11,10 +11,10 @@ import android.view.ViewGroup;
 /**
  * A simple {@link Fragment} subclass.
  */
-public class CategoriesFragment extends PageFragment {
+public class ProgramCategoriesFragment extends PageFragment {
 
 
-    public CategoriesFragment() {
+    public ProgramCategoriesFragment() {
         // Required empty public constructor
     }
 
@@ -23,7 +23,7 @@ public class CategoriesFragment extends PageFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        return inflater.inflate(R.layout.fragment_categories, container, false);
+        return inflater.inflate(R.layout.fragment_program_categories, container, false);
     }
 
 
