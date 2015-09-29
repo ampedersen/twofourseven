@@ -1,16 +1,15 @@
 package com.molamil.radio24syv.storage;
 
-import android.content.ContentValues;
 import android.content.Context;
-import android.database.Cursor;
-import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.molamil.radio24syv.RadioLibrary;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.storage.model.TopicInfo;
 
-import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -20,8 +19,10 @@ public class Storage {
     public final static long DOWNLOAD_ID_UNKNOWN = -1;
     public final static int PODCAST_ID_UNKNOWN = -1;
     public final static String COLOR_UNKNOWN = "";
+    public final static String TOPIC_ID_UNKNOWN = "";
 
     private StorageDatabase database;
+    private HashMap<String, TopicInfo> cachedTopicById = new HashMap<>();
 
     private static Storage instance = null;
 
@@ -58,7 +59,7 @@ public class Storage {
     }
 
     public void addProgram(ProgramInfo program) {
-        database.addProgram(program);
+        database.writeProgramInfo(program);
     }
 
     public void addPrograms(List<ProgramInfo> programs) {
@@ -101,20 +102,35 @@ public class Storage {
         database.removePodcast(podcastId);
     }
 
-    public void addTopic(String topic) {
-        database.addTopic(topic);
+//    public void addTopic(String topic) {
+//        database.addTopic(topic);
+//    }
+
+//    public void setTopicColor(String topic, String color) {
+//        database.setTopicColor(topic, color);
+//    }
+
+//    public String getTopicColor(String topic) {
+//        return database.getTopicColor(topic);
+//    }
+
+//    public List<String> getTopicNames() {
+//        return database.getTopicNames();
+//    }
+
+    public void addTopics(List<TopicInfo> topics) {
+        clearCache(); // Clear cache to make it initialize next time it is accessed
+        database.addTopics(topics);
     }
 
-    public void setTopicColor(String topic, String color) {
-        database.setTopicColor(topic, color);
+    public TopicInfo getTopic(String topicId) {
+        initializeCacheIfNeeded();
+        return cachedTopicById.get(topicId);
     }
 
-    public String getTopicColor(String topic) {
-        return database.getTopicColor(topic);
-    }
-
-    public List<String> getTopicNames() {
-        return database.getTopicNames();
+    public Collection<TopicInfo> getTopics() {
+        initializeCacheIfNeeded();
+        return cachedTopicById.values();
     }
 
     public void addPlayerHistory(int programId, String date) {
@@ -132,7 +148,7 @@ public class Storage {
     public List<Integer> getRelatedPrograms(int programId, int limit) {
         return database.getRelatedPrograms(programId, limit);
     }
-    
+
     public void deleteAll(Context context) {
         for (PodcastInfo podcast : database.getPodcasts()) {
             Log.d("JJJ", "Deleting " + podcast.getPodcastId() + " " + podcast.getTitle());
@@ -142,4 +158,20 @@ public class Storage {
         database.dropTables();
         database.createTables();
     }
+
+    private void clearCache() {
+        cachedTopicById.clear();
+    }
+
+    private void initializeCacheIfNeeded() {
+        boolean isInitialized = (cachedTopicById.size() > 0);
+        if (isInitialized) {
+            return;
+        }
+
+        for (TopicInfo t : database.getTopics()) {
+            cachedTopicById.put(t.getTopicId(), t);
+        }
+    }
+
 }

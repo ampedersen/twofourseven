@@ -11,10 +11,17 @@ import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.ConciseProgram;
+import com.molamil.radio24syv.api.model.TopicColors;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.ProgramButtonView;
+import com.molamil.radio24syv.view.ProgramCategoryButton;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.List;
 
 import retrofit.Callback;
@@ -23,8 +30,14 @@ import retrofit.Response;
 
 public class ProgramListFragment extends PageFragment {
 
+    public static final String ARGUMENT_CATEGORY = "Category";
+    public static final String ARGUMENT_TOPIC_ID = "TopicId";
+
     private OnFragmentInteractionListener mListener;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
+
+    private int category;
+    private String topicId;
 
     public ProgramListFragment() {
         // Required empty public constructor
@@ -33,6 +46,12 @@ public class ProgramListFragment extends PageFragment {
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        Bundle arguments = getArguments();
+        if (arguments != null) {
+            category = getArguments().getInt(ARGUMENT_CATEGORY, ProgramCategoryButton.CATEGORY_RECOMMENDED);
+            topicId = getArguments().getString(ARGUMENT_TOPIC_ID, Storage.TOPIC_ID_UNKNOWN);
+        }
     }
 
     @Override
@@ -60,8 +79,20 @@ public class ProgramListFragment extends PageFragment {
 
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
         getPrograms(content);
+        getTopicColors(content);
 
         return v;
+    }
+
+    public void showProgramCategory(int category, String topicId) {
+        this.category = category;
+        this.topicId = topicId;
+
+        View v = getView();
+        if (v != null) {
+            final ViewGroup content = (ViewGroup) getView().findViewById(R.id.content);
+            getPrograms(content);
+        }
     }
 
     private void getPrograms(final ViewGroup content) {
@@ -88,8 +119,6 @@ public class ProgramListFragment extends PageFragment {
                     programs.add(new ProgramInfo(conciseProgram));
                 }
                 if (!isCached) {
-                    Log.d("JJJ", "TODO AWAITING API SERVER-SIDE Updating topic colors");
-                    //RestClient.getApi().getTopicColor() //TODO update topic colors before updating program list
                     Log.d("JJJ", "Showing updated program list");
                     showPrograms(content, programs);
                     loadingText.setVisibility(View.GONE);
@@ -100,7 +129,7 @@ public class ProgramListFragment extends PageFragment {
             @Override
             public void onFailure(Throwable t) {
                 if (!isCached) {
-                    ((MainActivity) getActivity()).onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
+                    getMainActivity().onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
                     Log.d("JJJ", "fail " + t.getMessage());
                     t.printStackTrace();
                 }
@@ -115,6 +144,79 @@ public class ProgramListFragment extends PageFragment {
     }
 
     private void showPrograms(final ViewGroup content, List<ProgramInfo> programs) {
+        Log.d("JJJ", "showPrograms category " + category + " topicId " + topicId);
+        ArrayList<ProgramInfo> filteredPrograms = new ArrayList<>(programs);
+
+        boolean matchActive = true;
+        String matchTopicId = null;
+        boolean sortByName = false;
+        boolean sortByTopic = false;
+
+        switch (category) {
+            case ProgramCategoryButton.CATEGORY_RECOMMENDED:
+                sortByName = true;
+                break;
+
+            case ProgramCategoryButton.CATEGORY_ALL_BY_NAME:
+                sortByName = true;
+                break;
+
+            case ProgramCategoryButton.CATEGORY_ALL_BY_TOPIC:
+                sortByTopic = true;
+                break;
+
+            case ProgramCategoryButton.CATEGORY_TOPIC_BY_NAME:
+                matchTopicId = topicId;
+                sortByName = true;
+                break;
+
+            case ProgramCategoryButton.CATEGORY_INACTIVE_BY_NAME:
+                matchActive = false;
+                sortByName = true;
+                break;
+        }
+
+        filteredPrograms = getFilteredPrograms(filteredPrograms, matchActive, matchTopicId);
+        filteredPrograms = getSortedPrograms(filteredPrograms, sortByName, sortByTopic);
+
+        // TODO recommended programs is a special case
+        if (category == ProgramCategoryButton.CATEGORY_RECOMMENDED) {
+            while (filteredPrograms.size() > 3) {
+                filteredPrograms.remove(filteredPrograms.size() - 1);
+            }
+        }
+
+        addPrograms(content, filteredPrograms);
+    }
+
+    private static ArrayList<ProgramInfo> getFilteredPrograms(ArrayList<ProgramInfo> programs, boolean isActive, String matchTopicId) {
+        ArrayList<ProgramInfo> filteredPrograms = new ArrayList<>();
+        for (ProgramInfo p : programs) {
+            if ((p.getActive() == isActive) && ((matchTopicId == null) || p.getTopicId().equalsIgnoreCase(matchTopicId))) {
+                filteredPrograms.add(p);
+            }
+        }
+        return filteredPrograms;
+    }
+
+    private static ArrayList<ProgramInfo> getSortedPrograms(ArrayList<ProgramInfo> programs, final boolean sortByName, final boolean sortByTopic) {
+        Collections.sort(programs, new Comparator<ProgramInfo>() {
+            @Override
+            public int compare(ProgramInfo lhs, ProgramInfo rhs) {
+                if (sortByTopic) {
+                    int result = lhs.getTopic().compareToIgnoreCase(rhs.getTopic());
+                    if (result != 0) {
+                        return result; // If not same topic
+                    }
+                }
+                return lhs.getName().compareToIgnoreCase(rhs.getName());
+            }
+        });
+        return programs;
+    }
+
+    private void addPrograms(final ViewGroup content, List<ProgramInfo> programs) {
+        content.removeAllViews(); // Clear old content
         for (final ProgramInfo p : programs) {
             ProgramButtonView v = new ProgramButtonView(content.getContext());
             v.setProgram(p);
@@ -130,6 +232,41 @@ public class ProgramListFragment extends PageFragment {
             });
             content.addView(v);
         }
+    }
+
+    private void getTopicColors(final ViewGroup content) {
+        // Read list instantly from local storage (if available).
+        final Collection<TopicInfo> topics = Storage.get().getTopics();
+        final boolean isCached = (topics != null) && (topics.size() > 0);
+
+        Log.d("JJJ", "Updating topic colors");
+        // Update topic colors before updating program list UI
+        RestClient.getApi().getTopicColors().enqueue(new Callback<TopicColors>() {
+            @Override
+            public void onResponse(Response<TopicColors> response) {
+                TopicColors colors = response.body();
+                ArrayList<TopicInfo> topics = new ArrayList<TopicInfo>();
+                // This is not dynamic at all but this is the API we got...
+                topics.add(new TopicInfo("aktualitet", colors.getAktualitet()));
+                topics.add(new TopicInfo("andet", colors.getAndet()));
+                topics.add(new TopicInfo("debat", colors.getDebat()));
+                topics.add(new TopicInfo("kultur", colors.getKultur()));
+                topics.add(new TopicInfo("nyheder", colors.getNyheder()));
+                topics.add(new TopicInfo("reportage", colors.getReportage()));
+                topics.add(new TopicInfo("satire", colors.getSatire()));
+                topics.add(new TopicInfo("sport", colors.getSport()));
+                Storage.get().addTopics(topics);
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                if (!isCached) {
+                    getMainActivity().onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
+                    Log.d("JJJ", "fail " + t.getMessage());
+                    t.printStackTrace();
+                }
+            }
+        });
     }
 
     @Override

@@ -124,6 +124,10 @@ public class ProgramsFragment extends PageFragment {
         });
     }
 
+    public void showProgramCategory(int category, String topicId) {
+        programListFragment.showProgramCategory(category, topicId);
+    }
+
     // Adapter for program list page only
     private class ListPagerAdapter extends FragmentStatePagerAdapter {
         public ListPagerAdapter(FragmentManager fm) {

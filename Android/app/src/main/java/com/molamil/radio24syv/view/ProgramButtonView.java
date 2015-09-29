@@ -1,15 +1,20 @@
 package com.molamil.radio24syv.view;
 
 import android.content.Context;
+import android.graphics.PorterDuff;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.RadioPlayer;
+import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.storage.model.TopicInfo;
 
 /**
  * Created by jens on 21/09/15.
@@ -66,8 +71,8 @@ public class ProgramButtonView extends LinearLayout {
         nameText.setText(program.getName());
         TextView descriptionText = (TextView) findViewById(R.id.description_text);
         descriptionText.setText(program.getDescription());
-        TextView categoryText = (TextView) findViewById(R.id.category_text);
-        categoryText.setText(program.getTopic());
+        TextView topicText = (TextView) findViewById(R.id.topic_text);
+        topicText.setText(program.getTopic());
 
         View programButton = findViewById(R.id.program_button);
         programButton.setOnClickListener(new OnClickListener() {
@@ -78,6 +83,12 @@ public class ProgramButtonView extends LinearLayout {
                 }
             }
         });
+
+        TopicInfo topic = Storage.get().getTopic(program.getTopicId());
+        if (topic != null) {
+            ImageView image = (ImageView) findViewById(R.id.image);
+            image.setColorFilter(topic.getColorValue(), PorterDuff.Mode.MULTIPLY);
+        }
     }
 
     public ProgramInfo getProgram() {

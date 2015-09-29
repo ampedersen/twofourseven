@@ -10,4 +10,16 @@
         </attr>
         <attr name="url" format="string" />
     </declare-styleable>
+
+    <declare-styleable name="ProgramCategoryButton">
+        <attr name="selected" format="boolean" />
+        <attr name="category" format="enum">
+            <enum name="recommended" value="0"/>
+            <enum name="all_by_name" value="1"/>
+            <enum name="all_by_topic" value="2"/>
+            <enum name="topic_by_name" value="3"/>
+            <enum name="inactive_by_name" value="4"/>
+        </attr>
+        <attr name="topic_id" format="string" />
+    </declare-styleable>
 </resources>

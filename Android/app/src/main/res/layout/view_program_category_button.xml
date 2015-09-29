@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    >
+
+    <View
+        android:id="@+id/selected_indicator"
+        android:layout_width="3dp"
+        android:layout_height="32dp"
+        android:background="@color/radio_gray"
+        android:layout_gravity="center_vertical"
+        />
+
+    <TextView
+        android:id="@+id/topic_text"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Kategorinavn her"
+        style="@style/ProgramCategoryText"
+        android:layout_marginLeft="10dp"
+        />
+
+</merge>

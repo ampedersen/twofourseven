@@ -7,9 +7,9 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
 
-import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.storage.model.TopicInfo;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -35,6 +35,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static final String KEY_TOPIC_ID = "topic_id";
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_IMAGE_URL = "image_url";
+    private static final String KEY_ACTIVE = "active";
     private static final String KEY_TITLE = "title";
     private static final String KEY_DATE = "date";
     private static final String KEY_AUDIO_URL = "audio_url";
@@ -45,7 +46,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
             + KEY_DOWNLOAD_ID + " BIGINT" + ")"; // TODO index on download_id
 
     private static final String SQL_CREATE_TABLE_PROGRAM = "CREATE TABLE " + TABLE_PROGRAM + "(" + KEY_PROGRAM_ID + " INTEGER PRIMARY KEY, "
-            + KEY_NAME + " TEXT, " + KEY_TOPIC_ID + " TEXT, " + KEY_DESCRIPTION + " TEXT, " + KEY_IMAGE_URL + " TEXT" + ")";
+            + KEY_NAME + " TEXT, " + KEY_TOPIC_ID + " TEXT, " + KEY_DESCRIPTION + " TEXT, " + KEY_IMAGE_URL + " TEXT, " + KEY_ACTIVE + " TEXT" + ")";
 
     private static final String SQL_CREATE_TABLE_PODCAST = "CREATE TABLE " + TABLE_PODCAST + "(" + KEY_PODCAST_ID + " INTEGER PRIMARY KEY, "
             + KEY_PROGRAM_ID + " INTEGER, " // TODO index on program_id
@@ -156,8 +157,8 @@ public class StorageDatabase extends SQLiteOpenHelper {
         deleteRow(TABLE_LIBRARY, KEY_PODCAST_ID + " = " + podcastId);
     }
 
-    public void addProgram(ProgramInfo program) {
-        addProgram(getWritableDatabase(), program);
+    public void writeProgramInfo(ProgramInfo program) {
+        writeProgramInfo(getWritableDatabase(), program);
     }
 
     public void addPrograms(List<ProgramInfo> programs) {
@@ -166,22 +167,12 @@ public class StorageDatabase extends SQLiteOpenHelper {
         db.beginTransaction(); // Use transaction because we will be adding lots of items (saves a lot of database operations)
         try {
             for (ProgramInfo p : programs) {
-                addProgram(db, p);
+                writeProgramInfo(db, p);
             }
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
         }
-    }
-
-    private static void addProgram(SQLiteDatabase db, ProgramInfo program) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_PROGRAM_ID, program.getProgramId());
-        values.put(KEY_NAME, program.getName());
-        values.put(KEY_TOPIC_ID, program.getTopic());
-        values.put(KEY_DESCRIPTION, program.getDescription());
-        values.put(KEY_IMAGE_URL, program.getImageUrl());
-        db.replace(TABLE_PROGRAM, null, values);
     }
 
     public ProgramInfo getProgram(int programId) {
@@ -220,7 +211,6 @@ public class StorageDatabase extends SQLiteOpenHelper {
     }
 
     public List<ProgramInfo> getProgramsWithPodcastsInLibrary() {
-        //SELECT * FROM TABLE1 T1 WHERE ID IN (SELECT ID FROM TABLE2)
         String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " IN (SELECT " + KEY_PROGRAM_ID + " FROM " + TABLE_PODCAST + ")";
         Log.d("JJJ", query);
 
@@ -245,14 +235,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     }
 
     public void addPodcast(PodcastInfo podcast) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_PODCAST_ID, podcast.getPodcastId());
-        values.put(KEY_PROGRAM_ID, podcast.getProgramId());
-        values.put(KEY_TITLE, podcast.getTitle());
-        values.put(KEY_DESCRIPTION, podcast.getDescription());
-        values.put(KEY_DATE, podcast.getDate());
-        values.put(KEY_AUDIO_URL, podcast.getAudioUrl());
-        getWritableDatabase().replace(TABLE_PODCAST, null, values);
+        writePodcastInfo(getWritableDatabase(), podcast);
     }
 
     public PodcastInfo getPodcast(int podcastId) {
@@ -328,54 +311,102 @@ public class StorageDatabase extends SQLiteOpenHelper {
         deleteRow(TABLE_PODCAST, KEY_PODCAST_ID + " = " + podcastId);
     }
 
-    public void addTopic(String topic) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_TOPIC_ID, topic); // Funny thing is that the key is also the actual topic text displayed...
-        values.put(KEY_COLOR, Storage.COLOR_UNKNOWN);
-        getWritableDatabase().replace(TABLE_TOPIC, null, values);
+//    public void addTopic(String topic) {
+//        ContentValues values = new ContentValues();
+//        values.put(KEY_TOPIC_ID, topic); // Funny thing is that the key is also the actual topic text displayed...
+//        values.put(KEY_COLOR, Storage.COLOR_UNKNOWN);
+//        getWritableDatabase().replace(TABLE_TOPIC, null, values);
+//    }
+
+//    public void setTopicColor(String topic, String color) {
+//        ContentValues values = new ContentValues();
+//        values.put(KEY_TOPIC_ID, topic);
+//        values.put(KEY_COLOR, color);
+//        getWritableDatabase().replace(TABLE_TOPIC, null, values);
+//    }
+
+//    public String getTopicColor(String topic) {
+//        String query = "SELECT " + KEY_COLOR + " FROM " + TABLE_TOPIC + " WHERE " + KEY_TOPIC_ID + " = " + topic + " LIMIT 1";
+//        Log.d("JJJ", query);
+//
+//        Cursor c = getReadableDatabase().rawQuery(query, null);
+//        if ((c != null) && c.moveToFirst()) {
+//            String color = c.getString(c.getColumnIndex(KEY_COLOR));
+//            c.close();
+//            Log.d("JJJ", "color " + color);
+//            return color;
+//        } else {
+//            Log.d("JJJ", "color unknown");
+//            return Storage.COLOR_UNKNOWN;
+//        }
+//    }
+
+//    public List<String> getTopicNames() {
+//        String query = "SELECT DISTINCT " + KEY_TOPIC_ID + " FROM " + TABLE_PROGRAM;
+//        Log.d("JJJ", query);
+//
+//        ArrayList<String> names = new ArrayList<>();
+//        Cursor c = getReadableDatabase().rawQuery(query, null);
+//        if ((c != null) && c.moveToFirst()) {
+//            do {
+//                String topic = c.getString(c.getColumnIndex(KEY_TOPIC_ID));
+//                names.add(topic);
+//                Log.d("JJJ", "topic " + topic);
+//            } while (c.moveToNext());
+//            c.close();
+//            return names;
+//        } else {
+//            Log.d("JJJ", "topics unknown");
+//            return names;
+//        }
+//    }
+
+    public void addTopics(List<TopicInfo> topics) {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            for (TopicInfo t : topics) {
+                writeTopicInfo(db, t);
+            }
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
-    public void setTopicColor(String topic, String color) {
-        ContentValues values = new ContentValues();
-        values.put(KEY_TOPIC_ID, topic);
-        values.put(KEY_COLOR, color);
-        getWritableDatabase().replace(TABLE_TOPIC, null, values);
-    }
-
-    public String getTopicColor(String topic) {
-        String query = "SELECT " + KEY_COLOR + " FROM " + TABLE_TOPIC + " WHERE " + KEY_TOPIC_ID + " = " + topic + " LIMIT 1";
+    public TopicInfo getTopic(String topicId) {
+        String query = "SELECT * FROM " + TABLE_TOPIC + " WHERE " + KEY_TOPIC_ID + " = '" + topicId + "' LIMIT 1";
         Log.d("JJJ", query);
 
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
-            String color = c.getString(c.getColumnIndex(KEY_COLOR));
+            TopicInfo topic = readTopicInfo(c);
             c.close();
-            Log.d("JJJ", "color " + color);
-            return color;
+            Log.d("JJJ", "topic " + topic.getTopicId() + " color " + topic.getColor());
+            return topic;
         } else {
-            Log.d("JJJ", "color unknown");
-            return Storage.COLOR_UNKNOWN;
+            Log.d("JJJ", "topic unknown " + topicId);
+            return null;
         }
     }
 
-    public List<String> getTopicNames() {
-        String query = "SELECT DISTINCT " + KEY_TOPIC_ID + " FROM " + TABLE_PROGRAM;
+    public List<TopicInfo> getTopics() {
+        String query = "SELECT * FROM " + TABLE_TOPIC;
         Log.d("JJJ", query);
 
-        ArrayList<String> names = new ArrayList<>();
+        ArrayList<TopicInfo> topics = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             do {
-                String topic = c.getString(c.getColumnIndex(KEY_TOPIC_ID));
-                names.add(topic);
-                Log.d("JJJ", "topic " + topic);
+                TopicInfo t = readTopicInfo(c);
+                topics.add(t);
+                Log.d("JJJ", "topic " + t.getTopicId() + " color " + t.getColor());
             } while (c.moveToNext());
             c.close();
-            return names;
         } else {
-            Log.d("JJJ", "topics unknown");
-            return names;
+            Log.d("JJJ", "no topics");
         }
+        return topics;
     }
 
     public void addPlayerHistory(int programId, String date) {
@@ -446,6 +477,17 @@ public class StorageDatabase extends SQLiteOpenHelper {
         Log.d("JJJ", "DELETE FROM " + table + " WHERE " + whereSelector + " (" + rows + " row(s) deleted)");
     }
 
+    private static void writeProgramInfo(SQLiteDatabase db, ProgramInfo program) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_PROGRAM_ID, program.getProgramId());
+        values.put(KEY_NAME, program.getName());
+        values.put(KEY_TOPIC_ID, program.getTopic());
+        values.put(KEY_DESCRIPTION, program.getDescription());
+        values.put(KEY_IMAGE_URL, program.getImageUrl());
+        values.put(KEY_ACTIVE, Boolean.toString(program.getActive()));
+        db.replace(TABLE_PROGRAM, null, values);
+    }
+
     private static ProgramInfo readProgramInfo(Cursor c) {
         ProgramInfo program = new ProgramInfo();
         program.setProgramId(c.getInt(c.getColumnIndex(KEY_PROGRAM_ID)));
@@ -453,7 +495,19 @@ public class StorageDatabase extends SQLiteOpenHelper {
         program.setTopic(c.getString(c.getColumnIndex(KEY_TOPIC_ID)));
         program.setDescription(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
         program.setImageUrl(c.getString(c.getColumnIndex(KEY_IMAGE_URL)));
+        program.setActive(Boolean.parseBoolean(c.getString(c.getColumnIndex(KEY_ACTIVE))));
         return program;
+    }
+
+    private static void writePodcastInfo(SQLiteDatabase db, PodcastInfo podcast) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_PODCAST_ID, podcast.getPodcastId());
+        values.put(KEY_PROGRAM_ID, podcast.getProgramId());
+        values.put(KEY_TITLE, podcast.getTitle());
+        values.put(KEY_DESCRIPTION, podcast.getDescription());
+        values.put(KEY_DATE, podcast.getDate());
+        values.put(KEY_AUDIO_URL, podcast.getAudioUrl());
+        db.replace(TABLE_PODCAST, null, values);
     }
 
     private static PodcastInfo readPodcastInfo(Cursor c) {
@@ -465,5 +519,19 @@ public class StorageDatabase extends SQLiteOpenHelper {
         podcast.setDate(c.getString(c.getColumnIndex(KEY_DATE)));
         podcast.setAudioUrl(c.getString(c.getColumnIndex(KEY_AUDIO_URL)));
         return podcast;
+    }
+
+    private static void writeTopicInfo(SQLiteDatabase db, TopicInfo topic) {
+        ContentValues values = new ContentValues();
+        values.put(KEY_TOPIC_ID, topic.getTopicId()); // Funny thing is that the key is also the actual topic text displayed...
+        values.put(KEY_COLOR, topic.getColor());
+        db.replace(TABLE_TOPIC, null, values);
+    }
+
+    private static TopicInfo readTopicInfo(Cursor c) {
+        TopicInfo topic = new TopicInfo();
+        topic.setTopicId(c.getString(c.getColumnIndex(KEY_TOPIC_ID)));
+        topic.setColor(c.getString(c.getColumnIndex(KEY_COLOR)));
+        return topic;
     }
 }

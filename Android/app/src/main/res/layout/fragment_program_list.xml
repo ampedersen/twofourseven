@@ -14,7 +14,6 @@
         >
 
         <LinearLayout
-            android:id="@+id/content"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
@@ -42,7 +41,7 @@
                 />
 
             <TextView
-                android:id="@+id/category_text"
+                android:id="@+id/topic_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="Anbefalet"
@@ -56,6 +55,19 @@
                 android:visibility="gone"
                 android:layout_gravity="center"
                 />
+
+            <LinearLayout
+                android:id="@+id/content"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:divider="@android:drawable/divider_horizontal_bright"
+                android:showDividers="middle"
+                >
+
+                <!-- Program buttons are added here -->
+
+            </LinearLayout>
 
         </LinearLayout>
 

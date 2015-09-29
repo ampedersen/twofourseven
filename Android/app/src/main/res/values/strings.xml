@@ -35,6 +35,13 @@
     <!-- Programs -->
     <string name="programs_header">Programmer</string>
 
+    <!-- Program categories -->
+    <string name="program_categories_header">Kategorier</string>
+    <string name="recommended">Anbefalet</string>
+    <string name="alphabetically">Alfabetisk</string>
+    <string name="genre">Genre</string>
+    <string name="old_programs">Gamle programmer</string>
+
     <!-- News -->
     <string name="news_header">Sidste nyt</string>
 

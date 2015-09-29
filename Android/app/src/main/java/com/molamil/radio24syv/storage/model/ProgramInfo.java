@@ -18,6 +18,7 @@ public class ProgramInfo implements Serializable {
     private String topic;
     private String description;
     private String imageUrl;
+    private boolean active;
 
     public ProgramInfo() {}
 
@@ -27,6 +28,7 @@ public class ProgramInfo implements Serializable {
         topic = conciseProgram.getTopic();
         description = conciseProgram.getDescriptionText();
         imageUrl = conciseProgram.getImageUrl();
+        active = conciseProgram.getActive();
     }
 
     public int getProgramId() {
@@ -49,6 +51,10 @@ public class ProgramInfo implements Serializable {
         return topic;
     }
 
+    public String getTopicId() {
+        return topic.toLowerCase();
+    }
+
     public void setTopic(String topic) {
         this.topic = topic;
     }
@@ -67,5 +73,13 @@ public class ProgramInfo implements Serializable {
 
     public void setImageUrl(String imageUrl) {
         this.imageUrl = imageUrl;
+    }
+
+    public boolean getActive() {
+        return active;
+    }
+
+    public void setActive(boolean active) {
+        this.active = active;
     }
 }

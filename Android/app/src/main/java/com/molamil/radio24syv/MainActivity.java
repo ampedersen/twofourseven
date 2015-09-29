@@ -27,6 +27,7 @@ public class MainActivity extends FragmentActivity implements
         ProgramsFragment.OnFragmentInteractionListener,
         ProgramListFragment.OnFragmentInteractionListener,
         ProgramDetailsFragment.OnFragmentInteractionListener,
+        ProgramCategoriesFragment.OnFragmentInteractionListener,
         NewsFragment.OnFragmentInteractionListener,
         OfflineFragment.OnFragmentInteractionListener,
         PlayerFragment.OnFragmentInteractionListener {
@@ -37,6 +38,9 @@ public class MainActivity extends FragmentActivity implements
     String selectedTabTag;
     int mainPagePosition; // The position of the main page changes depending on the selected tab
     RadioPlayer radioPlayer;
+
+    private int selectedProgramCategory;
+    private String selectedProgramTopicId;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -175,6 +179,24 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
+    public void OnProgramCategorySelected(int categoryId, String topicId) {
+        Log.d("JJJ", "Category " + categoryId + " topidId " + topicId);
+        pager.setCurrentItem(mainPagePosition);
+        setSelectedProgramCategory(categoryId, topicId);
+    }
+
+    private void setSelectedProgramCategory(int category, String topicId) {
+        selectedProgramCategory = category;
+        selectedProgramTopicId = topicId;
+        // Show category in program list (if visible)
+        ProgramsFragment f = (ProgramsFragment) mainFragment.getChildFragmentManager().findFragmentByTag(MainFragment.TAG_TAB_PROGRAMS);
+        if (f == null) {
+            return;
+        }
+        f.showProgramCategory(selectedProgramCategory, selectedProgramTopicId);
+    }
+
+    @Override
     public void onPlayerSizeChanged(PlayerFragment.PlayerSize newSize, PlayerFragment.PlayerSize oldSize) {
         if (newSize == PlayerFragment.PlayerSize.BIG) {
             pager.setPagingEnabled(false);
@@ -214,6 +236,7 @@ public class MainActivity extends FragmentActivity implements
             case MainFragment.TAG_TAB_PROGRAMS:
                 pager.setAdapter(new ProgramsTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 1;
+                setSelectedProgramCategory(selectedProgramCategory, selectedProgramTopicId);
                 break;
             case MainFragment.TAG_TAB_NEWS:
                 pager.setAdapter(new NewsTabPagerAdapter(getSupportFragmentManager()));
@@ -291,7 +314,7 @@ public class MainActivity extends FragmentActivity implements
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return new ProgramCategoriesFragment();
+                    return ProgramCategoriesFragment.newInstance(selectedProgramCategory, selectedProgramTopicId);
                 case 1:
                     return mainFragment;
                 case 2:

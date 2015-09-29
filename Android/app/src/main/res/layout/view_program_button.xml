@@ -9,6 +9,7 @@
     >
 
     <ImageView
+        android:id="@+id/image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:src="@android:drawable/ic_search_category_default"
@@ -34,10 +35,10 @@
         />
 
     <TextView
-        android:id="@+id/category_text"
+        android:id="@+id/topic_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Category"
+        android:text="Topic"
         android:singleLine="true"
         android:layout_alignParentBottom="true"
         />

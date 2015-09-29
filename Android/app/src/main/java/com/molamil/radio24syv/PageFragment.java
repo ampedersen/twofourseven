@@ -49,6 +49,11 @@ public abstract class PageFragment extends Fragment {
 //        listener = null;
     }
 
+    // Convenience method for getting MainActivity.
+    public MainActivity getMainActivity() {
+        return (MainActivity) getActivity();
+    }
+
     /**
      * This interface must be implemented by activities that contain this
      * fragment to allow an interaction in this fragment to be communicated

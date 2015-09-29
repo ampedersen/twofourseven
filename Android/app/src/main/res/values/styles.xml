@@ -11,6 +11,11 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/page_title_text_size</item>
         <item name="android:gravity">center</item>
+        <item name="android:layout_gravity">center_horizontal</item>
+    </style>
+
+    <style name="SidePageTitleText" parent="PageTitleText">
+        <item name="android:textColor">@color/radio_black</item>
     </style>
 
     <style name="PageBackButton" >
@@ -33,4 +38,10 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/podcast_program_title_text_size</item>
     </style>
+
+    <style name="ProgramCategoryText" >
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/program_category_text_size</item>
+    </style>
+
 </resources>

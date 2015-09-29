@@ -3,10 +3,10 @@ package com.molamil.radio24syv.api;
 import com.molamil.radio24syv.api.model.Broadcast;
 import com.molamil.radio24syv.api.model.ConciseProgram;
 import com.molamil.radio24syv.api.model.Host;
-import com.molamil.radio24syv.api.model.MetaInfo;
 import com.molamil.radio24syv.api.model.Page;
 import com.molamil.radio24syv.api.model.Podcast;
 import com.molamil.radio24syv.api.model.Program;
+import com.molamil.radio24syv.api.model.TopicColors;
 
 import java.util.List;
 
@@ -39,7 +39,10 @@ public interface RestApi {
     // Info
 
     @GET("info/topics")
-    Call<String> getTopicColor(@Query("topic") String topic);
+    Call<TopicColors> getTopicColors();
+
+    @GET("info/topics/{topic}")
+    Call<String> getTopicColor(@Path("topic") String topic);
 
     // Pages
 
