@@ -14,6 +14,7 @@ import com.molamil.radio24syv.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.storage.model.TopicInfo;
 
 import java.util.List;
 
@@ -107,6 +108,12 @@ public class PodcastProgramView extends LinearLayout implements
 
         TextView titleText = (TextView) findViewById(R.id.name_text);
         titleText.setText(program.getName());
+
+        TopicInfo topic = Storage.get().getTopic(program.getTopicId());
+        boolean isTopicInStorage = (topic != null); // When the podcast is saved there is no way to get past downloading all topics, but just in case
+        if (isTopicInStorage) {
+            titleText.setTextColor(topic.getColorValue());
+        }
     }
 
     public void setRadioPlayer(RadioPlayer radioPlayer) {

@@ -13,6 +13,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.RadioViewPager;
 
 
@@ -124,8 +125,8 @@ public class ProgramsFragment extends PageFragment {
         });
     }
 
-    public void showProgramCategory(int category, String topicId) {
-        programListFragment.showProgramCategory(category, topicId);
+    public void showProgramCategory(int category, TopicInfo topic) {
+        programListFragment.showProgramCategory(category, topic);
     }
 
     // Adapter for program list page only

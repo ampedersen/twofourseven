@@ -391,7 +391,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     }
 
     public List<TopicInfo> getTopics() {
-        String query = "SELECT * FROM " + TABLE_TOPIC;
+        String query = "SELECT * FROM " + TABLE_TOPIC + " ORDER BY " + KEY_TOPIC_ID;
         Log.d("JJJ", query);
 
         ArrayList<TopicInfo> topics = new ArrayList<>();

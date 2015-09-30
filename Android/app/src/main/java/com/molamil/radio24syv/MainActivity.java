@@ -14,6 +14,7 @@ import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
+import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.RadioViewPager;
 
 import net.hockeyapp.android.CrashManager;
@@ -40,7 +41,7 @@ public class MainActivity extends FragmentActivity implements
     RadioPlayer radioPlayer;
 
     private int selectedProgramCategory;
-    private String selectedProgramTopicId;
+    private TopicInfo selectedProgramTopic;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -179,21 +180,21 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public void OnProgramCategorySelected(int categoryId, String topicId) {
-        Log.d("JJJ", "Category " + categoryId + " topidId " + topicId);
+    public void OnProgramCategorySelected(int categoryId, TopicInfo topic) {
+        Log.d("JJJ", "Category " + categoryId + " topid " + topic);
         pager.setCurrentItem(mainPagePosition);
-        setSelectedProgramCategory(categoryId, topicId);
+        setSelectedProgramCategory(categoryId, topic);
     }
 
-    private void setSelectedProgramCategory(int category, String topicId) {
+    private void setSelectedProgramCategory(int category, TopicInfo topic) {
         selectedProgramCategory = category;
-        selectedProgramTopicId = topicId;
+        selectedProgramTopic = topic;
         // Show category in program list (if visible)
         ProgramsFragment f = (ProgramsFragment) mainFragment.getChildFragmentManager().findFragmentByTag(MainFragment.TAG_TAB_PROGRAMS);
         if (f == null) {
             return;
         }
-        f.showProgramCategory(selectedProgramCategory, selectedProgramTopicId);
+        f.showProgramCategory(selectedProgramCategory, selectedProgramTopic);
     }
 
     @Override
@@ -236,7 +237,7 @@ public class MainActivity extends FragmentActivity implements
             case MainFragment.TAG_TAB_PROGRAMS:
                 pager.setAdapter(new ProgramsTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 1;
-                setSelectedProgramCategory(selectedProgramCategory, selectedProgramTopicId);
+                setSelectedProgramCategory(selectedProgramCategory, selectedProgramTopic);
                 break;
             case MainFragment.TAG_TAB_NEWS:
                 pager.setAdapter(new NewsTabPagerAdapter(getSupportFragmentManager()));
@@ -314,7 +315,7 @@ public class MainActivity extends FragmentActivity implements
         public Fragment getItem(int position) {
             switch (position) {
                 case 0:
-                    return ProgramCategoriesFragment.newInstance(selectedProgramCategory, selectedProgramTopicId);
+                    return ProgramCategoriesFragment.newInstance(selectedProgramCategory, selectedProgramTopic);
                 case 1:
                     return mainFragment;
                 case 2:

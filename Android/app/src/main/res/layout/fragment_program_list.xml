@@ -1,11 +1,10 @@
-<FrameLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     tools:context="com.molamil.radio24syv.ProgramsFragment"
-    android:background="@color/radio_black"
-    >
+    android:background="@color/radio_black">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -40,12 +39,11 @@
                 android:text="Søg"
                 />
 
-            <TextView
-                android:id="@+id/topic_text"
+            <com.molamil.radio24syv.view.ProgramCategoryButton
+                android:id="@+id/category_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Anbefalet"
-                android:textColor="@color/radio_red"/>
+                />
 
             <TextView
                 android:id="@+id/loading_text"

@@ -25,14 +25,14 @@ public class ProgramCategoriesFragment extends PageFragment {
 
     private OnFragmentInteractionListener listener;
     private int selectedCategory;
-    private String selectedTopicId;
+    private TopicInfo selectedTopic;
     private ArrayList<ProgramCategoryButton> buttons = new ArrayList<>();
 
-    public static ProgramCategoriesFragment newInstance(int selectedCategory, String selectedTopicId) {
+    public static ProgramCategoriesFragment newInstance(int selectedCategory, TopicInfo selectedTopic) {
         ProgramCategoriesFragment fragment = new ProgramCategoriesFragment();
         Bundle args = new Bundle();
         args.putInt(ProgramListFragment.ARGUMENT_CATEGORY, selectedCategory);
-        args.putString(ProgramListFragment.ARGUMENT_TOPIC_ID, selectedTopicId);
+        args.putSerializable(ProgramListFragment.ARGUMENT_TOPIC_ID, selectedTopic);
         fragment.setArguments(args);
         return fragment;
     }
@@ -48,7 +48,7 @@ public class ProgramCategoriesFragment extends PageFragment {
         Bundle arguments = getArguments();
         if (arguments != null) {
             selectedCategory = arguments.getInt(ProgramListFragment.ARGUMENT_CATEGORY);
-            selectedTopicId = arguments.getString(ProgramListFragment.ARGUMENT_TOPIC_ID);
+            selectedTopic = (TopicInfo) arguments.getSerializable(ProgramListFragment.ARGUMENT_TOPIC_ID);
         }
     }
 
@@ -60,67 +60,35 @@ public class ProgramCategoriesFragment extends PageFragment {
         int redColor = getResources().getColor(R.color.radio_red);
 
         ViewGroup contentTop = (ViewGroup) v.findViewById(R.id.content_top);
-        addButton(inflater, contentTop, R.string.recommended, redColor, null, ProgramCategoryButton.CATEGORY_RECOMMENDED);
-        addButton(inflater, contentTop, R.string.alphabetically, blackColor, null, ProgramCategoryButton.CATEGORY_ALL_BY_NAME);
-        addButton(inflater, contentTop, R.string.genre, blackColor, null, ProgramCategoryButton.CATEGORY_ALL_BY_TOPIC);
+        addButton(contentTop, null, ProgramCategoryButton.CATEGORY_RECOMMENDED);
+        addButton(contentTop, null, ProgramCategoryButton.CATEGORY_ALL_BY_NAME);
+        addButton(contentTop, null, ProgramCategoryButton.CATEGORY_ALL_BY_TOPIC);
 
         // TODO load topics in parent fragment, when complete - update and add topic buttons here (show "indlæser..." in the meantime)
         ViewGroup contentMiddle = (ViewGroup) v.findViewById(R.id.content_middle);
         for (TopicInfo t : Storage.get().getTopics()) {
-            addButton(inflater, contentMiddle, t.getTopicText(), t.getColorValue(), t.getTopicId(), ProgramCategoryButton.CATEGORY_TOPIC_BY_NAME);
+            addButton(contentMiddle, t, ProgramCategoryButton.CATEGORY_TOPIC_BY_NAME);
         }
 
         ViewGroup contentBottom = (ViewGroup) v.findViewById(R.id.content_bottom);
-        addButton(inflater, contentBottom, R.string.old_programs, blackColor, null, ProgramCategoryButton.CATEGORY_INACTIVE_BY_NAME);
+        addButton(contentBottom, null, ProgramCategoryButton.CATEGORY_INACTIVE_BY_NAME);
 
         updateSelectedButton();
 
         return v;
     }
 
-//    private View addButton(LayoutInflater inflater, ViewGroup content, int textId, int color, boolean isSelected) {
-//        return addButton(inflater, content, getResources().getText(textId).toString(), color, isSelected);
-//    }
-
-//    private View addButton(LayoutInflater inflater, ViewGroup content, String text, int color, boolean isSelected) {
-//        Log.d("JJJ", "addButton " + text);
-//        View button = inflater.inflate(R.layout.view_program_category_button, content, false);
-//
-//        View selectedIndicator = button.findViewById(R.id.selected_indicator);
-//        int backgroundColor;
-//        if (isSelected) {
-//            backgroundColor = R.color.radio_gray;
-//        } else {
-//            backgroundColor = R.color.transparent;
-//        }
-//        selectedIndicator.setBackgroundColor(getResources().getColor(backgroundColor));
-//
-//        TextView title = (TextView) button.findViewById(R.id.topic_text);
-//        title.setText(text);
-//        title.setTextColor(color);
-//
-//        content.addView(button);
-//
-//        return button;
-//    }
-    private ProgramCategoryButton addButton(LayoutInflater inflater, ViewGroup content, int textId, int color, String topicId, int category) {
-        return addButton(inflater, content, getResources().getText(textId).toString(), color, topicId, category);
-    }
-
-    private ProgramCategoryButton addButton(LayoutInflater inflater, ViewGroup content, String text, int color, String topicId, int category) {
+    private ProgramCategoryButton addButton(ViewGroup content, TopicInfo topic, int category) {
         ProgramCategoryButton button = new ProgramCategoryButton(getActivity(), null);
-        button.setTitle(text);
-        button.setColor(color);
-        button.setTopicId(topicId);
-        button.setCategory(category);
+        button.setCategoryAndTopic(category, topic);
         button.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (listener != null) {
                     ProgramCategoryButton button = (ProgramCategoryButton) v;
-                    listener.OnProgramCategorySelected(button.getCategory(), button.getTopicId());
+                    listener.OnProgramCategorySelected(button.getCategory(), button.getTopic());
                     selectedCategory = button.getCategory();
-                    selectedTopicId = button.getTopicId();
+                    selectedTopic = button.getTopic();
                     updateSelectedButton();
                 }
             }
@@ -132,7 +100,7 @@ public class ProgramCategoriesFragment extends PageFragment {
 
     private void updateSelectedButton() {
         for (ProgramCategoryButton b : buttons) {
-            boolean isSelected = (selectedCategory == b.getCategory()) && ((selectedTopicId == b.getTopicId()) || (selectedTopicId.equals(b.getTopicId())));
+            boolean isSelected = (selectedCategory == b.getCategory()) && (((selectedTopic == null) && (b.getTopic() == null)) || (selectedTopic.getTopicId().equals(b.getTopic().getTopicId())));
             b.setSelected(isSelected);
         }
     }
@@ -154,11 +122,7 @@ public class ProgramCategoriesFragment extends PageFragment {
         listener = null;
     }
 
-    public void showProgramCategory(int selectedProgramCategory, String selectedProgramTopicId) {
-        Log.d("JJJ", "show pårogrma cat " + selectedCategory + " " + selectedProgramTopicId);
-    }
-
     public interface OnFragmentInteractionListener {
-        void OnProgramCategorySelected(int categoryId, String topicId);
+        void OnProgramCategorySelected(int categoryId, TopicInfo topic);
     }
 }

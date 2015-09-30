@@ -8,7 +8,10 @@ import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.storage.model.TopicInfo;
 
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 
@@ -23,6 +26,7 @@ public class Storage {
 
     private StorageDatabase database;
     private HashMap<String, TopicInfo> cachedTopicById = new HashMap<>();
+    private ArrayList<TopicInfo> cachedTopicsSorted = new ArrayList<>();
 
     private static Storage instance = null;
 
@@ -130,7 +134,7 @@ public class Storage {
 
     public Collection<TopicInfo> getTopics() {
         initializeCacheIfNeeded();
-        return cachedTopicById.values();
+        return cachedTopicsSorted;
     }
 
     public void addPlayerHistory(int programId, String date) {
@@ -161,6 +165,7 @@ public class Storage {
 
     private void clearCache() {
         cachedTopicById.clear();
+        cachedTopicsSorted.clear();
     }
 
     private void initializeCacheIfNeeded() {
@@ -172,6 +177,14 @@ public class Storage {
         for (TopicInfo t : database.getTopics()) {
             cachedTopicById.put(t.getTopicId(), t);
         }
+
+        cachedTopicsSorted.addAll(cachedTopicById.values());
+        Collections.sort(cachedTopicsSorted, new Comparator<TopicInfo>() {
+            @Override
+            public int compare(TopicInfo lhs, TopicInfo rhs) {
+                return lhs.getTopicText().compareToIgnoreCase(rhs.getTopicText());
+            }
+        });
     }
 
 }

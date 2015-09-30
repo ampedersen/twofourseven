@@ -9,6 +9,7 @@
         android:layout_height="32dp"
         android:background="@color/radio_gray"
         android:layout_gravity="center_vertical"
+        android:layout_marginRight="10dp"
         />
 
     <TextView
@@ -17,7 +18,6 @@
         android:layout_height="wrap_content"
         android:text="Kategorinavn her"
         style="@style/ProgramCategoryText"
-        android:layout_marginLeft="10dp"
         />
 
 </merge>

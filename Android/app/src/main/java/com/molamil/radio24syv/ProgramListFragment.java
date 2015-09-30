@@ -33,11 +33,13 @@ public class ProgramListFragment extends PageFragment {
     public static final String ARGUMENT_CATEGORY = "Category";
     public static final String ARGUMENT_TOPIC_ID = "TopicId";
 
+    private enum Sorting { UNSORTED, SORT_BY_NAME, SORT_BY_TOPIC };
+
     private OnFragmentInteractionListener mListener;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
 
     private int category;
-    private String topicId;
+    private TopicInfo topic;
 
     public ProgramListFragment() {
         // Required empty public constructor
@@ -50,7 +52,7 @@ public class ProgramListFragment extends PageFragment {
         Bundle arguments = getArguments();
         if (arguments != null) {
             category = getArguments().getInt(ARGUMENT_CATEGORY, ProgramCategoryButton.CATEGORY_RECOMMENDED);
-            topicId = getArguments().getString(ARGUMENT_TOPIC_ID, Storage.TOPIC_ID_UNKNOWN);
+            topic = (TopicInfo) getArguments().getSerializable(ARGUMENT_TOPIC_ID);
         }
     }
 
@@ -78,21 +80,31 @@ public class ProgramListFragment extends PageFragment {
         });
 
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
-        getPrograms(content);
         getTopicColors(content);
+        updateProgramList(v);
 
         return v;
     }
 
-    public void showProgramCategory(int category, String topicId) {
+    public void showProgramCategory(int category, TopicInfo topic) {
         this.category = category;
-        this.topicId = topicId;
+        this.topic = topic;
 
         View v = getView();
         if (v != null) {
-            final ViewGroup content = (ViewGroup) getView().findViewById(R.id.content);
-            getPrograms(content);
+            updateProgramList(v);
         }
+    }
+
+    private void updateProgramList(View v) {
+        // The category button is only used as a label
+        ProgramCategoryButton categoryButton = (ProgramCategoryButton) v.findViewById(R.id.category_button);
+        categoryButton.setCategoryAndTopic(category, topic);
+        categoryButton.setSelectedIndicatorVisible(false);
+        categoryButton.adjustTitleColorForBlackBackground();
+
+        final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
+        getPrograms(content);
     }
 
     private void getPrograms(final ViewGroup content) {
@@ -144,40 +156,39 @@ public class ProgramListFragment extends PageFragment {
     }
 
     private void showPrograms(final ViewGroup content, List<ProgramInfo> programs) {
-        Log.d("JJJ", "showPrograms category " + category + " topicId " + topicId);
+        Log.d("JJJ", "showPrograms category " + category + " topic " + (topic == null ? "null" : topic.getTopicId()));
         ArrayList<ProgramInfo> filteredPrograms = new ArrayList<>(programs);
 
         boolean matchActive = true;
         String matchTopicId = null;
-        boolean sortByName = false;
-        boolean sortByTopic = false;
+        Sorting sorting = Sorting.UNSORTED;
 
         switch (category) {
             case ProgramCategoryButton.CATEGORY_RECOMMENDED:
-                sortByName = true;
+                sorting = Sorting.SORT_BY_NAME;
                 break;
 
             case ProgramCategoryButton.CATEGORY_ALL_BY_NAME:
-                sortByName = true;
+                sorting = Sorting.SORT_BY_NAME;
                 break;
 
             case ProgramCategoryButton.CATEGORY_ALL_BY_TOPIC:
-                sortByTopic = true;
+                sorting = Sorting.SORT_BY_TOPIC;
                 break;
 
             case ProgramCategoryButton.CATEGORY_TOPIC_BY_NAME:
-                matchTopicId = topicId;
-                sortByName = true;
+                matchTopicId = topic.getTopicId();
+                sorting = Sorting.SORT_BY_NAME;
                 break;
 
             case ProgramCategoryButton.CATEGORY_INACTIVE_BY_NAME:
                 matchActive = false;
-                sortByName = true;
+                sorting = Sorting.SORT_BY_NAME;
                 break;
         }
 
         filteredPrograms = getFilteredPrograms(filteredPrograms, matchActive, matchTopicId);
-        filteredPrograms = getSortedPrograms(filteredPrograms, sortByName, sortByTopic);
+        filteredPrograms = getSortedPrograms(filteredPrograms, sorting);
 
         // TODO recommended programs is a special case
         if (category == ProgramCategoryButton.CATEGORY_RECOMMENDED) {
@@ -186,6 +197,7 @@ public class ProgramListFragment extends PageFragment {
             }
         }
 
+        content.removeAllViews(); // Clear old content
         addPrograms(content, filteredPrograms);
     }
 
@@ -199,11 +211,11 @@ public class ProgramListFragment extends PageFragment {
         return filteredPrograms;
     }
 
-    private static ArrayList<ProgramInfo> getSortedPrograms(ArrayList<ProgramInfo> programs, final boolean sortByName, final boolean sortByTopic) {
+    private static ArrayList<ProgramInfo> getSortedPrograms(ArrayList<ProgramInfo> programs, final Sorting sorting) {
         Collections.sort(programs, new Comparator<ProgramInfo>() {
             @Override
             public int compare(ProgramInfo lhs, ProgramInfo rhs) {
-                if (sortByTopic) {
+                if (sorting == Sorting.SORT_BY_NAME) {
                     int result = lhs.getTopic().compareToIgnoreCase(rhs.getTopic());
                     if (result != 0) {
                         return result; // If not same topic
@@ -216,7 +228,6 @@ public class ProgramListFragment extends PageFragment {
     }
 
     private void addPrograms(final ViewGroup content, List<ProgramInfo> programs) {
-        content.removeAllViews(); // Clear old content
         for (final ProgramInfo p : programs) {
             ProgramButtonView v = new ProgramButtonView(content.getContext());
             v.setProgram(p);
