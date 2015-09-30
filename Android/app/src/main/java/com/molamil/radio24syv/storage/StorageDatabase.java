@@ -416,24 +416,8 @@ public class StorageDatabase extends SQLiteOpenHelper {
         getWritableDatabase().insert(TABLE_PLAYER_HISTORY, null, values);
     }
 
-    public List<Integer> getPlayerHistory(int limit) {
-        String query = "SELECT DISTINCT " + KEY_PROGRAM_ID + " FROM " + TABLE_PLAYER_HISTORY + " ORDER BY " + KEY_DATE + " DESC LIMIT " + limit;
-        Log.d("JJJ", query);
-
-        List<Integer> programIds = new ArrayList<>();
-        Cursor c = getReadableDatabase().rawQuery(query, null);
-        if ((c != null) && c.moveToFirst()) {
-            do {
-                int programId = c.getInt(c.getColumnIndex(KEY_PROGRAM_ID));
-                programIds.add(programId);
-                Log.d("JJJ", "programId " + programId);
-            } while (c.moveToNext());
-            c.close();
-            return programIds;
-        } else {
-            Log.d("JJJ", "player history unknown");
-            return programIds;
-        }
+    public List<ProgramInfo> getPlayerHistory(int limit) {
+        return getProgramsInQuery("SELECT DISTINCT " + KEY_PROGRAM_ID + " FROM " + TABLE_PLAYER_HISTORY + " ORDER BY " + KEY_DATE + " DESC LIMIT " + limit);
     }
 
     public void addRelatedPrograms(int programId, List<Integer> relatedProgramIds) {
@@ -452,23 +436,27 @@ public class StorageDatabase extends SQLiteOpenHelper {
         }
     }
 
-    public List<Integer> getRelatedPrograms(int programId, int limit) {
-        String query = "SELECT DISTINCT " + KEY_PROGRAM_ID_RELATED + " FROM " + TABLE_RELATED_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " LIMIT " + limit;
+    public List<ProgramInfo> getRelatedPrograms(int programId, int limit) {
+        return getProgramsInQuery("SELECT DISTINCT " + KEY_PROGRAM_ID_RELATED + " FROM " + TABLE_RELATED_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " LIMIT " + limit);
+    }
+
+    private List<ProgramInfo> getProgramsInQuery(String queryWithProgramIds) {
+        String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " IN (" + queryWithProgramIds + ")";
         Log.d("JJJ", query);
 
-        List<Integer> relatedProgramIds = new ArrayList<>();
+        List<ProgramInfo> programs = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             do {
-                int relatedProgramId = c.getInt(c.getColumnIndex(KEY_PROGRAM_ID_RELATED));
-                relatedProgramIds.add(relatedProgramId);
-                Log.d("JJJ", "relatedProgramId " + relatedProgramId);
+                ProgramInfo program = readProgramInfo(c);
+                programs.add(program);
+                Log.d("JJJ", "program " + program.getName());
             } while (c.moveToNext());
             c.close();
-            return relatedProgramIds;
+            return programs;
         } else {
-            Log.d("JJJ", "related programs unknown");
-            return relatedProgramIds;
+            Log.d("JJJ", "no programs");
+            return programs;
         }
     }
 

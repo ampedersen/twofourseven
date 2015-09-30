@@ -141,7 +141,7 @@ public class Storage {
         database.addPlayerHistory(programId, date);
     }
 
-    public List<Integer> getPlayerHistory(int limit) {
+    public List<ProgramInfo> getPlayerHistory(int limit) {
         return database.getPlayerHistory(limit);
     }
 
@@ -149,7 +149,7 @@ public class Storage {
         database.addRelatedPrograms(programId, relatedProgramIds);
     }
 
-    public List<Integer> getRelatedPrograms(int programId, int limit) {
+    public List<ProgramInfo> getRelatedPrograms(int programId, int limit) {
         return database.getRelatedPrograms(programId, limit);
     }
 

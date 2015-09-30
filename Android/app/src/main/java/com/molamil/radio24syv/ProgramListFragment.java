@@ -22,6 +22,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit.Callback;
@@ -157,7 +158,6 @@ public class ProgramListFragment extends PageFragment {
 
     private void showPrograms(final ViewGroup content, List<ProgramInfo> programs) {
         Log.d("JJJ", "showPrograms category " + category + " topic " + (topic == null ? "null" : topic.getTopicId()));
-        ArrayList<ProgramInfo> filteredPrograms = new ArrayList<>(programs);
 
         boolean matchActive = true;
         String matchTopicId = null;
@@ -187,18 +187,74 @@ public class ProgramListFragment extends PageFragment {
                 break;
         }
 
-        filteredPrograms = getFilteredPrograms(filteredPrograms, matchActive, matchTopicId);
-        filteredPrograms = getSortedPrograms(filteredPrograms, sorting);
-
-        // TODO recommended programs is a special case
+        // Recommended programs is a special case
         if (category == ProgramCategoryButton.CATEGORY_RECOMMENDED) {
-            while (filteredPrograms.size() > 3) {
-                filteredPrograms.remove(filteredPrograms.size() - 1);
-            }
-        }
+            content.removeAllViews(); // Clear old content
 
-        content.removeAllViews(); // Clear old content
-        addPrograms(content, filteredPrograms);
+            // Show recent programs
+            List<ProgramInfo> recentPrograms = Storage.get().getPlayerHistory(3);
+            if (recentPrograms.size() > 0) {
+                TextView t = new TextView(getActivity());
+                t.setText(R.string.programs_recent);
+                content.addView(t);
+                addPrograms(content, recentPrograms);
+            }
+
+            // The recent program IDs are needed for easy lookup later
+            List<Integer> recentProgramIds = new ArrayList<>();
+            for (ProgramInfo p : recentPrograms) {
+                recentProgramIds.add(p.getProgramId());
+            }
+
+            // Count how many times each program is related
+            List<ProgramInfo> allRecentPrograms = Storage.get().getPlayerHistory(Integer.MAX_VALUE);
+            final HashMap<Integer, Integer> relationsByProgramId = new HashMap<>();
+            for (ProgramInfo p : allRecentPrograms) {
+                for (ProgramInfo related : Storage.get().getRelatedPrograms(p.getProgramId(), Integer.MAX_VALUE)) {
+                    int id = related.getProgramId();
+                    boolean isRecentProgram = (recentProgramIds.contains(id)); // Do not recommend recent programs because that looks silly
+                    if (!isRecentProgram) {
+                        if (!relationsByProgramId.containsKey(id)) {
+                            relationsByProgramId.put(id, 0);
+                        }
+                        relationsByProgramId.put(id, relationsByProgramId.get(id) + 1); // Count another relation to this program
+                    }
+                }
+            }
+
+            // Sort related programs by how many times they are related
+            List<Integer> relatedProgramIds = new ArrayList<>();
+            relatedProgramIds.addAll(relationsByProgramId.keySet());
+            Collections.sort(relatedProgramIds, new Comparator<Integer>() {
+                @Override
+                public int compare(Integer lhs, Integer rhs) {
+                    return relationsByProgramId.get(lhs).compareTo(relationsByProgramId.get(rhs)); // Sort by number of relations
+                }
+            });
+
+            // Recommend the three most related programs
+            List<ProgramInfo> recommendedPrograms = new ArrayList<>();
+            for (int i = 0; (i < 3) && (i < relatedProgramIds.size()); i++) {
+                ProgramInfo p = Storage.get().getProgram(relatedProgramIds.get(i));
+                recommendedPrograms.add(p);
+            }
+
+            // Show recommended programs
+            if (recommendedPrograms.size() > 0) {
+                TextView t = new TextView(getActivity());
+                t.setText(R.string.programs_recomended);
+                content.addView(t);
+                addPrograms(content, recommendedPrograms);
+            }
+
+        } else {
+            ArrayList<ProgramInfo> filteredPrograms = new ArrayList<>(programs);
+            filteredPrograms = getFilteredPrograms(filteredPrograms, matchActive, matchTopicId);
+            filteredPrograms = getSortedPrograms(filteredPrograms, sorting);
+
+            content.removeAllViews(); // Clear old content
+            addPrograms(content, filteredPrograms);
+        }
     }
 
     private static ArrayList<ProgramInfo> getFilteredPrograms(ArrayList<ProgramInfo> programs, boolean isActive, String matchTopicId) {
