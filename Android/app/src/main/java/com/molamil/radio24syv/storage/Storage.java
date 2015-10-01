@@ -165,13 +165,7 @@ public class Storage {
     }
 
     public void deleteHistory(Context context) {
-        for (PodcastInfo podcast : database.getPodcasts()) {
-            Log.d("JJJ", "Deleting " + podcast.getPodcastId() + " " + podcast.getTitle());
-            RadioLibrary.getInstance().remove(context, podcast);
-        }
-        Log.d("JJJ", "Deleting database");
-        database.dropTables();
-        database.createTables();
+        database.deletePlayerHistory();
     }
 
     private void clearCache() {
