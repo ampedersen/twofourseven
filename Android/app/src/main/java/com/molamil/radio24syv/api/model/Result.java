@@ -3,26 +3,36 @@ package com.molamil.radio24syv.api.model;
 
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 @Generated("org.jsonschema2pojo")
 public class Result {
 
+    @SerializedName("id")
     @Expose
     private Integer id;
+    @SerializedName("name")
     @Expose
     private String name;
+    @SerializedName("intro")
     @Expose
     private String intro;
+    @SerializedName("description")
     @Expose
     private String description;
+    @SerializedName("url")
     @Expose
     private String url;
+    @SerializedName("createdAt")
     @Expose
     private String createdAt;
+    @SerializedName("updatedAt")
     @Expose
     private String updatedAt;
+    @SerializedName("type")
     @Expose
     private String type;
+    @SerializedName("metaDescription")
     @Expose
     private String metaDescription;
 

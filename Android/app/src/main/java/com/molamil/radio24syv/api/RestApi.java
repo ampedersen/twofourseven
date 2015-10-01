@@ -6,6 +6,7 @@ import com.molamil.radio24syv.api.model.Host;
 import com.molamil.radio24syv.api.model.Page;
 import com.molamil.radio24syv.api.model.Podcast;
 import com.molamil.radio24syv.api.model.Program;
+import com.molamil.radio24syv.api.model.Search;
 import com.molamil.radio24syv.api.model.TopicColors;
 
 import java.util.List;
@@ -54,15 +55,6 @@ public interface RestApi {
 
     // Podcasts
 
-//    @GET("/podcasts/program/{id}?size={size}&p={p}&year={year}&month={month}")
-//    Call<List<Podcast>> getPodcasts(@Path("id") String programId, @Path("size") Integer amount, @Path("p") Integer pageOffset, @Path("year") Integer year, @Path("month") Integer month);
-
-//    @GET("/podcasts/program/{id}")
-//    Call<List<Podcast>> getPodcasts(@Path("id") String programId);
-
-//    @GET("/podcasts/program/{id}")
-//    Call<List<Podcast>> getPodcasts(@Path("id") String programId, @Query("size") Integer amount, @Query("p") Integer pageOffset);
-
     @GET("/podcasts/program/{id}")
     Call<List<Podcast>> getPodcasts(@Path("id") Integer programId, @Query("size") Integer amount, @Query("p") Integer pageOffset);
 
@@ -87,6 +79,9 @@ public interface RestApi {
     Call<List<Program>> getPopularPrograms(@Path("limit") Integer amount);
 
     // Searches
+
+    @GET("search/{query}")
+    Call<Search> search(@Path("query") String query);
 
     // Stories (empty?)
 

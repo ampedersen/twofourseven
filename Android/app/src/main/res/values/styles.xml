@@ -42,7 +42,6 @@
     <style name="ProgramCategoryText" >
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/program_category_text_size</item>
-        <item name="android:background">@drawable/program_category_button_background</item>
     </style>
 
 </resources>

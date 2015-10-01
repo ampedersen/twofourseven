@@ -9,14 +9,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
-import android.view.View;
-import android.view.ViewGroup;
-import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
-import com.molamil.radio24syv.api.model.ConciseProgram;
 import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.api.model.RelatedProgram;
+import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
@@ -29,13 +26,13 @@ import net.hockeyapp.android.UpdateManager;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import retrofit.Callback;
 import retrofit.Response;
 
 public class MainActivity extends FragmentActivity implements
         RadioPlayer.RadioPlayerProvider,
+        RadioPlayer.OnPlaybackListener,
         MainFragment.OnMainFragmentInteractionListener,
         PageFragment.OnFragmentInteractionListener,
         ScheduleFragment.OnFragmentInteractionListener,
@@ -45,7 +42,8 @@ public class MainActivity extends FragmentActivity implements
         ProgramCategoriesFragment.OnFragmentInteractionListener,
         NewsFragment.OnFragmentInteractionListener,
         OfflineFragment.OnFragmentInteractionListener,
-        PlayerFragment.OnFragmentInteractionListener, RadioPlayer.OnPlaybackListener {
+        PlayerFragment.OnFragmentInteractionListener,
+        ProgramSearchFragment.OnFragmentInteractionListener {
 
     RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
     SidePageTransformer pageTransformer;
@@ -274,6 +272,12 @@ public class MainActivity extends FragmentActivity implements
 
         mainFragment.setTabSize(MainFragment.TabSize.NORMAL); // Normal tab size
         mainFragment.setError(null); // Clear error message
+
+        // Show/hide keyboard
+//        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
+//        if (imm != null){
+//            imm.toggleSoftInput(0, InputMethodManager.HIDE_IMPLICIT_ONLY);
+//        }
     }
 
     @Override
@@ -419,7 +423,7 @@ public class MainActivity extends FragmentActivity implements
                 case 1:
                     return mainFragment;
                 case 2:
-                    return new SearchFragment();
+                    return new ProgramSearchFragment();
             }
             Log.e("JJJ", "Unable to determine a fragment for " + selectedTabTag + " page " + position + " - returning null");
             return null;

@@ -2,27 +2,14 @@ package com.molamil.radio24syv.view;
 
 import android.content.Context;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
-import android.graphics.Canvas;
-import android.graphics.Paint;
-import android.graphics.Rect;
-import android.graphics.drawable.ColorDrawable;
-import android.support.v7.graphics.drawable.DrawableWrapper;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
-import com.molamil.radio24syv.RadioPlayer;
-import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.TopicInfo;
-
-import org.w3c.dom.Text;
 
 /**
  * Created by jens on 11/09/15.

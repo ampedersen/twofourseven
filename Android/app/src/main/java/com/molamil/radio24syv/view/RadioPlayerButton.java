@@ -11,7 +11,7 @@ import android.view.View;
 import android.widget.Button;
 
 import com.molamil.radio24syv.R;
-import com.molamil.radio24syv.RadioPlayer;
+import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 
 /**

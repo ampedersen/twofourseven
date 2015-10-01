@@ -1,16 +1,13 @@
-package com.molamil.radio24syv;
+package com.molamil.radio24syv.player;
 
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
-import android.media.AudioAttributes;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
 import android.net.ConnectivityManager;
@@ -21,16 +18,16 @@ import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
 import android.support.v4.app.NotificationCompat;
-import android.support.v4.app.NotificationManagerCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.molamil.radio24syv.MainActivity;
+import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.storage.Storage;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.security.acl.NotOwnerException;
 
 /**
  * Encapsulates MediaPlayer and makes it possible to keep playing audio even when app is sent to background.

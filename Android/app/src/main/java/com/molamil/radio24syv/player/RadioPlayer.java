@@ -1,4 +1,4 @@
-package com.molamil.radio24syv;
+package com.molamil.radio24syv.player;
 
 import android.content.BroadcastReceiver;
 import android.content.ComponentName;

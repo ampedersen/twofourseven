@@ -7,6 +7,7 @@ import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.ConciseProgram;
 import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.api.model.RelatedProgram;
+import com.molamil.radio24syv.storage.Storage;
 
 import java.io.Serializable;
 
@@ -26,7 +27,7 @@ public class ProgramInfo implements Serializable {
     public ProgramInfo() {}
 
     public ProgramInfo(ConciseProgram conciseProgram) {
-        programId = RestClient.getIntegerSafely(conciseProgram.getVideoProgramId(), 0);
+        programId = RestClient.getIntegerSafely(conciseProgram.getVideoProgramId(), Storage.PROGRAM_ID_UNKNOWN);
         name = conciseProgram.getName();
         topic = conciseProgram.getTopic();
         description = conciseProgram.getDescriptionText();
@@ -35,7 +36,7 @@ public class ProgramInfo implements Serializable {
     }
 
     public ProgramInfo(Program program) {
-        programId = RestClient.getIntegerSafely(program.getVideoProgramId(), 0);
+        programId = RestClient.getIntegerSafely(program.getVideoProgramId(), Storage.PROGRAM_ID_UNKNOWN);
         name = program.getName();
         topic = program.getTopic();
         description = RestClient.getTextWithoutHtmlTags(program.getDescriptionHtml());
@@ -43,14 +44,15 @@ public class ProgramInfo implements Serializable {
         active = program.getActive();
     }
 
-    public ProgramInfo(RelatedProgram relatedProgram) {
-        programId = RestClient.getIntegerSafely((int)relatedProgram.getVideoProgramId(), 0); // I suppose this is an integer
-        name = relatedProgram.getName();
-        topic = relatedProgram.getTopic();
-        description = relatedProgram.getDescriptionText();
-        imageUrl = relatedProgram.getImageUrl();
-        active = relatedProgram.getActive();
-    }
+    // TODO this is broken until the API returns an integer instead of null for relatedProgram.getVideoProgramId()
+//    public ProgramInfo(RelatedProgram relatedProgram) {
+//        programId = RestClient.getIntegerSafely((int) relatedProgram.getVideoProgramId(), Storage.PROGRAM_ID_UNKNOWN); // I suppose this is an integer
+//        name = relatedProgram.getName();
+//        topic = relatedProgram.getTopic();
+//        description = relatedProgram.getDescriptionText();
+//        imageUrl = relatedProgram.getImageUrl();
+//        active = relatedProgram.getActive();
+//    }
 
     public int getProgramId() {
         return programId;

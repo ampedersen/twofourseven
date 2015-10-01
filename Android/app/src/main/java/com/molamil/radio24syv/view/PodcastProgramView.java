@@ -9,8 +9,8 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
-import com.molamil.radio24syv.RadioLibrary;
-import com.molamil.radio24syv.RadioPlayer;
+import com.molamil.radio24syv.storage.RadioLibrary;
+import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;

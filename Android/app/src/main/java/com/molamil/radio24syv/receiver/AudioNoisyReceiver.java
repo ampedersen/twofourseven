@@ -1,15 +1,12 @@
 package com.molamil.radio24syv.receiver;
 
 import android.content.BroadcastReceiver;
-import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
-import android.content.ServiceConnection;
-import android.os.IBinder;
 import android.util.Log;
 
-import com.molamil.radio24syv.RadioPlayer;
-import com.molamil.radio24syv.RadioPlayerService;
+import com.molamil.radio24syv.player.RadioPlayer;
+import com.molamil.radio24syv.player.RadioPlayerService;
 
 public class AudioNoisyReceiver extends BroadcastReceiver {
 

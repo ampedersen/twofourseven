@@ -1,4 +1,4 @@
-package com.molamil.radio24syv;
+package com.molamil.radio24syv.storage;
 
 import android.app.DownloadManager;
 import android.content.BroadcastReceiver;
@@ -10,7 +10,7 @@ import android.net.Uri;
 import android.os.Environment;
 import android.util.Log;
 
-import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 

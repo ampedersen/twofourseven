@@ -4,16 +4,13 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
-import android.view.ViewGroup;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
-import com.molamil.radio24syv.RadioPlayer;
-import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.player.RadioPlayer;
 
 import java.util.ArrayList;
-import java.util.List;
 
 /**
  * Created by jens on 21/09/15.

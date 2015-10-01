@@ -5,18 +5,24 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.annotation.Generated;
 import com.google.gson.annotations.Expose;
+import com.google.gson.annotations.SerializedName;
 
 @Generated("org.jsonschema2pojo")
-public class Searches {
+public class Search {
 
+    @SerializedName("q")
     @Expose
     private String q;
+    @SerializedName("resultsFound")
     @Expose
     private Integer resultsFound;
+    @SerializedName("resultsLoaded")
     @Expose
     private Integer resultsLoaded;
+    @SerializedName("offset")
     @Expose
     private Integer offset;
+    @SerializedName("results")
     @Expose
     private List<Result> results = new ArrayList<Result>();
 

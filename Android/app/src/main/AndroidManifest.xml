@@ -39,7 +39,7 @@
         <activity android:name="net.hockeyapp.android.UpdateActivity" /> <!-- Hockeyapp -->
 
         <service
-            android:name=".RadioPlayerService"
+            android:name=".player.RadioPlayerService"
             android:enabled="true"
             android:exported="false" >
         </service>

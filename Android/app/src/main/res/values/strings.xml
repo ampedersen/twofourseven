@@ -46,6 +46,11 @@
     <string name="genre">Genre</string>
     <string name="old_programs">Gamle programmer</string>
 
+    <!-- Program search -->
+    <string name="search_hint">Indtast søgning</string>
+    <string name="search_help">Søg efter program eller vært</string>
+    <string name="search_no_results">Din søgning gav intet resultat</string>
+
     <!-- News -->
     <string name="news_header">Sidste nyt</string>
 
