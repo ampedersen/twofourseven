@@ -326,10 +326,10 @@ public class ProgramListFragment extends PageFragment {
         Collections.sort(programs, new Comparator<ProgramInfo>() {
             @Override
             public int compare(ProgramInfo lhs, ProgramInfo rhs) {
-                if (sorting == Sorting.SORT_BY_NAME) {
+                if (sorting == Sorting.SORT_BY_TOPIC) {
                     int result = lhs.getTopic().compareToIgnoreCase(rhs.getTopic());
                     if (result != 0) {
-                        return result; // If not same topic
+                        return result; // If not same topic, else it falls through to comparing names below
                     }
                 }
                 return lhs.getName().compareToIgnoreCase(rhs.getName());
