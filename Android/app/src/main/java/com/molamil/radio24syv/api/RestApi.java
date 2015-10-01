@@ -83,6 +83,9 @@ public interface RestApi {
     @GET("programs/{slug}")
     Call<List<Program>> getProgram(@Path("slug") Integer programId);
 
+    @GET("programs/popular/yesterday/{limit}")
+    Call<List<Program>> getPopularPrograms(@Path("limit") Integer amount);
+
     // Searches
 
     // Stories (empty?)

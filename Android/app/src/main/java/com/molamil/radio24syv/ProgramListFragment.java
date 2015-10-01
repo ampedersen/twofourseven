@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.ConciseProgram;
+import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.api.model.TopicColors;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
@@ -192,7 +193,7 @@ public class ProgramListFragment extends PageFragment {
             content.removeAllViews(); // Clear old content
 
             // Show recent programs
-            List<ProgramInfo> recentPrograms = Storage.get().getPlayerHistory(3);
+            final List<ProgramInfo> recentPrograms = Storage.get().getPlayerHistory(3);
             if (recentPrograms.size() > 0) {
                 TextView t = new TextView(getActivity());
                 t.setText(R.string.programs_recent);
@@ -246,6 +247,31 @@ public class ProgramListFragment extends PageFragment {
                 content.addView(t);
                 addPrograms(content, recommendedPrograms);
             }
+
+            RestClient.getApi().getPopularPrograms(3).enqueue(new Callback<List<Program>>() {
+                @Override
+                public void onResponse(Response<List<Program>> response) {
+                    if ((response.body() == null) || (response.body().size() == 0)) {
+                        return;
+                    }
+                    ArrayList<ProgramInfo> popularPrograms = new ArrayList<ProgramInfo>(response.body().size());
+                    for (Program program : response.body()) {
+                        //popularPrograms.add(new ProgramInfo(program)); // This includes -full- program info and a long description text (unlike all other program buttons)
+                        popularPrograms.add(Storage.get().getProgram(program.getVideoProgramId()));
+                    }
+                    TextView t = new TextView(getActivity());
+                    t.setText(R.string.programs_popular);
+                    content.addView(t);
+                    addPrograms(content, popularPrograms);
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    ((MainActivity) getActivity()).onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
+                    Log.d("JJJ", "fail " + t.getMessage());
+                    t.printStackTrace();
+                }
+            });
 
         } else {
             ArrayList<ProgramInfo> filteredPrograms = new ArrayList<>(programs);

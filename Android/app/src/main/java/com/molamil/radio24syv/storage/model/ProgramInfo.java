@@ -4,11 +4,12 @@ import android.database.Cursor;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.ConciseProgram;
+import com.molamil.radio24syv.api.model.Program;
 
 import java.io.Serializable;
 
 /**
- * Information about a ConciseProgram from the API containing only the stuff needed.
+ * Information about a ConciseProgram or Program from the API containing only the stuff needed.
  * Dependency on the API is handled through this class. And it is also lighter to pass as serializable.
  * Created by jens on 24/09/15.
  */
@@ -29,6 +30,15 @@ public class ProgramInfo implements Serializable {
         description = conciseProgram.getDescriptionText();
         imageUrl = conciseProgram.getImageUrl();
         active = conciseProgram.getActive();
+    }
+
+    public ProgramInfo(Program program) {
+        programId = RestClient.getIntegerSafely(program.getVideoProgramId(), 0);
+        name = program.getName();
+        topic = program.getTopic();
+        description = getTextWithoutHtmlTags(program.getDescriptionHtml());
+        imageUrl = program.getImageUrl();
+        active = program.getActive();
     }
 
     public int getProgramId() {
@@ -81,5 +91,24 @@ public class ProgramInfo implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    private static String getTextWithoutHtmlTags(String html) {
+        html = html.replace("&amp;", "&"); // Ampersand instead of html code
+        html = html.replace("<p", "\n<p"); // Line break before <p>
+        html = html.trim();
+        StringBuilder builder = new StringBuilder();
+        int textStart = 0;
+        do {
+            int textEnd = html.indexOf("<", textStart);
+            if (textEnd < 0) {
+                textEnd = html.length() - 1;
+            }
+            if (textEnd > textStart) {
+                builder.append(html.substring(textStart, textEnd)); // Second parameter is the end index, NOT the number of characters to copy
+            }
+            textStart = html.indexOf(">", textEnd) + 1;
+        } while ((textStart > 0) && (textStart < html.length()));
+        return builder.toString();
     }
 }
