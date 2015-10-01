@@ -33,6 +33,13 @@
                 android:text="Reset all"
                 />
 
+            <Button
+                android:id="@+id/delete_history_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Reset history"
+                />
+
             <LinearLayout
                 android:id="@+id/content"
                 android:layout_width="match_parent"

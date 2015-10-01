@@ -44,13 +44,20 @@ public class OfflineFragment extends PageFragment {
         v.findViewById(R.id.delete_all_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Storage.get().deleteAll(getActivity());
+                Storage.get().deleteAll(v.getContext());
+            }
+        });
+
+        v.findViewById(R.id.delete_history_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Storage.get().deleteHistory(v.getContext());
             }
         });
 
         ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
         for (ProgramInfo program : Storage.get().getProgramsWithPodcastsInLibrary()) {
-            PodcastProgramView p = new PodcastProgramView(getActivity());
+            PodcastProgramView p = new PodcastProgramView(v.getContext());
             p.setProgram(program);
             p.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
             p.setPodcasts(Storage.get().getPodcasts(program.getProgramId()));

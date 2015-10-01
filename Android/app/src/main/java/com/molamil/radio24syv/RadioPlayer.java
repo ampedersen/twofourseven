@@ -10,6 +10,8 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.molamil.radio24syv.storage.Storage;
+
 import java.util.ArrayList;
 
 /**
@@ -56,12 +58,14 @@ public class RadioPlayer {
 
     ArrayList<OnPlaybackListener> listenerList = new ArrayList<>();
     private String url = URL_UNASSIGNED; // Keeps track of the url that was most recently set an action with
+    private int programId = Storage.PROGRAM_ID_UNKNOWN;
     Context context;
     RadioPlayerService service = null;
     boolean isBoundToService;
 
     int pendingAction = ACTION_UNASSIGNED; // If the service is not yet bound this action will getInstance performed once bound
     String pendingUrl = URL_UNASSIGNED;
+    int pendingProgramId = Storage.PROGRAM_ID_UNKNOWN;
 
     public RadioPlayer(Context context) {
         Log.d("JJJ", "Create RadioPlayer - starting radio service");
@@ -92,6 +96,15 @@ public class RadioPlayer {
         LocalBroadcastManager.getInstance(context).unregisterReceiver(messageReceiver);
 
         listenerList.clear();
+    }
+
+    public int getProgramId() {
+        if (isBoundToService) {
+            return service.getProgramId(); // The actual playing url. Might be different from this.url if the call has not gone through yet.
+        } else {
+            Log.d("JJJ", "Unable to getInstance program ID from service because it is not connected");
+            return Storage.PROGRAM_ID_UNKNOWN;
+        }
     }
 
     public String getUrl() {
@@ -155,44 +168,46 @@ public class RadioPlayer {
         }
     }
 
-    public void play(String url) {
+    public void play(int programId, String url) {
+        this.programId = programId;
         this.url = url;
-        setAction(url, ACTION_PLAY);
+        setAction(programId, url, ACTION_PLAY);
     }
 
     public void stop() {
-        setAction(url, ACTION_STOP);
+        setAction(programId, url, ACTION_STOP);
     }
 
     public void pause() {
-        setAction(url, ACTION_PAUSE);
+        setAction(programId, url, ACTION_PAUSE);
     }
 
-    public void next() { setAction(url, ACTION_NEXT); }
+    public void next() { setAction(programId, url, ACTION_NEXT); }
 
-    public void previous() { setAction(url, ACTION_PREVIOUS); }
+    public void previous() { setAction(programId, url, ACTION_PREVIOUS); }
 
-    private void setAction(final String url, int action) {
-        Log.d("JJJ", "setAction " + action + " isBound " + isBoundToService + " " + service + " url " + url);
+    private void setAction(int programId, final String url, int action) {
+        Log.d("JJJ", "setAction " + action + " isBound " + isBoundToService + " " + service + " programId " + programId + " url " + url);
         if (isBoundToService) {
-            service.setAction(url, action);
+            service.setAction(programId, url, action);
             clearPendingAction(); // We got hole through to the service, clear pending action
         } else {
             Log.d("JJJ", "Unable to set action for service because service is not bound - will set the action when it getInstance bound");
-            setPendingAction(url, action);
+            setPendingAction(programId, url, action);
         }
     }
 
     private void clearPendingAction() {
-        setPendingAction(URL_UNASSIGNED, ACTION_UNASSIGNED);
+        setPendingAction(Storage.PROGRAM_ID_UNKNOWN, URL_UNASSIGNED, ACTION_UNASSIGNED);
     }
 
     private boolean isPendingAction() {
         return (pendingUrl != null) && (!pendingUrl.equals(URL_UNASSIGNED)) && (pendingAction != ACTION_UNASSIGNED);
     }
 
-    private void setPendingAction(String url, int action) {
-        Log.d("JJJ", "set pending action " + getActionName(action) + " url " + url);
+    private void setPendingAction(int programId, String url, int action) {
+        Log.d("JJJ", "set pending action " + getActionName(action) + " url " + url + " programId " + programId);
+        pendingProgramId = programId;
         pendingUrl = url;
         pendingAction = action;
     }
@@ -210,7 +225,7 @@ public class RadioPlayer {
 
             if (isPendingAction()) {
                 Log.d("JJJ", "Executing pending action " + getActionName(pendingAction) + " url " + pendingUrl);
-                setAction(pendingUrl, pendingAction);
+                setAction(pendingProgramId, pendingUrl, pendingAction);
             } else {
                 callback(); // Make a callback to all listeners about the state of the player service
             }

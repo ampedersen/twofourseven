@@ -36,7 +36,7 @@ public class RestClient
     private RestClient(String baseUrl)
     {
         Gson gson = new GsonBuilder()
-                .setDateFormat("yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SSS'Z'")
+                .setDateFormat(getDateFormat())
                 .create();
 
         Retrofit retrofit = new Retrofit.Builder()
@@ -73,5 +73,28 @@ public class RestClient
         } else {
             return defaultValue; // Horrible null pointer exception if Integer is null
         }
+    }
+
+    public static String getDateFormat() {
+        return "yyyy'-'MM'-'dd'T'HH':'mm':'ss'.'SSS'Z'"; // The date format used by the API
+    }
+
+    public static String getTextWithoutHtmlTags(String html) {
+        html = html.replace("&amp;", "&"); // Ampersand instead of html code
+        html = html.replace("<p", "\n<p"); // Line break before <p>
+        html = html.trim();
+        StringBuilder builder = new StringBuilder();
+        int textStart = 0;
+        do {
+            int textEnd = html.indexOf("<", textStart);
+            if (textEnd < 0) {
+                textEnd = html.length() - 1;
+            }
+            if (textEnd > textStart) {
+                builder.append(html.substring(textStart, textEnd)); // Second parameter is the end index, NOT the number of characters to copy
+            }
+            textStart = html.indexOf(">", textEnd) + 1;
+        } while ((textStart > 0) && (textStart < html.length()));
+        return builder.toString();
     }
 }

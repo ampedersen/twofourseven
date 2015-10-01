@@ -55,6 +55,9 @@ public class LiveFragment extends PageFragment {
         RestClient.getApi().getNextBroadcasts(1, 0).enqueue(new Callback<List<Broadcast>>() {
             @Override
             public void onResponse(Response<List<Broadcast>> response) {
+                if (listener != null) {
+                    listener.onError(null);
+                }
                 List<Broadcast> body = response.body();
                 if (body != null) {
                     Broadcast b = body.get(0);
@@ -67,6 +70,7 @@ public class LiveFragment extends PageFragment {
                     ((TextView) v.findViewById(R.id.program_time_end)).setText(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
                     ((TextView) v.findViewById(R.id.program_category)).setText(b.getTopic());
                     ((TextView) v.findViewById(R.id.program_description)).setText(b.getDescriptionText());
+                    ((RadioPlayerButton) v.findViewById(R.id.play_button)).setProgramId(b.getVideoProgramId());
                 } else {
                     if (listener != null) {
                         listener.onError(response.message());

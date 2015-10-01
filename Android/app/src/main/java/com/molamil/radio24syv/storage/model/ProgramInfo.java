@@ -1,10 +1,12 @@
 package com.molamil.radio24syv.storage.model;
 
+import android.content.Intent;
 import android.database.Cursor;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.ConciseProgram;
 import com.molamil.radio24syv.api.model.Program;
+import com.molamil.radio24syv.api.model.RelatedProgram;
 
 import java.io.Serializable;
 
@@ -36,9 +38,18 @@ public class ProgramInfo implements Serializable {
         programId = RestClient.getIntegerSafely(program.getVideoProgramId(), 0);
         name = program.getName();
         topic = program.getTopic();
-        description = getTextWithoutHtmlTags(program.getDescriptionHtml());
+        description = RestClient.getTextWithoutHtmlTags(program.getDescriptionHtml());
         imageUrl = program.getImageUrl();
         active = program.getActive();
+    }
+
+    public ProgramInfo(RelatedProgram relatedProgram) {
+        programId = RestClient.getIntegerSafely((int)relatedProgram.getVideoProgramId(), 0); // I suppose this is an integer
+        name = relatedProgram.getName();
+        topic = relatedProgram.getTopic();
+        description = relatedProgram.getDescriptionText();
+        imageUrl = relatedProgram.getImageUrl();
+        active = relatedProgram.getActive();
     }
 
     public int getProgramId() {
@@ -93,22 +104,4 @@ public class ProgramInfo implements Serializable {
         this.active = active;
     }
 
-    private static String getTextWithoutHtmlTags(String html) {
-        html = html.replace("&amp;", "&"); // Ampersand instead of html code
-        html = html.replace("<p", "\n<p"); // Line break before <p>
-        html = html.trim();
-        StringBuilder builder = new StringBuilder();
-        int textStart = 0;
-        do {
-            int textEnd = html.indexOf("<", textStart);
-            if (textEnd < 0) {
-                textEnd = html.length() - 1;
-            }
-            if (textEnd > textStart) {
-                builder.append(html.substring(textStart, textEnd)); // Second parameter is the end index, NOT the number of characters to copy
-            }
-            textStart = html.indexOf(">", textEnd) + 1;
-        } while ((textStart > 0) && (textStart < html.length()));
-        return builder.toString();
-    }
 }

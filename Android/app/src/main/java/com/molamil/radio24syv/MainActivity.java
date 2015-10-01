@@ -20,6 +20,8 @@ import com.molamil.radio24syv.view.RadioViewPager;
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
 
+import org.joda.time.DateTime;
+
 public class MainActivity extends FragmentActivity implements
         RadioPlayer.RadioPlayerProvider,
         MainFragment.OnMainFragmentInteractionListener,
@@ -31,7 +33,7 @@ public class MainActivity extends FragmentActivity implements
         ProgramCategoriesFragment.OnFragmentInteractionListener,
         NewsFragment.OnFragmentInteractionListener,
         OfflineFragment.OnFragmentInteractionListener,
-        PlayerFragment.OnFragmentInteractionListener {
+        PlayerFragment.OnFragmentInteractionListener, RadioPlayer.OnPlaybackListener {
 
     RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
     SidePageTransformer pageTransformer;
@@ -57,6 +59,7 @@ public class MainActivity extends FragmentActivity implements
         pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
 
         radioPlayer = new RadioPlayer(this);
+        radioPlayer.addListener(this);
 
         // Hockeyapp
         checkForUpdates();
@@ -277,6 +280,29 @@ public class MainActivity extends FragmentActivity implements
         if (BuildConfig.HOCKEYAPP_UPDATES_ENABLED) {
             UpdateManager.register(this, BuildConfig.HOCKEYAPP_APP_ID);
         }
+    }
+
+    @Override
+    public void OnBusy(RadioPlayer player) {
+
+    }
+
+    @Override
+    public void OnStarted(RadioPlayer player) {
+        int programId = player.getProgramId();
+        String date = DateTime.now().toString(RestClient.getDateFormat());
+        Log.d("JJJ", "addPlayerHistory programId " + programId + " date " + date);
+        Storage.get().addPlayerHistory(programId, date);
+    }
+
+    @Override
+    public void OnStopped(RadioPlayer player) {
+
+    }
+
+    @Override
+    public void OnPaused(RadioPlayer player) {
+
     }
 
     /*

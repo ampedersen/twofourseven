@@ -96,7 +96,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         super.onActivityCreated(savedInstanceState);
         RadioPlayer player = radioPlayerProvider.getRadioPlayer();
         player.addListener(this);
-        linkPlaybackButtons(player, getView());
+        setupPlaybackButtons(player, getView());
 
     }
 
@@ -128,7 +128,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         if (size == PlayerSize.NONE) {
             setSize(PlayerSize.SMALL);
         }
-        linkPlaybackButtons(player, getView());
+        setupPlaybackButtons(player, getView());
     }
 
     @Override
@@ -136,20 +136,21 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         if (size == PlayerSize.NONE) {
             setSize(PlayerSize.SMALL);
         }
-        linkPlaybackButtons(player, getView());
+        setupPlaybackButtons(player, getView());
     }
 
-    private void linkPlaybackButtons(RadioPlayer player, View parentView) {
+    private void setupPlaybackButtons(RadioPlayer player, View parentView) {
         // Link all buttons to always show current playback status
-        linkButton(player, parentView, R.id.play_button);
-        linkButton(player, parentView, R.id.stop_button);
-        linkButton(player, parentView, R.id.pause_button);
-        linkButton(player, parentView, R.id.next_button);
-        linkButton(player, parentView, R.id.previous_button);
+        setupButton(player, parentView, R.id.play_button);
+        setupButton(player, parentView, R.id.stop_button);
+        setupButton(player, parentView, R.id.pause_button);
+        setupButton(player, parentView, R.id.next_button);
+        setupButton(player, parentView, R.id.previous_button);
     }
 
-    private void linkButton(RadioPlayer player, View parentView, int buttonId) {
+    private void setupButton(RadioPlayer player, View parentView, int buttonId) {
         RadioPlayerButton b = (RadioPlayerButton)parentView.findViewById(buttonId);
+        b.setProgramId(player.getProgramId());
         b.setUrl(player.getUrl());
         b.setRadioPlayer(player);
     }

@@ -12,6 +12,7 @@ import android.widget.Button;
 
 import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.RadioPlayer;
+import com.molamil.radio24syv.storage.Storage;
 
 /**
  * Created by jens on 11/09/15.
@@ -22,6 +23,7 @@ public class RadioPlayerButton extends Button implements
 
     private int action;
     private String url;
+    private int programId;
 
     private RadioPlayer player;
     private boolean isAvailable = true;
@@ -36,8 +38,9 @@ public class RadioPlayerButton extends Button implements
                 0, 0);
 
         try {
-            action = a.getInteger(R.styleable.RadioPlayerButton_action, RadioPlayer.ACTION_PLAY);
+            setAction(a.getInteger(R.styleable.RadioPlayerButton_action, RadioPlayer.ACTION_PLAY));
             setUrl(a.getString(R.styleable.RadioPlayerButton_url));
+            setProgramId(a.getInteger(R.styleable.RadioPlayerButton_programId, Storage.PROGRAM_ID_UNKNOWN));
         } finally {
             a.recycle();
         }
@@ -59,6 +62,14 @@ public class RadioPlayerButton extends Button implements
 
     public void setUrl(String url) {
         this.url = url;
+    }
+
+    public int getProgramId() {
+        return programId;
+    }
+
+    public void setProgramId(int programId) {
+        this.programId = programId;
     }
 
     public void setRadioPlayer(RadioPlayer player) {
@@ -84,7 +95,7 @@ public class RadioPlayerButton extends Button implements
 
     @Override
     public void onClick(View v) {
-        Log.d("JJJ", "action " + action + " player " + player);
+        Log.d("JJJ", "action " + action + " player " + player + " programId " + programId + " url " + url);
         if (player == null) {
             return;
         }
@@ -96,7 +107,7 @@ public class RadioPlayerButton extends Button implements
 
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                player.play(getUrl());
+                player.play(getProgramId(), getUrl());
                 break;
             case RadioPlayer.ACTION_STOP:
                 player.stop();

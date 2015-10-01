@@ -9,6 +9,7 @@
             <enum name="previous" value="4"/>
         </attr>
         <attr name="url" format="string" />
+        <attr name="programId" format="integer" />
     </declare-styleable>
 
     <!--<declare-styleable name="ProgramCategoryButton">-->

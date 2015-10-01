@@ -74,19 +74,6 @@ public class ProgramListView extends LinearLayout {
             titleText.setVisibility(View.GONE); // No title
         }
     }
-    public void setPrograms(List<ProgramInfo> programs) {
-        programButtons = new ArrayList<>(programs.size());
-
-        ViewGroup content = (ViewGroup) findViewById(R.id.content);
-        for (ProgramInfo p : programs) {
-            ProgramButtonView v = new ProgramButtonView(getContext());
-            v.setProgram(p);
-            v.setOnProgramButtonViewListener(onProgramButtonClicked);
-            v.setRadioPlayer(player);
-            programButtons.add(v);
-            content.addView(v);
-        }
-    }
 
     private ProgramButtonView.OnProgramButtonViewListener onProgramButtonClicked = new ProgramButtonView.OnProgramButtonViewListener() {
         @Override

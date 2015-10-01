@@ -8,6 +8,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
 import android.widget.ImageView;
 import android.widget.TabHost;
 import android.widget.TabWidget;
@@ -214,6 +215,7 @@ public class MainFragment extends Fragment {
         if (v != null) {
             TextView error = (TextView) v.findViewById(R.id.error_text);
             if ((message != null) && !message.equals("")) {
+                message = getResources().getString(R.string.error_generic); // Replace with user-friendly message instead of too-technical error message. TODO meaningful error messages (and check internet connection)
                 error.setText(message);
                 error.setVisibility(View.VISIBLE);
             } else {

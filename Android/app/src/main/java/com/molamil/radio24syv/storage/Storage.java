@@ -23,6 +23,7 @@ public class Storage {
     public final static int PODCAST_ID_UNKNOWN = -1;
     public final static String COLOR_UNKNOWN = "";
     public final static String TOPIC_ID_UNKNOWN = "";
+    public final static int PROGRAM_ID_UNKNOWN = -1;
 
     private StorageDatabase database;
     private HashMap<String, TopicInfo> cachedTopicById = new HashMap<>();
@@ -154,6 +155,16 @@ public class Storage {
     }
 
     public void deleteAll(Context context) {
+        for (PodcastInfo podcast : database.getPodcasts()) {
+            Log.d("JJJ", "Deleting " + podcast.getPodcastId() + " " + podcast.getTitle());
+            RadioLibrary.getInstance().remove(context, podcast);
+        }
+        Log.d("JJJ", "Deleting database");
+        database.dropTables();
+        database.createTables();
+    }
+
+    public void deleteHistory(Context context) {
         for (PodcastInfo podcast : database.getPodcasts()) {
             Log.d("JJJ", "Deleting " + podcast.getPodcastId() + " " + podcast.getTitle());
             RadioLibrary.getInstance().remove(context, podcast);

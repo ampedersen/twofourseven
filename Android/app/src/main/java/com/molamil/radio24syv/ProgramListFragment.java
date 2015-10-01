@@ -37,7 +37,7 @@ public class ProgramListFragment extends PageFragment {
 
     private enum Sorting { UNSORTED, SORT_BY_NAME, SORT_BY_TOPIC };
 
-    private OnFragmentInteractionListener mListener;
+    private OnFragmentInteractionListener listener;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
 
     private int category;
@@ -66,8 +66,8 @@ public class ProgramListFragment extends PageFragment {
         categoriesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onShowSidePage(OnFragmentInteractionListener.Side.SHOW_LEFT);
+                if (listener != null) {
+                    listener.onShowSidePage(OnFragmentInteractionListener.Side.SHOW_LEFT);
                 }
             }
         });
@@ -75,8 +75,8 @@ public class ProgramListFragment extends PageFragment {
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onShowSidePage(OnFragmentInteractionListener.Side.SHOW_RIGHT);
+                if (listener != null) {
+                    listener.onShowSidePage(OnFragmentInteractionListener.Side.SHOW_RIGHT);
                 }
             }
         });
@@ -125,6 +125,9 @@ public class ProgramListFragment extends PageFragment {
         RestClient.getApi().getPrograms().enqueue(new Callback<List<ConciseProgram>>() {
             @Override
             public void onResponse(Response<List<ConciseProgram>> response) {
+                if (listener != null) {
+                    listener.onError(null);
+                }
                 if (isCached) {
                     programs.clear(); // Clear old values
                 }
@@ -143,7 +146,9 @@ public class ProgramListFragment extends PageFragment {
             @Override
             public void onFailure(Throwable t) {
                 if (!isCached) {
-                    getMainActivity().onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
+                    if (listener != null) {
+                        listener.onError(t.getLocalizedMessage());
+                    }
                     Log.d("JJJ", "fail " + t.getMessage());
                     t.printStackTrace();
                 }
@@ -193,12 +198,30 @@ public class ProgramListFragment extends PageFragment {
             content.removeAllViews(); // Clear old content
 
             // Show recent programs
-            final List<ProgramInfo> recentPrograms = Storage.get().getPlayerHistory(3);
+            final List<ProgramInfo> recentPrograms = Storage.get().getPlayerHistory(4); // Get one more than we need because if a program is playing it should not be shown
             if (recentPrograms.size() > 0) {
-                TextView t = new TextView(getActivity());
-                t.setText(R.string.programs_recent);
-                content.addView(t);
-                addPrograms(content, recentPrograms);
+                // Remove the extra program
+                int playingProgramId = radioPlayerProvider.getRadioPlayer().getProgramId();
+                ProgramInfo removeProgram = null;
+                for (ProgramInfo p : recentPrograms) {
+                    if (p.getProgramId() == playingProgramId) {
+                        removeProgram = p; // Remove currently playing program
+                        break;
+                    }
+                }
+                if ((removeProgram == null) && (recentPrograms.size() > 3)) {
+                    removeProgram = recentPrograms.get(recentPrograms.size() - 1); // Remove last program
+                }
+                Log.d("JJJ", "Remove recent " + removeProgram.getName());
+                recentPrograms.remove(removeProgram);
+
+                // Show programs (if we still have any left)
+                if (recentPrograms.size() > 0) {
+                    TextView t = new TextView(content.getContext());
+                    t.setText(R.string.programs_recent);
+                    content.addView(t);
+                    addPrograms(content, recentPrograms);
+                }
             }
 
             // The recent program IDs are needed for easy lookup later
@@ -242,15 +265,19 @@ public class ProgramListFragment extends PageFragment {
 
             // Show recommended programs
             if (recommendedPrograms.size() > 0) {
-                TextView t = new TextView(getActivity());
+                TextView t = new TextView(content.getContext());
                 t.setText(R.string.programs_recomended);
                 content.addView(t);
                 addPrograms(content, recommendedPrograms);
             }
 
+            // Show popular programs
             RestClient.getApi().getPopularPrograms(3).enqueue(new Callback<List<Program>>() {
                 @Override
                 public void onResponse(Response<List<Program>> response) {
+                    if (listener != null) {
+                        listener.onError(null);
+                    }
                     if ((response.body() == null) || (response.body().size() == 0)) {
                         return;
                     }
@@ -259,7 +286,7 @@ public class ProgramListFragment extends PageFragment {
                         //popularPrograms.add(new ProgramInfo(program)); // This includes -full- program info and a long description text (unlike all other program buttons)
                         popularPrograms.add(Storage.get().getProgram(program.getVideoProgramId()));
                     }
-                    TextView t = new TextView(getActivity());
+                    TextView t = new TextView(content.getContext());
                     t.setText(R.string.programs_popular);
                     content.addView(t);
                     addPrograms(content, popularPrograms);
@@ -267,7 +294,9 @@ public class ProgramListFragment extends PageFragment {
 
                 @Override
                 public void onFailure(Throwable t) {
-                    ((MainActivity) getActivity()).onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
+                    if (listener != null) {
+                        listener.onError(t.getLocalizedMessage());
+                    }
                     Log.d("JJJ", "fail " + t.getMessage());
                     t.printStackTrace();
                 }
@@ -318,8 +347,8 @@ public class ProgramListFragment extends PageFragment {
             v.setOnProgramButtonViewListener(new ProgramButtonView.OnProgramButtonViewListener() {
                 @Override
                 public void OnProgramButtonViewClicked(ProgramButtonView view) {
-                    if (mListener != null) {
-                        mListener.onProgramSelected(p);
+                    if (listener != null) {
+                        listener.onProgramSelected(p);
                     }
                 }
             });
@@ -337,6 +366,9 @@ public class ProgramListFragment extends PageFragment {
         RestClient.getApi().getTopicColors().enqueue(new Callback<TopicColors>() {
             @Override
             public void onResponse(Response<TopicColors> response) {
+                if (listener != null) {
+                    listener.onError(null);
+                }
                 TopicColors colors = response.body();
                 ArrayList<TopicInfo> topics = new ArrayList<TopicInfo>();
                 // This is not dynamic at all but this is the API we got...
@@ -354,7 +386,9 @@ public class ProgramListFragment extends PageFragment {
             @Override
             public void onFailure(Throwable t) {
                 if (!isCached) {
-                    getMainActivity().onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
+                    if (listener != null) {
+                        listener.onError(t.getLocalizedMessage());
+                    }
                     Log.d("JJJ", "fail " + t.getMessage());
                     t.printStackTrace();
                 }
@@ -366,7 +400,7 @@ public class ProgramListFragment extends PageFragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            listener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -382,7 +416,7 @@ public class ProgramListFragment extends PageFragment {
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {

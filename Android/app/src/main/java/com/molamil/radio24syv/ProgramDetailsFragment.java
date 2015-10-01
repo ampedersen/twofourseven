@@ -32,7 +32,7 @@ public class ProgramDetailsFragment extends PageFragment implements
 
     private static final int BATCH_SIZE = 50; // Number of podcasts to load per batch
 
-    private OnFragmentInteractionListener mListener;
+    private OnFragmentInteractionListener listener;
     private PodcastEpisodeView expandedView = null;
     private DateTime lastPodcastDate = null;
 
@@ -76,8 +76,8 @@ public class ProgramDetailsFragment extends PageFragment implements
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                if (mListener != null) {
-                    mListener.onBackButtonPressed();
+                if (listener != null) {
+                    listener.onBackButtonPressed();
                 }
             }
         });
@@ -99,6 +99,9 @@ public class ProgramDetailsFragment extends PageFragment implements
         RestClient.getApi().getPodcasts(program.getProgramId(), amount, batch).enqueue(new Callback<List<Podcast>>() {
             @Override
             public void onResponse(Response<List<Podcast>> response) {
+                if (listener != null) {
+                    listener.onError(null);
+                }
                 //for (Podcast p : response.body()) { // For some reason this does not work
                 //for (Podcast p : response.body().iterator) { // For some reason this does not work neither
                 for (int i = 0; i < response.body().size(); i++) {
@@ -137,8 +140,10 @@ public class ProgramDetailsFragment extends PageFragment implements
 
             @Override
             public void onFailure(Throwable t) {
+                if (listener != null) {
+                    listener.onError(t.getLocalizedMessage());
+                }
                 loadingText.setVisibility(View.GONE);
-                ((MainActivity) getActivity()).onError("Kunne ikke få forbindelse, beklager."); // TODO meaningful error messages (and check internet connection)
                 Log.d("JJJ", "fail " + t.getMessage());
                 t.printStackTrace();
             }
@@ -149,7 +154,7 @@ public class ProgramDetailsFragment extends PageFragment implements
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            listener = (OnFragmentInteractionListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement OnFragmentInteractionListener");
@@ -165,7 +170,7 @@ public class ProgramDetailsFragment extends PageFragment implements
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
+        listener = null;
     }
 
     @Override

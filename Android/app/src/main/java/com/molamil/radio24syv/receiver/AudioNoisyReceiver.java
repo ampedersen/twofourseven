@@ -22,7 +22,7 @@ public class AudioNoisyReceiver extends BroadcastReceiver {
             if (binder != null) {
                 Log.d("JJJ", "Pausing playback");
                 RadioPlayerService player = binder.getService();
-                player.setAction(player.getUrl(), RadioPlayer.ACTION_PAUSE);
+                player.setAction(player.getProgramId(), player.getUrl(), RadioPlayer.ACTION_PAUSE);
             } else {
                 Log.d("JJJ", "Unable to pause playback because the service is not started (null)");
             }

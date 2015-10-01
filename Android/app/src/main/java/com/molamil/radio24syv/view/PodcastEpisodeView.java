@@ -130,6 +130,8 @@ public class PodcastEpisodeView extends LinearLayout implements
         titleText.setText(podcast.getTitle());
         TextView descriptionText = (TextView) findViewById(R.id.description_text);
         descriptionText.setText(podcast.getDescription());
+        RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
+        playButton.setProgramId(podcast.getProgramId());
 
         RadioLibrary.getInstance().addListener(getContext(), podcast.getPodcastId(), this); // Listen for updates for this podcast ID
     }

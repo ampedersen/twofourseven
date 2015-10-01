@@ -24,6 +24,7 @@
     <string name="tab_programs">Programmer</string>
     <string name="tab_news">Sidste nyt</string>
     <string name="tab_offline">Lyt offline</string>
+    <string name="error_generic">Kunne ikke få forbindelse, beklager.</string>
 
     <!-- Live radio -->
     <string name="live_header">Radio24syv Live</string>

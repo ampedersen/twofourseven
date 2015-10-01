@@ -83,21 +83,33 @@ public class StorageDatabase extends SQLiteOpenHelper {
     }
 
     private void createTables(SQLiteDatabase db) {
-        execSQL(db, SQL_CREATE_TABLE_LIBRAY);
-        execSQL(db, SQL_CREATE_TABLE_PROGRAM);
-        execSQL(db, SQL_CREATE_TABLE_PODCAST);
-        execSQL(db, SQL_CREATE_TABLE_TOPIC);
-        execSQL(db, SQL_CREATE_TABLE_PLAYER_HISTORY);
-        execSQL(db, SQL_CREATE_TABLE_RELATED_PROGRAM);
+        db.beginTransaction();
+        try {
+            execSQL(db, SQL_CREATE_TABLE_LIBRAY);
+            execSQL(db, SQL_CREATE_TABLE_PROGRAM);
+            execSQL(db, SQL_CREATE_TABLE_PODCAST);
+            execSQL(db, SQL_CREATE_TABLE_TOPIC);
+            execSQL(db, SQL_CREATE_TABLE_PLAYER_HISTORY);
+            execSQL(db, SQL_CREATE_TABLE_RELATED_PROGRAM);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     private void dropTables(SQLiteDatabase db) {
-        execSQL(db, SQL_DROP_TABLE + TABLE_LIBRARY);
-        execSQL(db, SQL_DROP_TABLE + TABLE_PROGRAM);
-        execSQL(db, SQL_DROP_TABLE + TABLE_PODCAST);
-        execSQL(db, SQL_DROP_TABLE + TABLE_TOPIC);
-        execSQL(db, SQL_DROP_TABLE + TABLE_PLAYER_HISTORY);
-        execSQL(db, SQL_DROP_TABLE + TABLE_RELATED_PROGRAM);
+        db.beginTransaction();
+        try {
+            execSQL(db, SQL_DROP_TABLE + TABLE_LIBRARY);
+            execSQL(db, SQL_DROP_TABLE + TABLE_PROGRAM);
+            execSQL(db, SQL_DROP_TABLE + TABLE_PODCAST);
+            execSQL(db, SQL_DROP_TABLE + TABLE_TOPIC);
+            execSQL(db, SQL_DROP_TABLE + TABLE_PLAYER_HISTORY);
+            execSQL(db, SQL_DROP_TABLE + TABLE_RELATED_PROGRAM);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     private static void execSQL(SQLiteDatabase db, String query) {
@@ -417,7 +429,46 @@ public class StorageDatabase extends SQLiteOpenHelper {
     }
 
     public List<ProgramInfo> getPlayerHistory(int limit) {
-        return getProgramsInQuery("SELECT DISTINCT " + KEY_PROGRAM_ID + " FROM " + TABLE_PLAYER_HISTORY + " ORDER BY " + KEY_DATE + " DESC LIMIT " + limit);
+        //cool but has duplicates
+        String query = "SELECT * FROM " + TABLE_PROGRAM + " JOIN " + TABLE_PLAYER_HISTORY + " ON " + TABLE_PROGRAM + "." + KEY_PROGRAM_ID + " = " + TABLE_PLAYER_HISTORY + "." + KEY_PROGRAM_ID + " ORDER BY " + KEY_DATE + " DESC";
+        Log.d("JJJ", query);
+
+//        String s = "---------------------";
+        List<ProgramInfo> programs = new ArrayList<>();
+        List<Integer> addedProgramIds = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                ProgramInfo program = readProgramInfo(c);
+//                String date = c.getString(c.getColumnIndex(KEY_DATE));
+                boolean isAdded = addedProgramIds.contains(program.getProgramId()); // Compensating for SQL skills (do not want to waste more time trying different queries using keywords (NATRUAL JOIN hello) which may or may not be supported by SQLite on Android 4...)
+                if (!isAdded) {
+                    programs.add(program);
+                    addedProgramIds.add(program.getProgramId());
+                }
+//                s += "\n" + date + " program " + program.getName();
+            } while (c.moveToNext() && (programs.size() < limit));
+            c.close();
+//            Log.d("JJJ", s);
+            return programs;
+        } else {
+            Log.d("JJJ", "no programs");
+            return programs;
+        }
+    }
+
+    public void deletePlayerHistory() {
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            execSQL(db, SQL_DROP_TABLE + TABLE_PLAYER_HISTORY);
+            execSQL(db, SQL_DROP_TABLE + TABLE_RELATED_PROGRAM);
+            execSQL(db, SQL_CREATE_TABLE_PLAYER_HISTORY);
+            execSQL(db, SQL_CREATE_TABLE_RELATED_PROGRAM);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
     }
 
     public void addRelatedPrograms(int programId, List<Integer> relatedProgramIds) {
