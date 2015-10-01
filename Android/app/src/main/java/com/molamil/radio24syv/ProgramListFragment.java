@@ -213,8 +213,10 @@ public class ProgramListFragment extends PageFragment {
                 if ((removeProgram == null) && (recentPrograms.size() > 3)) {
                     removeProgram = recentPrograms.get(recentPrograms.size() - 1); // Remove last program
                 }
-                Log.d("JJJ", "Remove recent " + removeProgram.getName());
-                recentPrograms.remove(removeProgram);
+                if (removeProgram != null) {
+                    Log.d("JJJ", "Remove recent " + removeProgram.getName());
+                    recentPrograms.remove(removeProgram);
+                }
 
                 // Show programs (if we still have any left)
                 if (recentPrograms.size() > 0) {
