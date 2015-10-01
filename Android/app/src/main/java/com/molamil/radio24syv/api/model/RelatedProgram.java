@@ -29,6 +29,9 @@ public class RelatedProgram {
     @SerializedName("active")
     @Expose
     private Boolean active;
+    @SerializedName("appImages")
+    @Expose
+    private AppImages appImages;
 
     /**
      * 
@@ -154,6 +157,24 @@ public class RelatedProgram {
      */
     public void setActive(Boolean active) {
         this.active = active;
+    }
+
+    /**
+     * 
+     * @return
+     *     The appImages
+     */
+    public AppImages getAppImages() {
+        return appImages;
+    }
+
+    /**
+     * 
+     * @param appImages
+     *     The appImages
+     */
+    public void setAppImages(AppImages appImages) {
+        this.appImages = appImages;
     }
 
 }

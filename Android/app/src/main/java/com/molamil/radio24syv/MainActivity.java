@@ -9,8 +9,14 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.api.model.ConciseProgram;
+import com.molamil.radio24syv.api.model.Program;
+import com.molamil.radio24syv.api.model.RelatedProgram;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
@@ -21,6 +27,12 @@ import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
 
 import org.joda.time.DateTime;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import retrofit.Callback;
+import retrofit.Response;
 
 public class MainActivity extends FragmentActivity implements
         RadioPlayer.RadioPlayerProvider,
@@ -289,10 +301,72 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void OnStarted(RadioPlayer player) {
-        int programId = player.getProgramId();
+        final int programId = player.getProgramId();
+
+        // Store player history
         String date = DateTime.now().toString(RestClient.getDateFormat());
         Log.d("JJJ", "addPlayerHistory programId " + programId + " date " + date);
         Storage.get().addPlayerHistory(programId, date);
+
+        // Store related programs
+        RestClient.getApi().getProgram(programId).enqueue(new Callback<Program>() {
+            @Override
+            public void onResponse(Response<Program> response) {
+                MainActivity.this.onError(null);
+                Program program = response.body();
+                if ((program != null) && (program.getRelatedPrograms() != null)) {
+                    // TODO use this code when API returns something real instead of NULL for getVideoProgramId()
+//                    ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
+//                    for (RelatedProgram p : program.getRelatedPrograms()) {
+//                        relatedProgramIds.add((int) p.getVideoProgramId());
+//                    }
+//                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId);
+//                    if (relatedProgramIds.size() > 0) {
+//                        Storage.get().addRelatedPrograms(programId, relatedProgramIds);
+//                    }
+
+                    // BEGIN WORKAROUND
+                    // Slug is returned, but programId is null
+                    ArrayList<String> relatedProgramSlugs = new ArrayList<>(program.getRelatedPrograms().size());
+                    for (RelatedProgram p : program.getRelatedPrograms()) {
+                        relatedProgramSlugs.add(p.getSlug());
+                    }
+                    // We have to look up slug to get the programId. TODO if the workaround is here to stay: cache this - save in program table along with all the other ProgramInfo
+                    for (String slug : relatedProgramSlugs) {
+                        RestClient.getApi().getProgram(slug).enqueue(new Callback<Program>() {
+                            @Override
+                            public void onResponse(Response<Program> response) {
+                                MainActivity.this.onError(null);
+                                Program program = response.body();
+                                if (program != null) {
+                                    ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
+                                    relatedProgramIds.add(program.getVideoProgramId());
+                                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId);
+                                    if (relatedProgramIds.size() > 0) {
+                                        Storage.get().addRelatedPrograms(programId, relatedProgramIds);
+                                    }
+                                }
+                            }
+
+                            @Override
+                            public void onFailure(Throwable t) {
+                                MainActivity.this.onError(t.getLocalizedMessage());
+                                Log.d("JJJ", "fail " + t.getMessage());
+                                t.printStackTrace();
+                            }
+                        });
+                    }
+                    // END WORKAROUND
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                MainActivity.this.onError(t.getLocalizedMessage());
+                Log.d("JJJ", "fail " + t.getMessage());
+                t.printStackTrace();
+            }
+        });
     }
 
     @Override

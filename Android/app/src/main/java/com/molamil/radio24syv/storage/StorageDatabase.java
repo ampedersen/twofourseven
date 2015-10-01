@@ -198,8 +198,8 @@ public class StorageDatabase extends SQLiteOpenHelper {
             Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId());
             return program;
         }
-            Log.d("JJJ", "programId not found " + programId);
-        return new ProgramInfo();
+        Log.d("JJJ", "programId not found " + programId);
+        return null;
     }
 
     public List<ProgramInfo> getPrograms() {

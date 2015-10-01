@@ -13,7 +13,7 @@ public class RebroadcastInfo {
     private String day;
     @SerializedName("time")
     @Expose
-    private String time;
+    private Object time;
 
     /**
      * 
@@ -38,7 +38,7 @@ public class RebroadcastInfo {
      * @return
      *     The time
      */
-    public String getTime() {
+    public Object getTime() {
         return time;
     }
 
@@ -47,7 +47,7 @@ public class RebroadcastInfo {
      * @param time
      *     The time
      */
-    public void setTime(String time) {
+    public void setTime(Object time) {
         this.time = time;
     }
 

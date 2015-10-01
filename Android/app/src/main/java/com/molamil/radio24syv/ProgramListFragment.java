@@ -25,6 +25,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Random;
 
 import retrofit.Callback;
 import retrofit.Response;
@@ -249,10 +250,20 @@ public class ProgramListFragment extends PageFragment {
             // Sort related programs by how many times they are related
             List<Integer> relatedProgramIds = new ArrayList<>();
             relatedProgramIds.addAll(relationsByProgramId.keySet());
+            final Random random = new Random();
             Collections.sort(relatedProgramIds, new Comparator<Integer>() {
                 @Override
                 public int compare(Integer lhs, Integer rhs) {
-                    return relationsByProgramId.get(lhs).compareTo(relationsByProgramId.get(rhs)); // Sort by number of relations
+                    int result = relationsByProgramId.get(lhs).compareTo(relationsByProgramId.get(rhs)); // Sort by number of relations
+                    if (result == 0) {
+                        // Random pick if count is the same. Helps making the list appear different if recommendations are even.
+                        if (random.nextBoolean()) {
+                            result = 1;
+                        } else {
+                            result = -1;
+                        }
+                    }
+                    return result;
                 }
             });
 

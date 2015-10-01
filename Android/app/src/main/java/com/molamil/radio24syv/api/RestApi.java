@@ -78,10 +78,10 @@ public interface RestApi {
     Call<List<ConciseProgram>> getPrograms(@Path("slug") Integer topicId);
 
     @GET("programs/{slug}")
-    Call<List<Program>> getProgram(@Path("slug") String programSlug);
+    Call<Program> getProgram(@Path("slug") String programSlug);
 
     @GET("programs/{slug}")
-    Call<List<Program>> getProgram(@Path("slug") Integer programId);
+    Call<Program> getProgram(@Path("slug") Integer programId);
 
     @GET("programs/popular/yesterday/{limit}")
     Call<List<Program>> getPopularPrograms(@Path("limit") Integer amount);
