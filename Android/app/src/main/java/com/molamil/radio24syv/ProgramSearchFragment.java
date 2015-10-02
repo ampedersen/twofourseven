@@ -55,6 +55,7 @@ public class ProgramSearchFragment extends PageFragment {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     search(v.getText().toString());
+                    getMainActivity().setKeyboardVisible(false);
                     handled = true;
                 }
                 return handled;
@@ -67,9 +68,7 @@ public class ProgramSearchFragment extends PageFragment {
             @Override
             public void onClick(View v) {
                 search(searchText.getText().toString());
-//                searchText.requestFocus();
-//                InputMethodManager imm = (InputMethodManager) getActivity().getSystemService(Context.INPUT_METHOD_SERVICE);
-//                imm.showSoftInput(searchText, InputMethodManager.SHOW_IMPLICIT);
+                getMainActivity().setKeyboardVisible(false);
             }
         });
 

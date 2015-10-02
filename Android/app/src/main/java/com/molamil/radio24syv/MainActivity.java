@@ -84,19 +84,7 @@ public class MainActivity extends FragmentActivity implements
             public void onPageSelected(int position) {
                 // Quick & dirty way of hiding the keyboard when going away from Program Search side page. Android keyboard handling is unbelievable.
                 boolean isKeyboardNeeded = isKeyboardNeededByPagePosition.containsKey(position) && isKeyboardNeededByPagePosition.get(position);
-
-                View v = getCurrentFocus(); // Find the currently focused view, so we can grab the correct window token from it.
-                if (v == null) {
-                    v = new View(MainActivity.this); // If no view currently has focus, create a new one, just so we can grab a window token from it
-                }
-
-                InputMethodManager manager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
-                if (isKeyboardNeeded) {
-                    manager.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT); // Show keyboard
-                }
-                else {
-                    manager.hideSoftInputFromWindow(v.getWindowToken(), 0); // Hide keyboard
-                }
+                setKeyboardVisible(isKeyboardNeeded);
             }
 
             @Override
@@ -104,7 +92,7 @@ public class MainActivity extends FragmentActivity implements
 
             }
         });
-        
+
         radioPlayer = new RadioPlayer(this);
         radioPlayer.addListener(this);
 
@@ -184,6 +172,25 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void onBackButtonPressed() {
         onBackPressed(); // React as if the physical back button was pressed
+    }
+
+    public void setKeyboardVisible(boolean show) {
+        /**
+         * Hides the on-screen keyboard. NOTE: Only works when called from an Activity. Does not work when called from a Fragment (this won't work because you'll be passing a reference to the Fragment's host Activity, which will have no focused control while the Fragment is shown)
+         * http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
+         */
+        View v = getCurrentFocus(); // Find the currently focused view, so we can grab the correct window token from it.
+        if (v == null) {
+            v = new View(MainActivity.this); // If no view currently has focus, create a new one, just so we can grab a window token from it
+        }
+
+        InputMethodManager manager = (InputMethodManager) getSystemService(Activity.INPUT_METHOD_SERVICE);
+        if (show) {
+            manager.showSoftInput(v, InputMethodManager.SHOW_IMPLICIT); // Show keyboard
+        }
+        else {
+            manager.hideSoftInputFromWindow(v.getWindowToken(), 0); // Hide keyboard
+        }
     }
 
     @Override
