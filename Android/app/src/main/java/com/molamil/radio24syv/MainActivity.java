@@ -359,7 +359,6 @@ public class MainActivity extends FragmentActivity implements
                 MainActivity.this.onError(null);
                 Program program = response.body();
                 if ((program != null) && (program.getRelatedPrograms() != null)) {
-                    // TODO use this code when API returns something real instead of NULL for getVideoProgramId()
                     ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
                     for (RelatedProgram p : program.getRelatedPrograms()) {
                         Object id = p.getVideoProgramId();
@@ -377,39 +376,6 @@ public class MainActivity extends FragmentActivity implements
                     if (relatedProgramIds.size() > 0) {
                         Storage.get().addRelatedPrograms(programId, relatedProgramIds);
                     }
-
-                    // BEGIN WORKAROUND
-//                    // Slug is returned, but programId is null
-//                    ArrayList<String> relatedProgramSlugs = new ArrayList<>(program.getRelatedPrograms().size());
-//                    for (RelatedProgram p : program.getRelatedPrograms()) {
-//                        relatedProgramSlugs.add(p.getSlug());
-//                    }
-//                    // We have to look up slug to get the programId. TODO if the workaround is here to stay: cache this - save slug in program table along with all the other ProgramInfo
-//                    for (String slug : relatedProgramSlugs) {
-//                        RestClient.getApi().getProgram(slug).enqueue(new Callback<Program>() {
-//                            @Override
-//                            public void onResponse(Response<Program> response) {
-//                                MainActivity.this.onError(null);
-//                                Program program = response.body();
-//                                if (program != null) {
-//                                    ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
-//                                    relatedProgramIds.add(program.getVideoProgramId());
-//                                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId);
-//                                    if (relatedProgramIds.size() > 0) {
-//                                        Storage.get().addRelatedPrograms(programId, relatedProgramIds);
-//                                    }
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onFailure(Throwable t) {
-//                                MainActivity.this.onError(t.getLocalizedMessage());
-//                                Log.d("JJJ", "fail " + t.getMessage());
-//                                t.printStackTrace();
-//                            }
-//                        });
-//                    }
-                    // END WORKAROUND
                 }
             }
 
