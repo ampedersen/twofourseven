@@ -60,7 +60,6 @@ public class MainActivity extends FragmentActivity implements
 
     private int selectedProgramCategory;
     private TopicInfo selectedProgramTopic;
-    private HashMap<Integer, Boolean> isKeyboardNeededByPagePosition = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -74,24 +73,6 @@ public class MainActivity extends FragmentActivity implements
         pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
         pager.setPageTransformer(false, pageTransformer);
         pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
-            @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
-
-            }
-
-            @Override
-            public void onPageSelected(int position) {
-                // Quick & dirty way of hiding the keyboard when going away from Program Search side page. Android keyboard handling is unbelievable.
-                boolean isKeyboardNeeded = isKeyboardNeededByPagePosition.containsKey(position) && isKeyboardNeededByPagePosition.get(position);
-                setKeyboardVisible(isKeyboardNeeded);
-            }
-
-            @Override
-            public void onPageScrollStateChanged(int state) {
-
-            }
-        });
 
         radioPlayer = new RadioPlayer(this);
         radioPlayer.addListener(this);
@@ -174,11 +155,11 @@ public class MainActivity extends FragmentActivity implements
         onBackPressed(); // React as if the physical back button was pressed
     }
 
+    /**
+     * Hide/show the on-screen keyboard. NOTE: Only works when called from an Activity. Does not work when called from a Fragment (this won't work because you'll be passing a reference to the Fragment's host Activity, which will have no focused control while the Fragment is shown)
+     * http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
+     */
     public void setKeyboardVisible(boolean show) {
-        /**
-         * Hides the on-screen keyboard. NOTE: Only works when called from an Activity. Does not work when called from a Fragment (this won't work because you'll be passing a reference to the Fragment's host Activity, which will have no focused control while the Fragment is shown)
-         * http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
-         */
         View v = getCurrentFocus(); // Find the currently focused view, so we can grab the correct window token from it.
         if (v == null) {
             v = new View(MainActivity.this); // If no view currently has focus, create a new one, just so we can grab a window token from it
@@ -213,8 +194,6 @@ public class MainActivity extends FragmentActivity implements
                 mainFragment.setTabSize(MainFragment.TabSize.SMALL);
                 break;
         }
-
-
     }
 
     @Override
@@ -278,12 +257,6 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    private void setIsKeyboardNeededByPagePosition(boolean page0, boolean page1, boolean page2) {
-        isKeyboardNeededByPagePosition.put(0, page0);
-        isKeyboardNeededByPagePosition.put(1, page1);
-        isKeyboardNeededByPagePosition.put(2, page2);
-    }
-
     @Override
     public void onMainTabChanged(String tabTag) {
         //Log.d("JJJ", "onMainTabChanged "+ tabTag);
@@ -298,23 +271,19 @@ public class MainActivity extends FragmentActivity implements
             case MainFragment.TAG_TAB_LIVE:
                 pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 0;
-                setIsKeyboardNeededByPagePosition(false, false, false);
                 break;
             case MainFragment.TAG_TAB_PROGRAMS:
                 pager.setAdapter(new ProgramsTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 1;
                 setSelectedProgramCategory(selectedProgramCategory, selectedProgramTopic);
-                setIsKeyboardNeededByPagePosition(false, false, true);
                 break;
             case MainFragment.TAG_TAB_NEWS:
                 pager.setAdapter(new NewsTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 0;
-                setIsKeyboardNeededByPagePosition(false, false, false);
                 break;
             case MainFragment.TAG_TAB_OFFLINE:
                 pager.setAdapter(new OfflineTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 0;
-                setIsKeyboardNeededByPagePosition(false, false, false);
                 break;
         }
 
@@ -391,46 +360,55 @@ public class MainActivity extends FragmentActivity implements
                 Program program = response.body();
                 if ((program != null) && (program.getRelatedPrograms() != null)) {
                     // TODO use this code when API returns something real instead of NULL for getVideoProgramId()
-//                    ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
-//                    for (RelatedProgram p : program.getRelatedPrograms()) {
-//                        relatedProgramIds.add((int) p.getVideoProgramId());
-//                    }
-//                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId);
-//                    if (relatedProgramIds.size() > 0) {
-//                        Storage.get().addRelatedPrograms(programId, relatedProgramIds);
-//                    }
+                    ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
+                    for (RelatedProgram p : program.getRelatedPrograms()) {
+                        Object id = p.getVideoProgramId();
+                        if (id instanceof Double) {
+                            int programId = ((Double) id).intValue(); // Read program ID directly
+                            relatedProgramIds.add(programId);
+                        } else {
+                            ProgramInfo relatedProgram = Storage.get().getProgram(p.getSlug()); // Look up program ID using slug
+                            if (relatedProgram != null) {
+                                relatedProgramIds.add(relatedProgram.getProgramId());
+                            }
+                        }
+                    }
+                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId);
+                    if (relatedProgramIds.size() > 0) {
+                        Storage.get().addRelatedPrograms(programId, relatedProgramIds);
+                    }
 
                     // BEGIN WORKAROUND
-                    // Slug is returned, but programId is null
-                    ArrayList<String> relatedProgramSlugs = new ArrayList<>(program.getRelatedPrograms().size());
-                    for (RelatedProgram p : program.getRelatedPrograms()) {
-                        relatedProgramSlugs.add(p.getSlug());
-                    }
-                    // We have to look up slug to get the programId. TODO if the workaround is here to stay: cache this - save slug in program table along with all the other ProgramInfo
-                    for (String slug : relatedProgramSlugs) {
-                        RestClient.getApi().getProgram(slug).enqueue(new Callback<Program>() {
-                            @Override
-                            public void onResponse(Response<Program> response) {
-                                MainActivity.this.onError(null);
-                                Program program = response.body();
-                                if (program != null) {
-                                    ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
-                                    relatedProgramIds.add(program.getVideoProgramId());
-                                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId);
-                                    if (relatedProgramIds.size() > 0) {
-                                        Storage.get().addRelatedPrograms(programId, relatedProgramIds);
-                                    }
-                                }
-                            }
-
-                            @Override
-                            public void onFailure(Throwable t) {
-                                MainActivity.this.onError(t.getLocalizedMessage());
-                                Log.d("JJJ", "fail " + t.getMessage());
-                                t.printStackTrace();
-                            }
-                        });
-                    }
+//                    // Slug is returned, but programId is null
+//                    ArrayList<String> relatedProgramSlugs = new ArrayList<>(program.getRelatedPrograms().size());
+//                    for (RelatedProgram p : program.getRelatedPrograms()) {
+//                        relatedProgramSlugs.add(p.getSlug());
+//                    }
+//                    // We have to look up slug to get the programId. TODO if the workaround is here to stay: cache this - save slug in program table along with all the other ProgramInfo
+//                    for (String slug : relatedProgramSlugs) {
+//                        RestClient.getApi().getProgram(slug).enqueue(new Callback<Program>() {
+//                            @Override
+//                            public void onResponse(Response<Program> response) {
+//                                MainActivity.this.onError(null);
+//                                Program program = response.body();
+//                                if (program != null) {
+//                                    ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
+//                                    relatedProgramIds.add(program.getVideoProgramId());
+//                                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId);
+//                                    if (relatedProgramIds.size() > 0) {
+//                                        Storage.get().addRelatedPrograms(programId, relatedProgramIds);
+//                                    }
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Throwable t) {
+//                                MainActivity.this.onError(t.getLocalizedMessage());
+//                                Log.d("JJJ", "fail " + t.getMessage());
+//                                t.printStackTrace();
+//                            }
+//                        });
+//                    }
                     // END WORKAROUND
                 }
             }

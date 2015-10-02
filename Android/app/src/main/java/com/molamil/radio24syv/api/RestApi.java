@@ -81,7 +81,7 @@ public interface RestApi {
     // Searches
 
     @GET("search/{query}")
-    Call<Search> search(@Path("query") String query);
+    Call<Search> search(@Path("query") String query, @Query("type") String type, @Query("limit") Integer amount, @Query("offset") Integer pageOffset);
 
     // Stories (empty?)
 

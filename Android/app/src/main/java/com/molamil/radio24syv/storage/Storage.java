@@ -74,6 +74,10 @@ public class Storage {
         return database.getProgram(programId);
     }
 
+    public ProgramInfo getProgram(String programSlug) {
+        return database.getProgram(programSlug);
+    }
+
     public List<ProgramInfo> getPrograms() {
         return database.getPrograms();
     }

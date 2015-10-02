@@ -117,6 +117,9 @@ public class ProgramsFragment extends PageFragment {
     }
 
     public void showDetails(ProgramInfo program) {
+        if (listener != null) {
+            listener.onShowSidePage(PageFragment.OnFragmentInteractionListener.Side.HIDE); // Show main page (program search side page could be showing)
+        }
         pager.setAdapter(new DetailsPagerAdapter(getChildFragmentManager(), program));
         //pager.setCurrentItem(1, true); // This changes page instantly even though told otherwise. It happens when setCurrentItem() is called straight after changing adapter.
         new Handler().post(new Runnable() {

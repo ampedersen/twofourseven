@@ -97,4 +97,35 @@ public class RestClient
         } while ((textStart > 0) && (textStart < html.length()));
         return builder.toString();
     }
+
+    // "Official" way of getting slug from URL: Man kan sådan set også godt slå programmer op på deres slug,
+    // så i princippet kan du tage url’en og strippe http://www.radio24syv.dk/programmer/ og den efterfølgende /.
+    public static String getProgramSlugFromUrl(String url) {
+        if (url == null) {
+            return null;
+        }
+
+        final String SLASH = "/";
+        final String PROGRAMMER = "programmer" + SLASH;
+
+        int startIndex = url.indexOf(PROGRAMMER);
+        if (startIndex == -1) {
+            return url; // Return the whole URL, something is wrong
+        } else {
+            startIndex = startIndex + PROGRAMMER.length(); // Start after "programmer/"
+        }
+
+        int endIndex = url.indexOf("/", startIndex);
+        if (endIndex == -1) {
+            endIndex = url.length() - 1;
+        } else {
+            // Ends before "/" because substring() minuses one (yay..)
+        }
+
+        if ((startIndex < url.length()) && (endIndex > startIndex)) {
+            return url.substring(startIndex, endIndex);
+        } else {
+            return url; // Return the whole URL, something is wrong
+        }
+    }
 }

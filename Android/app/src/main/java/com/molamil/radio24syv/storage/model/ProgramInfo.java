@@ -1,12 +1,8 @@
 package com.molamil.radio24syv.storage.model;
 
-import android.content.Intent;
-import android.database.Cursor;
-
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.ConciseProgram;
 import com.molamil.radio24syv.api.model.Program;
-import com.molamil.radio24syv.api.model.RelatedProgram;
 import com.molamil.radio24syv.storage.Storage;
 
 import java.io.Serializable;
@@ -18,6 +14,7 @@ import java.io.Serializable;
  */
 public class ProgramInfo implements Serializable {
     private int programId;
+    private String programSlug;
     private String name;
     private String topic;
     private String description;
@@ -28,6 +25,7 @@ public class ProgramInfo implements Serializable {
 
     public ProgramInfo(ConciseProgram conciseProgram) {
         programId = RestClient.getIntegerSafely(conciseProgram.getVideoProgramId(), Storage.PROGRAM_ID_UNKNOWN);
+        programSlug = conciseProgram.getSlug();
         name = conciseProgram.getName();
         topic = conciseProgram.getTopic();
         description = conciseProgram.getDescriptionText();
@@ -37,6 +35,7 @@ public class ProgramInfo implements Serializable {
 
     public ProgramInfo(Program program) {
         programId = RestClient.getIntegerSafely(program.getVideoProgramId(), Storage.PROGRAM_ID_UNKNOWN);
+        programSlug = program.getSlug();
         name = program.getName();
         topic = program.getTopic();
         description = RestClient.getTextWithoutHtmlTags(program.getDescriptionHtml());
@@ -47,6 +46,7 @@ public class ProgramInfo implements Serializable {
     // TODO this is broken until the API returns an integer instead of null for relatedProgram.getVideoProgramId()
 //    public ProgramInfo(RelatedProgram relatedProgram) {
 //        programId = RestClient.getIntegerSafely((int) relatedProgram.getVideoProgramId(), Storage.PROGRAM_ID_UNKNOWN); // I suppose this is an integer
+//        programSlug = program.getProgramSlug();
 //        name = relatedProgram.getName();
 //        topic = relatedProgram.getTopic();
 //        description = relatedProgram.getDescriptionText();
@@ -60,6 +60,14 @@ public class ProgramInfo implements Serializable {
 
     public void setProgramId(int programId) {
         this.programId = programId;
+    }
+
+    public String getProgramSlug() {
+        return programSlug;
+    }
+
+    public void setProgramSlug(String programSlug) {
+        this.programSlug = programSlug;
     }
 
     public String getName() {

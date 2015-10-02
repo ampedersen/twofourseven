@@ -41,12 +41,13 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static final String KEY_AUDIO_URL = "audio_url";
     private static final String KEY_COLOR = "color";
     private static final String KEY_PROGRAM_ID_RELATED = "program_id_related";
+    private static final String KEY_PROGRAM_SLUG = "program_slug";
 
     private static final String SQL_CREATE_TABLE_LIBRAY = "CREATE TABLE " + TABLE_LIBRARY + "(" + KEY_PODCAST_ID + " INTEGER PRIMARY KEY, "
             + KEY_DOWNLOAD_ID + " BIGINT" + ")"; // TODO index on download_id
 
     private static final String SQL_CREATE_TABLE_PROGRAM = "CREATE TABLE " + TABLE_PROGRAM + "(" + KEY_PROGRAM_ID + " INTEGER PRIMARY KEY, "
-            + KEY_NAME + " TEXT, " + KEY_TOPIC_ID + " TEXT, " + KEY_DESCRIPTION + " TEXT, " + KEY_IMAGE_URL + " TEXT, " + KEY_ACTIVE + " TEXT" + ")";
+            + KEY_PROGRAM_SLUG + " TEXT, " + KEY_NAME + " TEXT, " + KEY_TOPIC_ID + " TEXT, " + KEY_DESCRIPTION + " TEXT, " + KEY_IMAGE_URL + " TEXT, " + KEY_ACTIVE + " TEXT" + ")"; // TODO index on program_slug
 
     private static final String SQL_CREATE_TABLE_PODCAST = "CREATE TABLE " + TABLE_PODCAST + "(" + KEY_PODCAST_ID + " INTEGER PRIMARY KEY, "
             + KEY_PROGRAM_ID + " INTEGER, " // TODO index on program_id
@@ -64,17 +65,19 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 1;
+    private static final int DATABASE_VERSION = 2;
     private static final String DATABASE_NAME = "Storage.db";
 
     public StorageDatabase(Context context) {
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    @Override
     public void onCreate(SQLiteDatabase db) {
         createTables(db);
     }
 
+    @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Upgrade existing table to new format if table version is upgraded in a later app version.
         // For now, discard the data and start over.
@@ -195,10 +198,25 @@ public class StorageDatabase extends SQLiteOpenHelper {
         if ((c != null) && c.moveToFirst()) {
             ProgramInfo program = readProgramInfo(c);
             c.close();
-            Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId());
+            Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId() + " slug " + program.getProgramSlug());
             return program;
         }
         Log.d("JJJ", "programId not found " + programId);
+        return null;
+    }
+
+    public ProgramInfo getProgram(String programSlug) {
+        String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_SLUG + " = '" + programSlug + "' LIMIT 1";
+        Log.d("JJJ", query);
+
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            ProgramInfo program = readProgramInfo(c);
+            c.close();
+            Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId() + " slug " + program.getProgramSlug());
+            return program;
+        }
+        Log.d("JJJ", "programSlug not found " + programSlug);
         return null;
     }
 
@@ -519,17 +537,20 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static void writeProgramInfo(SQLiteDatabase db, ProgramInfo program) {
         ContentValues values = new ContentValues();
         values.put(KEY_PROGRAM_ID, program.getProgramId());
+        values.put(KEY_PROGRAM_SLUG, program.getProgramSlug());
         values.put(KEY_NAME, program.getName());
         values.put(KEY_TOPIC_ID, program.getTopic());
         values.put(KEY_DESCRIPTION, program.getDescription());
         values.put(KEY_IMAGE_URL, program.getImageUrl());
         values.put(KEY_ACTIVE, Boolean.toString(program.getActive()));
+        //Log.d("JJJ", "Writing " + program.getProgramSlug());
         db.replace(TABLE_PROGRAM, null, values);
     }
 
     private static ProgramInfo readProgramInfo(Cursor c) {
         ProgramInfo program = new ProgramInfo();
         program.setProgramId(c.getInt(c.getColumnIndex(KEY_PROGRAM_ID)));
+        program.setProgramSlug(c.getString(c.getColumnIndex(KEY_PROGRAM_SLUG)));
         program.setName(c.getString(c.getColumnIndex(KEY_NAME)));
         program.setTopic(c.getString(c.getColumnIndex(KEY_TOPIC_ID)));
         program.setDescription(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
