@@ -25,6 +25,8 @@ public class ProgramsFragment extends PageFragment {
     SidePageTransformer pageTransformer;
     ProgramListFragment programListFragment;
 
+    private boolean isKeyboardNeeded = false;
+
     public ProgramsFragment() {
         // Required empty public constructor
     }

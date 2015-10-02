@@ -1,11 +1,14 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
+import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -59,6 +62,23 @@ public class ProgramListFragment extends PageFragment {
             topic = (TopicInfo) getArguments().getSerializable(ARGUMENT_TOPIC_ID);
         }
     }
+
+//    public class Utilities {
+//        /**
+//         * Hides the on-screen keyboard. NOTE: Only works when called from an Activity. Does not work when called from a Fragment (this won't work because you'll be passing a reference to the Fragment's host Activity, which will have no focused control while the Fragment is shown)
+//         * http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
+//         */
+//        public static void hideKeyboard(Activity activity) {
+//            InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
+//            //Find the currently focused view, so we can grab the correct window token from it.
+//            View view = activity.getCurrentFocus();
+//            //If no view currently has focus, create a new one, just so we can grab a window token from it
+//            if(view == null) {
+//                view = new View(activity);
+//            }
+//            inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
+//        }
+//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
