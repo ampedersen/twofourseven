@@ -54,7 +54,6 @@ public class ProgramSearchFragment extends PageFragment {
                 boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_SEARCH) {
                     search(v.getText().toString());
-                    getMainActivity().setKeyboardVisible(false);
                     handled = true;
                 }
                 return handled;
@@ -67,7 +66,6 @@ public class ProgramSearchFragment extends PageFragment {
             @Override
             public void onClick(View v) {
                 search(searchText.getText().toString());
-                getMainActivity().setKeyboardVisible(false);
             }
         });
 
@@ -85,15 +83,43 @@ public class ProgramSearchFragment extends PageFragment {
         }
     }
 
+    private void updateStatus() {
+        View v = getView();
+        if (v == null) {
+            return;
+        }
+
+        TextView statusText = (TextView) v.findViewById(R.id.status_text);
+        if (results > 0) {
+            statusText.setVisibility(View.GONE);
+            getMainActivity().setKeyboardVisible(false); // Hide keyboard to show results
+        } else {
+            statusText.setVisibility(View.VISIBLE);
+            if ((query != null) && (query.length() > 0)) {
+                statusText.setText(R.string.search_no_results);
+            } else {
+                statusText.setText(R.string.search_instructions);
+            }
+        }
+    }
+
     private void search(final String query) {
         Log.d("JJJ", "Search " + query);
         this.query = query;
         results = 0;
+        showSearchResults(null);
+
+        if ((query == null) || (query.length() == 0)) {
+            return; // Return, the search API does not like empty queries
+        }
 
         RestClient.getApi().search(query, "program", 50, 0).enqueue(new Callback<Search>() {
             @Override
             public void onResponse(Response<Search> response) {
                 if (isQueryStillRelevant(query)) {
+                    if (listener != null) {
+                        listener.onError(null);
+                    }
                     Search search = response.body();
                     showSearchResults(search.getResults());
                 }
@@ -125,35 +151,37 @@ public class ProgramSearchFragment extends PageFragment {
         ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
         content.removeAllViews();
 
-        for (Result r : results) {
-//            TextView t = new TextView(v.getContext());
-//            t.setText(r.getName() + " " + r.getType() + " " + r.getId());
-//            content.addView(t);
-            boolean isProgram = r.getType().equalsIgnoreCase("program");
-            if (isProgram) {
-                //ProgramInfo program = Storage.get().getProgram(r.getId()); // This ID is from an external search provider and does not make sense to us and the API
-                String programSlug = RestClient.getProgramSlugFromUrl(r.getUrl()); // According to Radio24syv this is the way to get the program identifier (slug) from a search result
-                ProgramInfo program = Storage.get().getProgram(programSlug);
-                if (program != null) {
-                    ProgramButtonView button = new ProgramButtonView(content.getContext());
-                    button.setProgram(program);
-                    button.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
-                    button.setOnProgramButtonViewListener(new ProgramButtonView.OnProgramButtonViewListener() {
-                        @Override
-                        public void OnProgramButtonViewClicked(ProgramButtonView view) {
-                            if (listener != null) {
-                                listener.onProgramSelected(view.getProgram());
+        if (results == null) {
+            this.results = 0;
+        } else {
+            for (Result r : results) {
+                boolean isProgram = r.getType().equalsIgnoreCase("program");
+                if (isProgram) {
+                    //ProgramInfo program = Storage.get().getProgram(r.getId()); // This ID is from an external search provider and does not make sense to us and the API
+                    String programSlug = RestClient.getProgramSlugFromUrl(r.getUrl()); // According to Radio24syv this is the way to get the program identifier (slug) from a search result
+                    ProgramInfo program = Storage.get().getProgram(programSlug);
+                    if (program != null) {
+                        ProgramButtonView button = new ProgramButtonView(content.getContext());
+                        button.setProgram(program);
+                        button.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
+                        button.setOnProgramButtonViewListener(new ProgramButtonView.OnProgramButtonViewListener() {
+                            @Override
+                            public void OnProgramButtonViewClicked(ProgramButtonView view) {
+                                if (listener != null) {
+                                    listener.onProgramSelected(view.getProgram());
+                                }
                             }
-                        }
-                    });
-                    content.addView(button);
-                } else {
-                    Log.d("JJJ", "Program not found for slug " + programSlug); // Search can return programs that getPrograms() does not..!
+                        });
+                        content.addView(button);
+                    } else {
+                        Log.d("JJJ", "Program not found for slug " + programSlug); // Search can return programs that getPrograms() does not..!
+                    }
                 }
             }
+            this.results = results.size();
         }
 
-        this.results = results.size();
+        updateStatus();
     }
 
     @Override
