@@ -575,7 +575,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
         podcast.setPodcastId(c.getInt(c.getColumnIndex(KEY_PODCAST_ID)));
         podcast.setProgramId(c.getInt(c.getColumnIndex(KEY_PROGRAM_ID)));
         podcast.setTitle(c.getString(c.getColumnIndex(KEY_TITLE)));
-        podcast.setDescription(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
+        podcast.setDescriptionText(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
         podcast.setDate(c.getString(c.getColumnIndex(KEY_DATE)));
         podcast.setAudioUrl(c.getString(c.getColumnIndex(KEY_AUDIO_URL)));
         return podcast;

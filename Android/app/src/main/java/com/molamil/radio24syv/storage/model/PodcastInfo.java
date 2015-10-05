@@ -1,5 +1,6 @@
 package com.molamil.radio24syv.storage.model;
 
+import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Podcast;
 
 import java.io.Serializable;
@@ -17,13 +18,14 @@ public class PodcastInfo implements Serializable {
     private String date;
     private String audioUrl;
 
-    public PodcastInfo() {}
+    public PodcastInfo() {
+    }
 
     public PodcastInfo(Podcast podcast) {
         podcastId = podcast.getVideoPodcastId();
         programId = podcast.getProgramInfo().getId();
         title = podcast.getTitle();
-        description = podcast.getDescription().getText();
+        setDescriptionHtml(podcast.getDescription().getHtml());
         date = podcast.getPublishInfo().getCreatedAt();
         audioUrl = podcast.getAudioInfo().getUrl();
     }
@@ -56,8 +58,12 @@ public class PodcastInfo implements Serializable {
         return description;
     }
 
-    public void setDescription(String description) {
-        this.description = description;
+    public void setDescriptionText(String text) {
+        this.description = text;
+    }
+
+    public void setDescriptionHtml(String html) {
+        this.description = RestClient.getTextWithoutHtmlTags(html);
     }
 
     public String getDate() {

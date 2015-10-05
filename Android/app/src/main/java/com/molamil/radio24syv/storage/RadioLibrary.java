@@ -106,19 +106,6 @@ public class RadioLibrary {
         callback(context, podcast.getPodcastId());
     }
 
-//    private static String getFilename(final String path) {
-//        if (path == null) {
-//            return ""; // Return empty string, path is null
-//        }
-//
-//        int pathEndIndex = path.lastIndexOf('/');
-//        if (pathEndIndex < path.length() - 1) {
-//            return path.substring(pathEndIndex + 1); // Return everything after the last slash
-//        } else {
-//            return ""; // Return empty string, there is no filename when the path ends with a slash
-//        }
-//    }
-
     private static String getFilename(final String path, int podcastId) {
         if (path == null) {
             return ""; // Return empty string, path is null
@@ -215,7 +202,8 @@ public class RadioLibrary {
             listenersByPodcastId.put(podcastId, new ArrayList<OnRadioLibraryStatusUpdatedListener>()); // Create entry for podcast ID
         }
 
-        if (!listenersByPodcastId.get(podcastId).contains(listener)) {
+        boolean isNewListener = !listenersByPodcastId.get(podcastId).contains(listener);
+        if (isNewListener) {
             listenersByPodcastId.get(podcastId).add(listener); // Add listener
             listener.OnRadioLibraryStatusUpdated(podcastId, getStatus(context, podcastId)); // Fire events to reflect current state
         }

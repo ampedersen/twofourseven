@@ -8,6 +8,8 @@ import com.google.gson.GsonBuilder;
 import org.joda.time.DateTime;
 import org.joda.time.LocalDateTime;
 
+import java.util.Locale;
+
 import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 
@@ -67,6 +69,11 @@ public class RestClient
         return time.toString("HH.mm");
     }
 
+    public static String getLocalDate(String dateWithTimeZone) {
+        LocalDateTime date = new DateTime(dateWithTimeZone).toLocalDateTime();
+        return String.format(Locale.US, "%d/%d", date.getDayOfMonth(), date.getMonthOfYear());
+    }
+
     public static int getIntegerSafely(Integer i, int defaultValue) {
         if (i != null) {
             return i;
@@ -82,6 +89,7 @@ public class RestClient
     public static String getTextWithoutHtmlTags(String html) {
         html = html.replace("&amp;", "&"); // Ampersand instead of html code
         html = html.replace("<p", "\n<p"); // Line break before <p>
+        html = html.replace("<li", "\n<p"); // Line break before <li>
         html = html.trim();
         StringBuilder builder = new StringBuilder();
         int textStart = 0;

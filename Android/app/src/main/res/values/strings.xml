@@ -55,6 +55,7 @@
 
     <!-- News -->
     <string name="news_header">Sidste nyt</string>
+    <string name="news_empty">Hør seneste nyt fra Radio24syv</string>
 
     <!-- Offline -->
     <string name="offline_header">Lyt offline</string>

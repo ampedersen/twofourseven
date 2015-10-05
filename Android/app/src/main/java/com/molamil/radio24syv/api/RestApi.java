@@ -58,6 +58,9 @@ public interface RestApi {
     @GET("/podcasts/program/{id}")
     Call<List<Podcast>> getPodcasts(@Path("id") Integer programId, @Query("size") Integer amount, @Query("p") Integer pageOffset);
 
+    @GET("/podcasts/news")
+    Call<List<Podcast>> getLatestNewsPodcasts();
+
     // Programs
 
     @GET("programs")
