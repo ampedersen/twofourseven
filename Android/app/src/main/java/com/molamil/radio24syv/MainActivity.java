@@ -23,6 +23,7 @@ import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
 import com.molamil.radio24syv.storage.model.TopicInfo;
+import com.molamil.radio24syv.view.ProgramScheduleButtonView;
 import com.molamil.radio24syv.view.RadioViewPager;
 
 import net.hockeyapp.android.CrashManager;
@@ -49,7 +50,8 @@ public class MainActivity extends FragmentActivity implements
         NewsFragment.OnFragmentInteractionListener,
         OfflineFragment.OnFragmentInteractionListener,
         PlayerFragment.OnFragmentInteractionListener,
-        ProgramSearchFragment.OnFragmentInteractionListener {
+        ProgramSearchFragment.OnFragmentInteractionListener,
+        ProgramScheduleButtonView.OnProgramScheduleButtonViewListener {
 
     RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
     SidePageTransformer pageTransformer;
@@ -60,6 +62,7 @@ public class MainActivity extends FragmentActivity implements
 
     private int selectedProgramCategory;
     private TopicInfo selectedProgramTopic;
+    private HashMap<Integer, Boolean> isKeyboardNeededByPagePosition = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -155,11 +158,11 @@ public class MainActivity extends FragmentActivity implements
         onBackPressed(); // React as if the physical back button was pressed
     }
 
-    /**
-     * Hide/show the on-screen keyboard. NOTE: Only works when called from an Activity. Does not work when called from a Fragment (this won't work because you'll be passing a reference to the Fragment's host Activity, which will have no focused control while the Fragment is shown)
-     * http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
-     */
     public void setKeyboardVisible(boolean show) {
+        /**
+         * Hides the on-screen keyboard. NOTE: Only works when called from an Activity. Does not work when called from a Fragment (this won't work because you'll be passing a reference to the Fragment's host Activity, which will have no focused control while the Fragment is shown)
+         * http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
+         */
         View v = getCurrentFocus(); // Find the currently focused view, so we can grab the correct window token from it.
         if (v == null) {
             v = new View(MainActivity.this); // If no view currently has focus, create a new one, just so we can grab a window token from it
@@ -194,6 +197,8 @@ public class MainActivity extends FragmentActivity implements
                 mainFragment.setTabSize(MainFragment.TabSize.SMALL);
                 break;
         }
+
+
     }
 
     @Override
@@ -235,6 +240,19 @@ public class MainActivity extends FragmentActivity implements
         f.showProgramCategory(selectedProgramCategory, selectedProgramTopic);
     }
 
+
+    @Override
+    public void OnProgramScheduleButtonClicked(ProgramScheduleButtonView view) {
+// ""ACTHUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
+    }
+
+    @Override
+    public void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view) {
+// ""ACTHUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
+
+    }
+
+
     @Override
     public void onPlayerSizeChanged(PlayerFragment.PlayerSize newSize, PlayerFragment.PlayerSize oldSize) {
         if (newSize == PlayerFragment.PlayerSize.BIG) {
@@ -257,6 +275,12 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
+    private void setIsKeyboardNeededByPagePosition(boolean page0, boolean page1, boolean page2) {
+        isKeyboardNeededByPagePosition.put(0, page0);
+        isKeyboardNeededByPagePosition.put(1, page1);
+        isKeyboardNeededByPagePosition.put(2, page2);
+    }
+
     @Override
     public void onMainTabChanged(String tabTag) {
         //Log.d("JJJ", "onMainTabChanged "+ tabTag);
@@ -271,19 +295,23 @@ public class MainActivity extends FragmentActivity implements
             case MainFragment.TAG_TAB_LIVE:
                 pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 0;
+                setIsKeyboardNeededByPagePosition(false, false, false);
                 break;
             case MainFragment.TAG_TAB_PROGRAMS:
                 pager.setAdapter(new ProgramsTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 1;
                 setSelectedProgramCategory(selectedProgramCategory, selectedProgramTopic);
+                setIsKeyboardNeededByPagePosition(false, false, true);
                 break;
             case MainFragment.TAG_TAB_NEWS:
                 pager.setAdapter(new NewsTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 0;
+                setIsKeyboardNeededByPagePosition(false, false, false);
                 break;
             case MainFragment.TAG_TAB_OFFLINE:
                 pager.setAdapter(new OfflineTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 0;
+                setIsKeyboardNeededByPagePosition(false, false, false);
                 break;
         }
 
@@ -359,6 +387,7 @@ public class MainActivity extends FragmentActivity implements
                 MainActivity.this.onError(null);
                 Program program = response.body();
                 if ((program != null) && (program.getRelatedPrograms() != null)) {
+                    // TODO use this code when API returns something real instead of NULL for getVideoProgramId()
                     ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
                     for (RelatedProgram p : program.getRelatedPrograms()) {
                         Object id = p.getVideoProgramId();
@@ -376,6 +405,39 @@ public class MainActivity extends FragmentActivity implements
                     if (relatedProgramIds.size() > 0) {
                         Storage.get().addRelatedPrograms(programId, relatedProgramIds);
                     }
+
+                    // BEGIN WORKAROUND
+//                    // Slug is returned, but programId is null
+//                    ArrayList<String> relatedProgramSlugs = new ArrayList<>(program.getRelatedPrograms().size());
+//                    for (RelatedProgram p : program.getRelatedPrograms()) {
+//                        relatedProgramSlugs.add(p.getSlug());
+//                    }
+//                    // We have to look up slug to get the programId. TODO if the workaround is here to stay: cache this - save slug in program table along with all the other ProgramInfo
+//                    for (String slug : relatedProgramSlugs) {
+//                        RestClient.getApi().getProgram(slug).enqueue(new Callback<Program>() {
+//                            @Override
+//                            public void onResponse(Response<Program> response) {
+//                                MainActivity.this.onError(null);
+//                                Program program = response.body();
+//                                if (program != null) {
+//                                    ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
+//                                    relatedProgramIds.add(program.getVideoProgramId());
+//                                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId);
+//                                    if (relatedProgramIds.size() > 0) {
+//                                        Storage.get().addRelatedPrograms(programId, relatedProgramIds);
+//                                    }
+//                                }
+//                            }
+//
+//                            @Override
+//                            public void onFailure(Throwable t) {
+//                                MainActivity.this.onError(t.getLocalizedMessage());
+//                                Log.d("JJJ", "fail " + t.getMessage());
+//                                t.printStackTrace();
+//                            }
+//                        });
+//                    }
+                    // END WORKAROUND
                 }
             }
 

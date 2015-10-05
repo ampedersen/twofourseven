@@ -37,6 +37,11 @@
         <item name="android:textColor">@color/radio_white</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/podcast_program_title_text_size</item>
+        <item name="android:singleLine">true</item>
+    </style>
+
+    <style name="ScheduleProgramTitleText" parent="PodcastProgramTitleText">
+        <item name="android:textColor">@color/radio_black</item>
     </style>
 
     <style name="ProgramCategoryText" >
@@ -44,4 +49,13 @@
         <item name="android:textSize">@dimen/program_category_text_size</item>
     </style>
 
+    <style name="ScheduleTimeText">
+        <item name="android:textColor">@color/radio_red</item>
+        <item name="android:textSize">@dimen/schedule_time_text_size</item>
+    </style>
+
+    <style name="DateText">
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">@dimen/date_text_size</item>
+    </style>
 </resources>

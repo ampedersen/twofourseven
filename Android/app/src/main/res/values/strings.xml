@@ -30,9 +30,12 @@
     <!-- Live radio -->
     <string name="live_header">Radio24syv Live</string>
     <string name="live_schedule_button">Se sendeplan</string>
-    <string name="playing_now">Playing now</string> <!-- TODO Lige nu -->
+    <string name="playing_now">Lige nu</string>
     <string name="expand_text">Se mere</string>
     <string name="contract_text">Se mindre</string>
+
+    <!-- Schedule -->
+    <string name="schedule_header">Sendeplan</string>
 
     <!-- Programs -->
     <string name="programs_header">Programmer</string>

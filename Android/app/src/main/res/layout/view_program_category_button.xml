@@ -6,7 +6,7 @@
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:background="@drawable/program_category_button_background"
+        android:background="@drawable/button_white_background"
         >
 
         <!-- Has to be a LinearLayout nested inside a RelativeLayout or else the TextView will not expand to match parent width. Go figure. -->
