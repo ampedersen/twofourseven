@@ -21,6 +21,8 @@ import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.view.ProgramButtonView;
 
+import org.apache.http.auth.BasicUserPrincipal;
+
 import java.util.List;
 
 import retrofit.Callback;
@@ -32,10 +34,13 @@ import retrofit.Response;
  */
 public class ProgramSearchFragment extends PageFragment {
 
+    private enum State { NONE, READY, BUSY }
+
     private OnFragmentInteractionListener listener;
     private String query;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
-    private int results = 0;
+    private int resultCount = 0;
+    private State state;
 
     public ProgramSearchFragment() {
         // Required empty public constructor
@@ -69,6 +74,8 @@ public class ProgramSearchFragment extends PageFragment {
             }
         });
 
+        state = State.READY;
+
         return v;
     }
 
@@ -78,64 +85,51 @@ public class ProgramSearchFragment extends PageFragment {
 
         MainActivity a = getMainActivity();
         if (a != null) {
-            boolean isKeyboardNedeed = isVisibleToUser && (results == 0);
+            boolean isKeyboardNedeed = isVisibleToUser && (resultCount == 0); // Hide keyboard when the fragment is not visible and no search results are showing
             a.setKeyboardVisible(isKeyboardNedeed);
-        }
-    }
-
-    private void updateStatus() {
-        View v = getView();
-        if (v == null) {
-            return;
-        }
-
-        TextView statusText = (TextView) v.findViewById(R.id.status_text);
-        if (results > 0) {
-            statusText.setVisibility(View.GONE);
-            getMainActivity().setKeyboardVisible(false); // Hide keyboard to show results
-        } else {
-            statusText.setVisibility(View.VISIBLE);
-            if ((query != null) && (query.length() > 0)) {
-                statusText.setText(R.string.search_no_results);
-            } else {
-                statusText.setText(R.string.search_instructions);
-            }
         }
     }
 
     private void search(final String query) {
         Log.d("JJJ", "Search " + query);
         this.query = query;
-        results = 0;
-        showSearchResults(null);
 
-        if ((query == null) || (query.length() == 0)) {
-            return; // Return, the search API does not like empty queries
+        boolean isQueryInvalid = (query == null) || (query.length() == 0); // The search API does not like empty queries
+        if (isQueryInvalid) {
+            state = State.READY;
+            showSearchResults(null);
+        } else {
+            state = State.BUSY;
+
+            RestClient.getApi().search(query, "program", 50, 0).enqueue(new Callback<Search>() {
+                @Override
+                public void onResponse(Response<Search> response) {
+                    if (isQueryStillRelevant(query)) {
+                        state = State.READY;
+                        if (listener != null) {
+                            listener.onError(null);
+                        }
+                        Search search = response.body();
+                        showSearchResults(search.getResults());
+                    }
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    if (isQueryStillRelevant(query)) {
+                        state = State.READY;
+                        if (listener != null) {
+                            listener.onError(t.getLocalizedMessage());
+                        }
+                        showSearchResults(null);
+                        Log.d("JJJ", "fail " + t.getMessage());
+                        t.printStackTrace();
+                    }
+                }
+            });
         }
 
-        RestClient.getApi().search(query, "program", 50, 0).enqueue(new Callback<Search>() {
-            @Override
-            public void onResponse(Response<Search> response) {
-                if (isQueryStillRelevant(query)) {
-                    if (listener != null) {
-                        listener.onError(null);
-                    }
-                    Search search = response.body();
-                    showSearchResults(search.getResults());
-                }
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                if (isQueryStillRelevant(query)) {
-                    if (listener != null) {
-                        listener.onError(t.getLocalizedMessage());
-                    }
-                    Log.d("JJJ", "fail " + t.getMessage());
-                    t.printStackTrace();
-                }
-            }
-        });
+        updateStatus();
     }
 
     private boolean isQueryStillRelevant(String query) {
@@ -152,7 +146,7 @@ public class ProgramSearchFragment extends PageFragment {
         content.removeAllViews();
 
         if (results == null) {
-            this.results = 0;
+            resultCount = 0;
         } else {
             for (Result r : results) {
                 boolean isProgram = r.getType().equalsIgnoreCase("program");
@@ -178,10 +172,58 @@ public class ProgramSearchFragment extends PageFragment {
                     }
                 }
             }
-            this.results = results.size();
+            resultCount = results.size();
         }
 
         updateStatus();
+    }
+
+    private void updateStatus() {
+        View v = getView();
+        if (v == null) {
+            return;
+        }
+
+//        TextView statusText = (TextView) v.findViewById(R.id.status_text);
+//        if (resultCount > 0) {
+//            statusText.setVisibility(View.GONE);
+//            getMainActivity().setKeyboardVisible(false); // Hide keyboard to show resultCount
+//        } else {
+//            statusText.setVisibility(View.VISIBLE);
+//            if ((query != null) && (query.length() > 0)) {
+//                statusText.setText(R.string.search_no_results);
+//            } else {
+//                statusText.setText(R.string.search_instructions);
+//            }
+//        }
+        TextView statusText = (TextView) v.findViewById(R.id.status_text);
+        boolean isShowingResults = (resultCount > 0);
+        switch (state) {
+
+            case READY:
+                if (isShowingResults) {
+                    statusText.setVisibility(View.GONE);
+                    getMainActivity().setKeyboardVisible(false); // Hide keyboard to show search results
+                } else {
+                    statusText.setVisibility(View.VISIBLE);
+                    boolean isSearchFinished = (query != null) && (query.length() > 0);
+                    if (isSearchFinished) {
+                        statusText.setText(R.string.search_no_results);
+                    } else {
+                        statusText.setText(R.string.search_instructions);
+                    }
+                }
+                break;
+
+            case BUSY:
+                if (isShowingResults) {
+                    statusText.setVisibility(View.GONE);
+                } else {
+                    statusText.setVisibility(View.VISIBLE);
+                    statusText.setText(R.string.search_busy);
+                }
+                break;
+        }
     }
 
     @Override

@@ -25,6 +25,7 @@
     <string name="tab_news">Sidste nyt</string>
     <string name="tab_offline">Lyt offline</string>
     <string name="error_generic">Kunne ikke få forbindelse, beklager.</string>
+    <string name="loading">Indlæser...</string>
 
     <!-- Live radio -->
     <string name="live_header">Radio24syv Live</string>
@@ -50,6 +51,7 @@
     <string name="search_hint">Indtast søgning</string>
     <string name="search_instructions">Søg efter program eller vært</string>
     <string name="search_no_results">Din søgning gav intet resultat</string>
+    <string name="search_busy">Søger...</string>
 
     <!-- News -->
     <string name="news_header">Sidste nyt</string>
