@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.CheckBox;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -88,7 +89,7 @@ public class ProgramScheduleButtonView extends LinearLayout {
             }
         });
 
-        View notificationButton = findViewById(R.id.notification_button);
+        CheckBox notificationButton = (CheckBox) findViewById(R.id.notification_button);
         if (broadcast.isPlayingNow()) {
             notificationButton.setVisibility(View.INVISIBLE); // Invisible will not render the graphics but still take up layout space
         } else {
@@ -97,7 +98,7 @@ public class ProgramScheduleButtonView extends LinearLayout {
                 @Override
                 public void onClick(View v) {
                     if (listener != null) {
-                        listener.OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView.this, v);
+                        listener.OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView.this, (CheckBox) v);
                     }
                 }
             });
@@ -114,6 +115,6 @@ public class ProgramScheduleButtonView extends LinearLayout {
 
     public interface OnProgramScheduleButtonViewListener {
         void OnProgramScheduleButtonClicked(ProgramScheduleButtonView view);
-        void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view, View clickedView);
+        void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view, CheckBox clickedView);
     }
 }

@@ -12,11 +12,9 @@ import android.view.LayoutInflater;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.ViewGroup.LayoutParams;
 import android.view.WindowManager;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
-import android.view.animation.Interpolator;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
 import android.widget.TextView;
@@ -38,7 +36,7 @@ public class Tooltip {
     protected View mView;
     protected Drawable mBackgroundDrawable = null;
     protected ShowListener showListener;
-    private boolean isDimissed = false;
+    private boolean isDismissed = false;
 
     public Tooltip(Context context, String text, int viewResource) {
         mContext = context;
@@ -163,16 +161,19 @@ public class Tooltip {
     }
 
     public void dismiss() {
-        if (isDimissed) {
+        if (isDismissed) {
             return; // Return, has already been dismissed but is waiting for disappear animation to end
         }
-        isDimissed = true;
+        isDismissed = true;
 
         Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.tooltip_disappear);
 
         // Waiting for the animation to end must be done like this. Android's AnimationListener.OnAnimationEnded() is completely unreliable.
         new Handler().postDelayed(new Runnable() {
             public void run() {
+                if (mWindow == null) {
+                    return; // Return, the app has been quit
+                }
                 mWindow.dismiss();
                 if (showListener != null) {
                     showListener.onDismiss();

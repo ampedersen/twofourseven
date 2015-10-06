@@ -265,7 +265,7 @@ public class RadioPlayerService extends Service implements
                     .setShowWhen(false) // No timestamp (Android 5)
                     .setWhen(0) // No timestamp (Android 4)
                     .setVisibility(Notification.VISIBILITY_PUBLIC) // Show everywhere
-                    .setPriority(Notification.PRIORITY_MAX) // Show at top in list
+                    .setPriority(Notification.PRIORITY_MAX) // Show in top of list
                     .setContentIntent(intent)
                     .build();
 

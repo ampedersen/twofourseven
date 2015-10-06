@@ -1,9 +1,13 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
+import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.SystemClock;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -12,11 +16,13 @@ import android.support.v4.view.ViewPager;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.CheckBox;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.api.model.RelatedProgram;
 import com.molamil.radio24syv.player.RadioPlayer;
+import com.molamil.radio24syv.receiver.AlarmNotificationReceiver;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
@@ -53,7 +59,7 @@ public class MainActivity extends FragmentActivity implements
         ProgramSearchFragment.OnFragmentInteractionListener,
         ProgramScheduleButtonView.OnProgramScheduleButtonViewListener {
 
-    private static final int NOTIFICATION_ALARM_MINUTES = 5; // How many minutes before program start the notification should be shown
+    public static final int NOTIFICATION_ALARM_MINUTES = 5; // How many minutes before program start the notification should be shown
     private static final int NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS = 3000; // How many milliseconds the tooltip should be visible when setting an alarm
 
     RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
@@ -284,29 +290,76 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view, View clickedView) {
+    public void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view, CheckBox clickedView) {
         String programSlug = view.getBroadcast().getProgramSlug(); // ACHTUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
+        ProgramInfo program = Storage.get().getProgram(programSlug); // TODO download program if not in storage
 
-        // TODO local notifications for scheduled programs
-        Log.d("JJJ", "TODO program notifications");
-        String message = getResources().getString(R.string.schedule_notification);
-        try {
-            message = String.format(message, NOTIFICATION_ALARM_MINUTES);
-        } catch (IllegalFormatException e){
-            Log.d("JJJ", "Unable to replace {0} with the number of minutes till program notification probably because the resource string does not contain any {0} to replace: " + message);
-        }
+        boolean isEnabled = clickedView.isChecked();
+        if (isEnabled) {
+            if (addAlarmNotification(program)) {
+                String message = getResources().getString(R.string.schedule_notification_tooltip);
+                try {
+                    message = String.format(message, NOTIFICATION_ALARM_MINUTES);
+                } catch (IllegalFormatException e) {
+                    Log.d("JJJ", "Unable to show number of minutes in alarm notification tooltip, probably because the resource string is missing formatting: " + message);
+                }
 
-        final Tooltip tooltip = new Tooltip(MainActivity.this, message);
-        tooltip.show(clickedView);
+                final Tooltip tooltip = new Tooltip(MainActivity.this, message);
+                tooltip.show(clickedView);
 
-        new android.os.Handler().postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                tooltip.dismiss();
+                // Delay hide tooltip
+                new android.os.Handler().postDelayed(new Runnable() {
+                    @Override
+                    public void run() {
+                        tooltip.dismiss();
+                    }
+                }, NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS);
+            } else {
+                clickedView.setChecked(false); // Alarm is not set
             }
-        }, NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS);
+        } else {
+            if (removeAlarmNotification(program)) {
+                // Success
+            } else {
+                clickedView.setChecked(false); // Alarm is still set
+            }
+        }
     }
 
+    public boolean addAlarmNotification(ProgramInfo program) {
+        PendingIntent alarmIntent = getAlarmNotificationIntent(program);
+        if (alarmIntent == null) {
+            return false;
+        }
+        Log.d("JJJ", "Adding alarm notification in " + NOTIFICATION_ALARM_MINUTES + " minutes for " + program.getName());
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        //long delayMilliseconds = 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
+        long delayMilliseconds = 1000 * 5; //TESTING
+        manager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + delayMilliseconds, alarmIntent);
+        return true;
+    }
+
+    public boolean removeAlarmNotification(ProgramInfo program) {
+        PendingIntent alarmIntent = getAlarmNotificationIntent(program);
+        if (alarmIntent == null) {
+            return false;
+        }
+        Log.d("JJJ", "Removing alarm notification for " + program.getName());
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        manager.cancel(alarmIntent);
+        return true;
+    }
+
+    private PendingIntent getAlarmNotificationIntent(ProgramInfo program) {
+        if (program.getProgramId() == Storage.PROGRAM_ID_UNKNOWN) {
+            Log.d("JJJ", "Unable to add/remove alarm for a program with programId unknown - ignoring " + program.getName());
+            return null;
+        }
+        Intent intent = new Intent("PROGRAM_ALARM");
+        intent.putExtra(AlarmNotificationReceiver.EXTRA_PROGRAM_NAME, program.getName());
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, program.getProgramId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return alarmIntent;
+    }
 
     @Override
     public void onPlayerSizeChanged(PlayerFragment.PlayerSize newSize, PlayerFragment.PlayerSize oldSize) {
@@ -380,12 +433,6 @@ public class MainActivity extends FragmentActivity implements
 
         mainFragment.setTabSize(MainFragment.TabSize.NORMAL); // Normal tab size
         mainFragment.setError(null); // Clear error message
-
-        // Show/hide keyboard
-//        InputMethodManager imm = (InputMethodManager) getSystemService(Context.INPUT_METHOD_SERVICE);
-//        if (imm != null){
-//            imm.toggleSoftInput(0, InputMethodManager.HIDE_IMPLICIT_ONLY);
-//        }
     }
 
     // Hockeyapp

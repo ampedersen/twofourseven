@@ -44,6 +44,12 @@
             android:exported="false" >
         </service>
 
+        <receiver android:name=".receiver.AlarmNotificationReceiver">
+            <intent-filter>
+                <action android:name="PROGRAM_ALARM" />
+            </intent-filter>
+        </receiver>
+
         <receiver
             android:name=".receiver.AudioNoisyReceiver"
             android:enabled="true"
