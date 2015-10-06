@@ -23,6 +23,7 @@ public class Storage {
     public final static String COLOR_UNKNOWN = "";
     public final static String TOPIC_ID_UNKNOWN = "";
     public final static int PROGRAM_ID_UNKNOWN = -1;
+    public final static int ALARM_ID_UNKNOWN = -1;
 
     private StorageDatabase database;
     private HashMap<String, TopicInfo> cachedTopicById = new HashMap<>();
@@ -157,6 +158,19 @@ public class Storage {
         return database.getRelatedPrograms(programId, limit);
     }
 
+    public int addAlarm(int programId, String programTime) {
+        return database.addAlarm(programId, programTime);
+    }
+
+    public int getAlarmId(int programId, String programTime) {
+        return database.getAlarmId(programId, programTime);
+    }
+
+    public void removeAlarm(int alarmId) {
+        database.removeAlarm(alarmId);
+    }
+
+
     public void deleteAll(Context context) {
         for (PodcastInfo podcast : database.getPodcasts()) {
             Log.d("JJJ", "Deleting " + podcast.getPodcastId() + " " + podcast.getTitle());
@@ -194,5 +208,4 @@ public class Storage {
             }
         });
     }
-
 }

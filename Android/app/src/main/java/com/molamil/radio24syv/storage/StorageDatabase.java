@@ -22,8 +22,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static final String TABLE_LIBRARY = "library";
     private static final String TABLE_PROGRAM = "program";
     private static final String TABLE_PODCAST = "podcast";
-    private static final String TABLE_PICTURE = "picture";
-    private static final String TABLE_CATEGORY = "category";
+    private static final String TABLE_ALARM = "alarm";
     private static final String TABLE_TOPIC = "topic";
     private static final String TABLE_PLAYER_HISTORY = "player_history";
     private static final String TABLE_RELATED_PROGRAM = "related_program";
@@ -42,30 +41,57 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static final String KEY_COLOR = "color";
     private static final String KEY_PROGRAM_ID_RELATED = "program_id_related";
     private static final String KEY_PROGRAM_SLUG = "program_slug";
+    private static final String KEY_ALARM_ID = "alarm_id";
 
-    private static final String SQL_CREATE_TABLE_LIBRAY = "CREATE TABLE " + TABLE_LIBRARY + "(" + KEY_PODCAST_ID + " INTEGER PRIMARY KEY, "
-            + KEY_DOWNLOAD_ID + " BIGINT" + ")"; // TODO index on download_id
+    private static final String SQL_CREATE_TABLE_LIBRAY = "CREATE TABLE " + TABLE_LIBRARY + "("
+            + KEY_PODCAST_ID + " INTEGER PRIMARY KEY, "
+            + KEY_DOWNLOAD_ID + " BIGINT" // TODO index on download_id
+            + ")";
 
-    private static final String SQL_CREATE_TABLE_PROGRAM = "CREATE TABLE " + TABLE_PROGRAM + "(" + KEY_PROGRAM_ID + " INTEGER PRIMARY KEY, "
-            + KEY_PROGRAM_SLUG + " TEXT, " + KEY_NAME + " TEXT, " + KEY_TOPIC_ID + " TEXT, " + KEY_DESCRIPTION + " TEXT, " + KEY_IMAGE_URL + " TEXT, " + KEY_ACTIVE + " TEXT" + ")"; // TODO index on program_slug
+    private static final String SQL_CREATE_TABLE_PROGRAM = "CREATE TABLE " + TABLE_PROGRAM + "("
+            + KEY_PROGRAM_ID + " INTEGER PRIMARY KEY, "
+            + KEY_PROGRAM_SLUG + " TEXT, " // TODO index on program_slug
+            + KEY_NAME + " TEXT, "
+            + KEY_TOPIC_ID + " TEXT, "
+            + KEY_DESCRIPTION + " TEXT, "
+            + KEY_IMAGE_URL + " TEXT, "
+            + KEY_ACTIVE + " TEXT"
+            + ")";
 
-    private static final String SQL_CREATE_TABLE_PODCAST = "CREATE TABLE " + TABLE_PODCAST + "(" + KEY_PODCAST_ID + " INTEGER PRIMARY KEY, "
+    private static final String SQL_CREATE_TABLE_PODCAST = "CREATE TABLE " + TABLE_PODCAST + "("
+            + KEY_PODCAST_ID + " INTEGER PRIMARY KEY, "
             + KEY_PROGRAM_ID + " INTEGER, " // TODO index on program_id
-            + KEY_TITLE + " TEXT, " + KEY_DESCRIPTION + " TEXT, " + KEY_AUDIO_URL + " TEXT, " + KEY_DATE + " TEXT" + ")"; // "DATE" type is not supported by Cursor so have to use "TEXT" for KEY_DATE, yay
+            + KEY_TITLE + " TEXT, "
+            + KEY_DESCRIPTION + " TEXT, "
+            + KEY_AUDIO_URL + " TEXT, "
+            + KEY_DATE + " TEXT" // "DATE" type is not supported by Cursor so have to use "TEXT" for KEY_DATE, yay
+            + ")";
 
-    private static final String SQL_CREATE_TABLE_TOPIC = "CREATE TABLE " + TABLE_TOPIC + "(" + KEY_TOPIC_ID + " TEXT PRIMARY KEY, "
-            + KEY_COLOR + " TEXT" + ")";
+    private static final String SQL_CREATE_TABLE_TOPIC = "CREATE TABLE " + TABLE_TOPIC + "("
+            + KEY_TOPIC_ID + " TEXT PRIMARY KEY, "
+            + KEY_COLOR + " TEXT"
+            + ")";
 
-    private static final String SQL_CREATE_TABLE_PLAYER_HISTORY = "CREATE TABLE " + TABLE_PLAYER_HISTORY + "(" + KEY_DATE + " TEXT, "
-            + KEY_PROGRAM_ID + " INTEGER" + ")"; // TODO index on date
+    private static final String SQL_CREATE_TABLE_PLAYER_HISTORY = "CREATE TABLE " + TABLE_PLAYER_HISTORY + "("
+            + KEY_DATE + " TEXT, " // TODO index on date
+            + KEY_PROGRAM_ID + " INTEGER"
+            + ")";
 
-    private static final String SQL_CREATE_TABLE_RELATED_PROGRAM = "CREATE TABLE " + TABLE_RELATED_PROGRAM + "(" + KEY_PROGRAM_ID + " INTEGER, "
-            + KEY_PROGRAM_ID_RELATED + " INTEGER" + ")"; // TODO index on program_id
+    private static final String SQL_CREATE_TABLE_RELATED_PROGRAM = "CREATE TABLE " + TABLE_RELATED_PROGRAM + "("
+            + KEY_PROGRAM_ID + " INTEGER, " // TODO index on program_id
+            + KEY_PROGRAM_ID_RELATED + " INTEGER"
+            + ")";
+
+    private static final String SQL_CREATE_TABLE_ALARM = "CREATE TABLE " + TABLE_ALARM + "("
+            + KEY_ALARM_ID + " INTEGER PRIMARY KEY, "
+            + KEY_DATE + " TEXT, " // TODO index on date
+            + KEY_PROGRAM_ID + " INTEGER"
+            + ")";
 
     private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 2;
+    private static final int DATABASE_VERSION = 3;
     private static final String DATABASE_NAME = "Storage.db";
 
     public StorageDatabase(Context context) {
@@ -81,11 +107,13 @@ public class StorageDatabase extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Upgrade existing table to new format if table version is upgraded in a later app version.
         // For now, discard the data and start over.
+        Log.d("JJJ", "Upgrading database to version " + newVersion + " (was version " + oldVersion + ")");
         dropTables(db);
         createTables(db);
     }
 
     private void createTables(SQLiteDatabase db) {
+        Log.d("JJJ", "Creating all database tables");
         db.beginTransaction();
         try {
             execSQL(db, SQL_CREATE_TABLE_LIBRAY);
@@ -94,6 +122,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
             execSQL(db, SQL_CREATE_TABLE_TOPIC);
             execSQL(db, SQL_CREATE_TABLE_PLAYER_HISTORY);
             execSQL(db, SQL_CREATE_TABLE_RELATED_PROGRAM);
+            execSQL(db, SQL_CREATE_TABLE_ALARM);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -101,6 +130,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     }
 
     private void dropTables(SQLiteDatabase db) {
+        Log.d("JJJ", "Dropping all database tables");
         db.beginTransaction();
         try {
             execSQL(db, SQL_DROP_TABLE + TABLE_LIBRARY);
@@ -109,6 +139,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
             execSQL(db, SQL_DROP_TABLE + TABLE_TOPIC);
             execSQL(db, SQL_DROP_TABLE + TABLE_PLAYER_HISTORY);
             execSQL(db, SQL_DROP_TABLE + TABLE_RELATED_PROGRAM);
+            execSQL(db, SQL_DROP_TABLE + TABLE_ALARM);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -509,6 +540,47 @@ public class StorageDatabase extends SQLiteOpenHelper {
         return getProgramsInQuery("SELECT DISTINCT " + KEY_PROGRAM_ID_RELATED + " FROM " + TABLE_RELATED_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " LIMIT " + limit);
     }
 
+    public int addAlarm(int programId, String programTime) {
+        int alarmId = Storage.ALARM_ID_UNKNOWN;
+
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            // First write the new entry
+            ContentValues values = new ContentValues();
+            values.put(KEY_PROGRAM_ID, programId);
+            values.put(KEY_DATE, programTime);
+            db.insert(TABLE_ALARM, null, values); // Alarm ID is automatically set by the database because it is the primary key. Same as if the column was AUTOINCREMENT.
+            // Then read the alarm ID it got assigned
+            alarmId = getAlarmId(db, programId, programTime);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return alarmId;
+    }
+
+    public int getAlarmId(int programId, String programTime) {
+        return getAlarmId(getReadableDatabase(), programId, programTime);
+    }
+
+    private int getAlarmId(SQLiteDatabase db, int programId, String programTime) {
+        String query = "SELECT " + KEY_ALARM_ID + " FROM " + TABLE_ALARM + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " AND " + KEY_DATE + " = '" + programTime + " LIMIT 1";
+        Log.d("JJJ", query);
+        int alarmId = Storage.ALARM_ID_UNKNOWN;
+        Cursor c = db.rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            alarmId = c.getInt(c.getColumnIndex(KEY_ALARM_ID));
+            c.close();
+        }
+        return alarmId;
+    }
+
+    public void removeAlarm(int alarmId) {
+        deleteRow(TABLE_ALARM, KEY_ALARM_ID + " = " + alarmId);
+    }
+
     private List<ProgramInfo> getProgramsInQuery(String queryWithProgramIds) {
         String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " IN (" + queryWithProgramIds + ")";
         Log.d("JJJ", query);
@@ -594,4 +666,5 @@ public class StorageDatabase extends SQLiteOpenHelper {
         topic.setColor(c.getString(c.getColumnIndex(KEY_COLOR)));
         return topic;
     }
+
 }

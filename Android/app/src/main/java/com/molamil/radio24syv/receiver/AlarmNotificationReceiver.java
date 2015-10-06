@@ -1,8 +1,6 @@
 package com.molamil.radio24syv.receiver;
 
-import android.app.Application;
 import android.app.Notification;
-import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -30,6 +28,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent i) {
         String programName = i.getStringExtra(EXTRA_PROGRAM_NAME);
+        int alarmMinutes = MainActivity.NOTIFICATION_ALARM_MINUTES;
         Log.d("JJJ", "Alarm notification received for " + programName);
 
         // Start MainActivity when notification is touched
@@ -58,9 +57,9 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
 
         Resources r = context.getResources();
         String title = r.getString(R.string.app_name);
-        String message = r.getString(R.string.schedule_notification_message);
+        String message = r.getString(R.string.program_alarm_notification);
         try {
-            message = String.format(message, programName, MainActivity.NOTIFICATION_ALARM_MINUTES);
+            message = String.format(message, programName, alarmMinutes);
         } catch (IllegalFormatException e) {
             Log.d("JJJ", "Unable to show number of minutes in alarm notification tooltip, probably because the resource string is missing formatting: " + message);
         }
@@ -77,7 +76,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 .setTicker(message)
                 .setAutoCancel(true)
                 .setCategory(Notification.CATEGORY_ALARM)
-                .setDefaults(Notification.DEFAULT_LIGHTS| Notification.DEFAULT_SOUND)
+                .setDefaults(Notification.DEFAULT_LIGHTS | Notification.DEFAULT_SOUND)
                 .build();
 
         NotificationManagerCompat.from(context).notify(0, notification);

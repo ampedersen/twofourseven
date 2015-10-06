@@ -60,6 +60,7 @@ public class MainActivity extends FragmentActivity implements
         ProgramScheduleButtonView.OnProgramScheduleButtonViewListener {
 
     public static final int NOTIFICATION_ALARM_MINUTES = 5; // How many minutes before program start the notification should be shown
+    private static final int NOTIFICATION_ALARM_MILLISECONDS = 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
     private static final int NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS = 3000; // How many milliseconds the tooltip should be visible when setting an alarm
 
     RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
@@ -291,73 +292,94 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view, CheckBox clickedView) {
+        String programTime = view.getBroadcast().getTimeBegin();
         String programSlug = view.getBroadcast().getProgramSlug(); // ACHTUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
         ProgramInfo program = Storage.get().getProgram(programSlug); // TODO download program if not in storage
-
+        if ((program == null) || (program.getProgramId() == Storage.PROGRAM_ID_UNKNOWN)) {
+            Log.d("JJJ", "Unable to add/remove alarm for a program with programId unknown - ignoring " + program.getName());
+            return;
+        }
+"test om skidtet virker"
         boolean isEnabled = clickedView.isChecked();
         if (isEnabled) {
-            if (addAlarmNotification(program)) {
-                String message = getResources().getString(R.string.schedule_notification_tooltip);
-                try {
-                    message = String.format(message, NOTIFICATION_ALARM_MINUTES);
-                } catch (IllegalFormatException e) {
-                    Log.d("JJJ", "Unable to show number of minutes in alarm notification tooltip, probably because the resource string is missing formatting: " + message);
-                }
-
-                final Tooltip tooltip = new Tooltip(MainActivity.this, message);
-                tooltip.show(clickedView);
-
-                // Delay hide tooltip
-                new android.os.Handler().postDelayed(new Runnable() {
-                    @Override
-                    public void run() {
-                        tooltip.dismiss();
+            String message;
+            long programTimeMilliseconds = DateTime.parse(programTime).getMillis();
+            long systemTime = SystemClock.elapsedRealtime();
+            long waitingTime = programTimeMilliseconds - systemTime;
+            if (waitingTime < 0) {
+                // Already started
+                message = getResources().getString(R.string.program_already_started);
+            } else if (waitingTime < NOTIFICATION_ALARM_MILLISECONDS) {
+                // Less than 5 minutes to start
+                message = getResources().getString(R.string.program_starts_too_soon);
+            } else {
+                // More than 5 minutes to start
+                int alarmId = Storage.get().addAlarm(program.getProgramId(), programTime); // Store alarm in database and get unique alarm ID that can be used to distinguish alarm notifications
+                long alarmTime = programTimeMilliseconds - NOTIFICATION_ALARM_MILLISECONDS;
+                if (addAlarmNotification(alarmId, program.getName(), programTime)) {
+                    // Alarm added
+                    message = getResources().getString(R.string.program_alarm_added);
+                    try {
+                        message = String.format(message, NOTIFICATION_ALARM_MINUTES);
+                    } catch (IllegalFormatException e) {
+                        Log.d("JJJ", "Unable to show number of minutes in alarm notification tooltip, probably because the resource string is missing formatting: " + message);
                     }
-                }, NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS);
-            } else {
-                clickedView.setChecked(false); // Alarm is not set
+
+                } else {
+                    // Alarm could not be added
+                    clickedView.setChecked(false);
+                    message = getResources().getString(R.string.program_alarm_failed);
+                }
             }
+
+            // Show message in tooltip
+            final Tooltip tooltip = new Tooltip(MainActivity.this, message);
+            tooltip.show(clickedView);
+            new android.os.Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    tooltip.dismiss(); // Hide delayed
+                }
+            }, NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS);
         } else {
-            if (removeAlarmNotification(program)) {
+            int alarmId = Storage.get().getAlarmId(program.getProgramId(), programTime);
+            if (removeAlarmNotification(alarmId)) {
                 // Success
+                Storage.get().removeAlarm(alarmId);
             } else {
-                clickedView.setChecked(false); // Alarm is still set
+                clickedView.setChecked(true); // Alarm is still set (maybe?)
             }
         }
     }
 
-    public boolean addAlarmNotification(ProgramInfo program) {
-        PendingIntent alarmIntent = getAlarmNotificationIntent(program);
-        if (alarmIntent == null) {
+    private boolean addAlarmNotification(int alarmId, String programName, String programTime) {
+        PendingIntent alarmIntent = getAlarmNotificationIntent(alarmId, programName);
+        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
+        DateTime alarmTime = DateTime.parse(programName);
+        Log.d("JJJ", "Adding alarm notification at " + RestClient.getLocalTime(programTime) + " for alarmId " + alarmId + " " + programName);
+        long delayMilliseconds = alarmTime.getMillis() - 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
+        //long delayMilliseconds = 1000 * 5; //TESTING
+        boolean isAlarmInThePast = (delayMilliseconds < 0);
+        if (isAlarmInThePast) {
+            Log.d("JJJ", "Unable to set alarm because it is in the past");
             return false;
         }
-        Log.d("JJJ", "Adding alarm notification in " + NOTIFICATION_ALARM_MINUTES + " minutes for " + program.getName());
-        AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        //long delayMilliseconds = 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
-        long delayMilliseconds = 1000 * 5; //TESTING
         manager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + delayMilliseconds, alarmIntent);
         return true;
     }
 
-    public boolean removeAlarmNotification(ProgramInfo program) {
-        PendingIntent alarmIntent = getAlarmNotificationIntent(program);
-        if (alarmIntent == null) {
-            return false;
-        }
-        Log.d("JJJ", "Removing alarm notification for " + program.getName());
+    private boolean removeAlarmNotification(int alarmId) {
+        PendingIntent alarmIntent = getAlarmNotificationIntent(alarmId, ""); // Program name does not matter
+        Log.d("JJJ", "Removing alarm notification for alarmId " + alarmId);
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         manager.cancel(alarmIntent);
         return true;
     }
 
-    private PendingIntent getAlarmNotificationIntent(ProgramInfo program) {
-        if (program.getProgramId() == Storage.PROGRAM_ID_UNKNOWN) {
-            Log.d("JJJ", "Unable to add/remove alarm for a program with programId unknown - ignoring " + program.getName());
-            return null;
-        }
+    private PendingIntent getAlarmNotificationIntent(int alarmId, String programName) {
         Intent intent = new Intent("PROGRAM_ALARM");
-        intent.putExtra(AlarmNotificationReceiver.EXTRA_PROGRAM_NAME, program.getName());
-        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, program.getProgramId(), intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        intent.putExtra(AlarmNotificationReceiver.EXTRA_PROGRAM_NAME, programName);
+        PendingIntent alarmIntent = PendingIntent.getBroadcast(this, alarmId, intent, PendingIntent.FLAG_UPDATE_CURRENT);
         return alarmIntent;
     }
 
