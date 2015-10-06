@@ -36,6 +36,7 @@
 
     <!-- Schedule -->
     <string name="schedule_header">Sendeplan</string>
+    <string name="schedule_notification">Du vil få en besked %1$d minutter før programmet starter</string> <!-- %1$d will be replaced run-time with the number of minutes -->
 
     <!-- Programs -->
     <string name="programs_header">Programmer</string>

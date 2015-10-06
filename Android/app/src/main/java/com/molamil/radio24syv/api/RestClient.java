@@ -66,7 +66,7 @@ public class RestClient
     // The local o'clock converted from a date with time zone. Uses Joda-time library to ensure consistent time zone conversion across Android versions.
     public static String getLocalTime(String dateWithTimeZone) {
         LocalDateTime time = new DateTime(dateWithTimeZone).toLocalDateTime();
-        return time.toString("HH.mm");
+        return time.toString("HH:mm");
     }
 
     public static String getLocalDate(String dateWithTimeZone) {

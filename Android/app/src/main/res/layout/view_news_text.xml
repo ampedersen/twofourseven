@@ -9,8 +9,8 @@
     >
 
     <ImageView
-        android:layout_width="6dp"
-        android:layout_height="6dp"
+        android:layout_width="5dp"
+        android:layout_height="5dp"
         android:layout_marginTop="8sp"
         android:layout_marginBottom="8sp"
         android:layout_marginRight="12dp"

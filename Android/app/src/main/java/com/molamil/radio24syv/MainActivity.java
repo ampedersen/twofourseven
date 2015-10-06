@@ -1,11 +1,9 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
@@ -25,6 +23,7 @@ import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
 import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.ProgramScheduleButtonView;
 import com.molamil.radio24syv.view.RadioViewPager;
+import com.molamil.radio24syv.view.Tooltip;
 
 import net.hockeyapp.android.CrashManager;
 import net.hockeyapp.android.UpdateManager;
@@ -33,6 +32,7 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IllegalFormatException;
 
 import retrofit.Callback;
 import retrofit.Response;
@@ -52,6 +52,9 @@ public class MainActivity extends FragmentActivity implements
         PlayerFragment.OnFragmentInteractionListener,
         ProgramSearchFragment.OnFragmentInteractionListener,
         ProgramScheduleButtonView.OnProgramScheduleButtonViewListener {
+
+    private static final int NOTIFICATION_ALARM_MINUTES = 5; // How many minutes before program start the notification should be shown
+    private static final int NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS = 3000; // How many milliseconds the tooltip should be visible when setting an alarm
 
     RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
     SidePageTransformer pageTransformer;
@@ -214,6 +217,12 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onProgramSelected(ProgramInfo program) {
+        showProgramDetails(program);
+    }
+
+    private void showProgramDetails(ProgramInfo program) {
+        mainFragment.tabHost.setCurrentTabByTag(MainFragment.TAG_TAB_PROGRAMS);
+
         ProgramsFragment f = (ProgramsFragment) mainFragment.getChildFragmentManager().findFragmentByTag(MainFragment.TAG_TAB_PROGRAMS);
         if (f == null) {
             Log.d("JJJ", "OMG no programs fragment but a program was selected in its child ProgramListFragment.?!?!! " + program.getProgramId() + " " + program.getName());
@@ -243,13 +252,59 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void OnProgramScheduleButtonClicked(ProgramScheduleButtonView view) {
-// ""ACTHUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
+        String programSlug = view.getBroadcast().getProgramSlug(); // ACHTUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
+
+        // Try to get program instantly from local storage
+        ProgramInfo program = Storage.get().getProgram(programSlug);
+
+        if (program == null) {
+            // Get program using API
+            RestClient.getApi().getProgram(programSlug).enqueue(new Callback<Program>() {
+                @Override
+                public void onResponse(Response<Program> response) {
+                    onError(null);
+                    if (response.body() == null) {
+                        return;
+                    }
+                    ProgramInfo program = new ProgramInfo(response.body());
+                    Storage.get().addProgram(program); // Add to database
+                    showProgramDetails(program);
+                }
+
+                @Override
+                public void onFailure(Throwable t) {
+                    onError(t.getLocalizedMessage());
+                    Log.d("JJJ", "fail " + t.getMessage());
+                    t.printStackTrace();
+                }
+            });
+        } else {
+            showProgramDetails(program);
+        }
     }
 
     @Override
-    public void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view) {
-// ""ACTHUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
+    public void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view, View clickedView) {
+        String programSlug = view.getBroadcast().getProgramSlug(); // ACHTUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
 
+        // TODO local notifications for scheduled programs
+        Log.d("JJJ", "TODO program notifications");
+        String message = getResources().getString(R.string.schedule_notification);
+        try {
+            message = String.format(message, NOTIFICATION_ALARM_MINUTES);
+        } catch (IllegalFormatException e){
+            Log.d("JJJ", "Unable to replace {0} with the number of minutes till program notification probably because the resource string does not contain any {0} to replace: " + message);
+        }
+
+        final Tooltip tooltip = new Tooltip(MainActivity.this, message);
+        tooltip.show(clickedView);
+
+        new android.os.Handler().postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                tooltip.dismiss();
+            }
+        }, NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS);
     }
 
 

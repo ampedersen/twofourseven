@@ -89,14 +89,19 @@ public class ProgramScheduleButtonView extends LinearLayout {
         });
 
         View notificationButton = findViewById(R.id.notification_button);
-        notificationButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                if (listener != null) {
-                    listener.OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView.this);
+        if (broadcast.isPlayingNow()) {
+            notificationButton.setVisibility(View.INVISIBLE); // Invisible will not render the graphics but still take up layout space
+        } else {
+            notificationButton.setVisibility(View.VISIBLE);
+            notificationButton.setOnClickListener(new OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    if (listener != null) {
+                        listener.OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView.this, v);
+                    }
                 }
-            }
-        });
+            });
+        }
     }
 
     public BroadcastInfo getBroadcast() {
@@ -109,6 +114,6 @@ public class ProgramScheduleButtonView extends LinearLayout {
 
     public interface OnProgramScheduleButtonViewListener {
         void OnProgramScheduleButtonClicked(ProgramScheduleButtonView view);
-        void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view);
+        void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view, View clickedView);
     }
 }

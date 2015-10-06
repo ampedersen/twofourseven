@@ -58,4 +58,14 @@
         <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/date_text_size</item>
     </style>
+
+    <style name="Tooltip" parent="android:Widget.TextView">
+        <item name="android:gravity">center</item>
+        <item name="android:minHeight">50dp</item>
+        <item name="android:minWidth">75dp</item>
+        <item name="android:maxWidth">150dp</item>
+        <item name="android:padding">6dp</item>
+        <item name="android:textColor">@color/radio_white</item>
+        <item name="android:textSize">@dimen/podcast_episode_title_text_size</item>
+    </style>
 </resources>

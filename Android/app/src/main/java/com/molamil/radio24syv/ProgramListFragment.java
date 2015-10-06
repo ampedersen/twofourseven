@@ -317,8 +317,7 @@ public class ProgramListFragment extends PageFragment {
                     }
                     ArrayList<ProgramInfo> popularPrograms = new ArrayList<ProgramInfo>(response.body().size());
                     for (Program program : response.body()) {
-                        //popularPrograms.add(new ProgramInfo(program)); // getPopularPrograms() response includes -full- program info and a long description text (unlike all other program buttons)
-                        popularPrograms.add(Storage.get().getProgram(program.getVideoProgramId()));
+                        popularPrograms.add(new ProgramInfo(program));
                     }
                     TextView t = new TextView(content.getContext());
                     t.setText(R.string.programs_popular);
