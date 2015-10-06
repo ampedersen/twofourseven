@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.text.method.ScrollingMovementMethod;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewGroup.LayoutParams;
@@ -37,6 +38,7 @@ public class Tooltip {
     protected View mView;
     protected Drawable mBackgroundDrawable = null;
     protected ShowListener showListener;
+    private boolean isDimissed = false;
 
     public Tooltip(Context context, String text, int viewResource) {
         mContext = context;
@@ -64,7 +66,7 @@ public class Tooltip {
         int[] location = new int[2];
         anchor.getLocationOnScreen(location);
         Rect anchorRect = new Rect(location[0], location[1], location[0] + anchor.getWidth(), location[1] + anchor.getHeight());
-        //mView.measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); // JJJ: This does not work
+        //mView.measure(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT); // This does not work
         int measureSpec = View.MeasureSpec.makeMeasureSpec(0 /* any */, View.MeasureSpec.UNSPECIFIED);
         mView.measure(measureSpec, measureSpec);
         int rootHeight = mView.getMeasuredHeight();
@@ -114,15 +116,10 @@ public class Tooltip {
         } else  {
             animationId = R.anim.tooltip_appear_down;
         }
+        mView.clearAnimation();
         mView.setAnimation(AnimationUtils.loadAnimation(mContext, animationId));
     }
 
-    public class ReverseInterpolator implements Interpolator {
-        @Override
-        public float getInterpolation(float paramFloat) {
-            return Math.abs(paramFloat -1f);
-        }
-    }
     protected void preShow() {
         if (mView == null) throw new IllegalStateException("view undefined");
         if (showListener != null) {
@@ -134,8 +131,16 @@ public class Tooltip {
         mWindow.setWidth(WindowManager.LayoutParams.WRAP_CONTENT);
         mWindow.setHeight(WindowManager.LayoutParams.WRAP_CONTENT);
         mWindow.setTouchable(true);
-        mWindow.setFocusable(true);
+        mWindow.setFocusable(false);
         mWindow.setOutsideTouchable(true);
+        mWindow.setTouchInterceptor(new View.OnTouchListener() {
+            @Override
+            public boolean onTouch(View v, MotionEvent event) {
+                dismiss();
+                return false; // Return false, pass on the event
+            }
+        });
+
         mWindow.setContentView(mView);
     }
 
@@ -158,9 +163,14 @@ public class Tooltip {
     }
 
     public void dismiss() {
+        if (isDimissed) {
+            return; // Return, has already been dismissed but is waiting for disappear animation to end
+        }
+        isDimissed = true;
+
         Animation animation = AnimationUtils.loadAnimation(mContext, R.anim.tooltip_disappear);
 
-        // Waiting for the animation to end must be done like this. Android's AnimationListener.OnAnimationEnded() is completely unreliable, yay.
+        // Waiting for the animation to end must be done like this. Android's AnimationListener.OnAnimationEnded() is completely unreliable.
         new Handler().postDelayed(new Runnable() {
             public void run() {
                 mWindow.dismiss();
