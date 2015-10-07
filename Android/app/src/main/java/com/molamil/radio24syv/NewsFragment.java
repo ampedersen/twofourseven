@@ -110,7 +110,7 @@ public class NewsFragment extends Fragment {
 
             // News items
             String[] newsItems = podcast.getDescription().split("\n");
-            boolean isNewsEmpty = (newsItems.length < 1); // Skip the first item which is "Nyheder fra Radio24syv"
+            boolean isNewsEmpty = (newsItems.length <= 1); // Skip the first item which is "Nyheder fra Radio24syv"
             if (!isNewsEmpty) {
                 for (int i = 1; i < newsItems.length; i++) {
                     String s = newsItems[i];
