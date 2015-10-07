@@ -84,10 +84,9 @@ public class ProgramButtonView extends LinearLayout {
         });
 
         TopicInfo topic = Storage.get().getTopic(program.getTopicId());
-        if (topic != null) {
-            ImageView image = (ImageView) findViewById(R.id.image);
-            image.setColorFilter(topic.getColorValue(), PorterDuff.Mode.MULTIPLY);
-        }
+        ProgramImageView image = (ProgramImageView) findViewById(R.id.image);
+        image.setImageUrl(program.getImageUrl());
+        image.setColor(topic.getColorValue());
 
         RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
         playButton.setProgramId(program.getProgramId());

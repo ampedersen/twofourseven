@@ -15,4 +15,9 @@
     <declare-styleable name="DateLineView">
         <attr name="whiteBackground" format="boolean" />
     </declare-styleable>
+
+    <declare-styleable name="ProgramImageView">
+        <attr name="imageUrl" format="string" />
+        <attr name="tintColor" format="color" />
+    </declare-styleable>
 </resources>

@@ -24,6 +24,7 @@ import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.api.model.RelatedProgram;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.receiver.AlarmNotificationReceiver;
+import com.molamil.radio24syv.storage.ImageLibrary;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.BroadcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
@@ -97,6 +98,7 @@ public class MainActivity extends FragmentActivity implements
         // Initialize singletons
         Storage.initialize(this);
         RestClient.initialize(getResources().getString(R.string.url_api));
+        ImageLibrary.initialize(this);
 
         // Start on "Offline" tab if started by DownloadNotificationReceiver
         Intent callingIntent = getIntent();
