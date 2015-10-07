@@ -84,14 +84,14 @@ public class StorageDatabase extends SQLiteOpenHelper {
 
     private static final String SQL_CREATE_TABLE_ALARM = "CREATE TABLE " + TABLE_ALARM + "("
             + KEY_ALARM_ID + " INTEGER PRIMARY KEY, "
-            + KEY_DATE + " TEXT, " // TODO index on date
-            + KEY_PROGRAM_ID + " INTEGER"
+            + KEY_DATE + " TEXT, "
+            + KEY_PROGRAM_SLUG + " TEXT"
             + ")";
 
     private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 3;
+    private static final int DATABASE_VERSION = 4;
     private static final String DATABASE_NAME = "Storage.db";
 
     public StorageDatabase(Context context) {
@@ -540,7 +540,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
         return getProgramsInQuery("SELECT DISTINCT " + KEY_PROGRAM_ID_RELATED + " FROM " + TABLE_RELATED_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " LIMIT " + limit);
     }
 
-    public int addAlarm(int programId, String programTime) {
+    public int addAlarm(String programSlug, String programTime) {
         int alarmId = Storage.ALARM_ID_UNKNOWN;
 
         SQLiteDatabase db = getWritableDatabase();
@@ -548,11 +548,11 @@ public class StorageDatabase extends SQLiteOpenHelper {
         try {
             // First write the new entry
             ContentValues values = new ContentValues();
-            values.put(KEY_PROGRAM_ID, programId);
+            values.put(KEY_PROGRAM_SLUG, programSlug);
             values.put(KEY_DATE, programTime);
             db.insert(TABLE_ALARM, null, values); // Alarm ID is automatically set by the database because it is the primary key. Same as if the column was AUTOINCREMENT.
             // Then read the alarm ID it got assigned
-            alarmId = getAlarmId(db, programId, programTime);
+            alarmId = getAlarmId(db, programSlug, programTime);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -561,12 +561,12 @@ public class StorageDatabase extends SQLiteOpenHelper {
         return alarmId;
     }
 
-    public int getAlarmId(int programId, String programTime) {
-        return getAlarmId(getReadableDatabase(), programId, programTime);
+    public int getAlarmId(String programSlug, String programTime) {
+        return getAlarmId(getReadableDatabase(), programSlug, programTime);
     }
 
-    private int getAlarmId(SQLiteDatabase db, int programId, String programTime) {
-        String query = "SELECT " + KEY_ALARM_ID + " FROM " + TABLE_ALARM + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " AND " + KEY_DATE + " = '" + programTime + " LIMIT 1";
+    private int getAlarmId(SQLiteDatabase db, String programSlug, String programTime) {
+        String query = "SELECT " + KEY_ALARM_ID + " FROM " + TABLE_ALARM + " WHERE " + KEY_PROGRAM_SLUG + " = '" + programSlug + "' AND " + KEY_DATE + " = '" + programTime + "' LIMIT 1";
         Log.d("JJJ", query);
         int alarmId = Storage.ALARM_ID_UNKNOWN;
         Cursor c = db.rawQuery(query, null);

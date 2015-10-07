@@ -109,6 +109,16 @@ public class ProgramScheduleButtonView extends LinearLayout {
         return broadcast;
     }
 
+    public void setNotificationEnabled(boolean enabled) {
+        CheckBox notificationButton = (CheckBox) findViewById(R.id.notification_button);
+        notificationButton.setChecked(enabled);
+    }
+
+    public boolean getNotificationEnabled() {
+        CheckBox notificationButton = (CheckBox) findViewById(R.id.notification_button);
+        return notificationButton.isChecked();
+    }
+
     public void setOnProgramScheduleButtonViewListener(OnProgramScheduleButtonViewListener listener) {
         this.listener = listener;
     }

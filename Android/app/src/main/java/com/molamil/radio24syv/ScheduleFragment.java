@@ -10,12 +10,15 @@ import android.view.ViewGroup;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Broadcast;
+import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.BroadcastInfo;
 import com.molamil.radio24syv.view.DateLineView;
 import com.molamil.radio24syv.view.ProgramScheduleButtonView;
 
 import org.joda.time.DateTime;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit.Callback;
@@ -60,9 +63,10 @@ public class ScheduleFragment extends PageFragment {
                 content.removeAllViews();
 
                 List<Broadcast> broadcasts = response.body();
+
                 DateTime previousDate = null;
-                for (Broadcast broadcast : broadcasts) {
-                    BroadcastInfo b = new BroadcastInfo(broadcast);
+                for (int i = 0; i < broadcasts.size(); i++) {
+                    BroadcastInfo b = new BroadcastInfo(broadcasts.get(i));
 
                     // Date line separator between days
                     if (previousDate == null) {
@@ -83,6 +87,9 @@ public class ScheduleFragment extends PageFragment {
                     ProgramScheduleButtonView programButton = new ProgramScheduleButtonView(v.getContext());
                     programButton.setBroadcast(b);
                     programButton.setOnProgramScheduleButtonViewListener(buttonListener);
+                    int alarmId = Storage.get().getAlarmId(b.getProgramSlug(), b.getTimeBegin()); // Check if there is an alarm for this program and time
+                    boolean isNotificationEnabled = (alarmId != Storage.ALARM_ID_UNKNOWN);
+                    programButton.setNotificationEnabled(isNotificationEnabled);
                     content.addView(programButton);
                 }
             }

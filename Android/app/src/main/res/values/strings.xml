@@ -69,8 +69,8 @@
     <string name="offline_header">Lyt offline</string>
     <string name="download_podcast">Gem til offline</string>
     <string name="remove_podcast">Fjern fra offline</string>
-    <string name="episode_count">%d episode</string> <!-- %d MUST be in text, is replaced with the number of episodes -->
-    <string name="episodes_count">%d episoder</string> <!-- %d MUST be in text, is replaced with the number of episodes -->
+    <string name="episode_count">%1$s episode</string> <!-- %1$s is replaced with the number of episodes -->
+    <string name="episodes_count">%1$s episoder</string> <!-- %1$s is replaced with the number of episodes -->
 
     <!-- URLs (no slash at the end please) -->
     <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>

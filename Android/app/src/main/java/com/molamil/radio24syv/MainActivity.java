@@ -19,11 +19,13 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 
 import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.api.model.Broadcast;
 import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.api.model.RelatedProgram;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.receiver.AlarmNotificationReceiver;
 import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.BroadcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
 import com.molamil.radio24syv.storage.model.TopicInfo;
@@ -61,7 +63,7 @@ public class MainActivity extends FragmentActivity implements
 
     public static final int NOTIFICATION_ALARM_MINUTES = 5; // How many minutes before program start the notification should be shown
     private static final int NOTIFICATION_ALARM_MILLISECONDS = 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
-    private static final int NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS = 3000; // How many milliseconds the tooltip should be visible when setting an alarm
+    private static final int NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS = 4000; // How many milliseconds the tooltip should be visible when setting an alarm
 
     RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
     SidePageTransformer pageTransformer;
@@ -72,7 +74,6 @@ public class MainActivity extends FragmentActivity implements
 
     private int selectedProgramCategory;
     private TopicInfo selectedProgramTopic;
-    private HashMap<Integer, Boolean> isKeyboardNeededByPagePosition = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -292,15 +293,12 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view, CheckBox clickedView) {
-        String programTime = view.getBroadcast().getTimeBegin();
-        String programSlug = view.getBroadcast().getProgramSlug(); // ACHTUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
-        ProgramInfo program = Storage.get().getProgram(programSlug); // TODO download program if not in storage
-        if ((program == null) || (program.getProgramId() == Storage.PROGRAM_ID_UNKNOWN)) {
-            Log.d("JJJ", "Unable to add/remove alarm for a program with programId unknown - ignoring " + program.getName());
-            return;
-        }
-"test om skidtet virker"
-        boolean isEnabled = clickedView.isChecked();
+        BroadcastInfo broadcast = view.getBroadcast();
+        String programSlug = broadcast.getProgramSlug(); // ACHTUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
+        String programTime = broadcast.getTimeBegin();
+        String programName = broadcast.getName();
+
+        boolean isEnabled = view.getNotificationEnabled();
         if (isEnabled) {
             String message;
             long programTimeMilliseconds = DateTime.parse(programTime).getMillis();
@@ -314,20 +312,20 @@ public class MainActivity extends FragmentActivity implements
                 message = getResources().getString(R.string.program_starts_too_soon);
             } else {
                 // More than 5 minutes to start
-                int alarmId = Storage.get().addAlarm(program.getProgramId(), programTime); // Store alarm in database and get unique alarm ID that can be used to distinguish alarm notifications
-                long alarmTime = programTimeMilliseconds - NOTIFICATION_ALARM_MILLISECONDS;
-                if (addAlarmNotification(alarmId, program.getName(), programTime)) {
+                int alarmId = Storage.get().addAlarm(programSlug, programTime); // Store alarm in database and get unique alarm ID that can be used to distinguish alarm notifications
+                if (addAlarmNotification(alarmId, programName, programTime)) {
                     // Alarm added
                     message = getResources().getString(R.string.program_alarm_added);
                     try {
                         message = String.format(message, NOTIFICATION_ALARM_MINUTES);
                     } catch (IllegalFormatException e) {
-                        Log.d("JJJ", "Unable to show number of minutes in alarm notification tooltip, probably because the resource string is missing formatting: " + message);
+                        Log.d("JJJ", "Unable to show number of minutes in alarm notification tooltip, make sure the string has the formatting needed: " + message);
                     }
 
                 } else {
                     // Alarm could not be added
-                    clickedView.setChecked(false);
+                    Storage.get().removeAlarm(alarmId);
+                    view.setNotificationEnabled(false);
                     message = getResources().getString(R.string.program_alarm_failed);
                 }
             }
@@ -342,12 +340,10 @@ public class MainActivity extends FragmentActivity implements
                 }
             }, NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS);
         } else {
-            int alarmId = Storage.get().getAlarmId(program.getProgramId(), programTime);
-            if (removeAlarmNotification(alarmId)) {
+            int alarmId = Storage.get().getAlarmId(programSlug, programTime);
+            if ((alarmId != Storage.ALARM_ID_UNKNOWN) && removeAlarmNotification(alarmId)) {
                 // Success
                 Storage.get().removeAlarm(alarmId);
-            } else {
-                clickedView.setChecked(true); // Alarm is still set (maybe?)
             }
         }
     }
@@ -355,7 +351,7 @@ public class MainActivity extends FragmentActivity implements
     private boolean addAlarmNotification(int alarmId, String programName, String programTime) {
         PendingIntent alarmIntent = getAlarmNotificationIntent(alarmId, programName);
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
-        DateTime alarmTime = DateTime.parse(programName);
+        DateTime alarmTime = DateTime.parse(programTime);
         Log.d("JJJ", "Adding alarm notification at " + RestClient.getLocalTime(programTime) + " for alarmId " + alarmId + " " + programName);
         long delayMilliseconds = alarmTime.getMillis() - 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
         //long delayMilliseconds = 1000 * 5; //TESTING
@@ -405,12 +401,6 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    private void setIsKeyboardNeededByPagePosition(boolean page0, boolean page1, boolean page2) {
-        isKeyboardNeededByPagePosition.put(0, page0);
-        isKeyboardNeededByPagePosition.put(1, page1);
-        isKeyboardNeededByPagePosition.put(2, page2);
-    }
-
     @Override
     public void onMainTabChanged(String tabTag) {
         //Log.d("JJJ", "onMainTabChanged "+ tabTag);
@@ -425,23 +415,18 @@ public class MainActivity extends FragmentActivity implements
             case MainFragment.TAG_TAB_LIVE:
                 pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 0;
-                setIsKeyboardNeededByPagePosition(false, false, false);
                 break;
             case MainFragment.TAG_TAB_PROGRAMS:
                 pager.setAdapter(new ProgramsTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 1;
-                setSelectedProgramCategory(selectedProgramCategory, selectedProgramTopic);
-                setIsKeyboardNeededByPagePosition(false, false, true);
                 break;
             case MainFragment.TAG_TAB_NEWS:
                 pager.setAdapter(new NewsTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 0;
-                setIsKeyboardNeededByPagePosition(false, false, false);
                 break;
             case MainFragment.TAG_TAB_OFFLINE:
                 pager.setAdapter(new OfflineTabPagerAdapter(getSupportFragmentManager()));
                 mainPagePosition = 0;
-                setIsKeyboardNeededByPagePosition(false, false, false);
                 break;
         }
 
@@ -470,21 +455,6 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
-    /**
-     * Hides the on-screen keyboard. NOTE: Only works when called from an Activity. Does not work when called from a Fragment (this won't work because you'll be passing a reference to the Fragment's host Activity, which will have no focused control while the Fragment is shown)
-     * http://stackoverflow.com/questions/1109022/close-hide-the-android-soft-keyboard
-     */
-    public static void hideKeyboard(Activity activity) {
-        InputMethodManager inputMethodManager = (InputMethodManager) activity.getSystemService(Activity.INPUT_METHOD_SERVICE);
-        //Find the currently focused view, so we can grab the correct window token from it.
-        View view = activity.getCurrentFocus();
-        //If no view currently has focus, create a new one, just so we can grab a window token from it
-        if (view == null) {
-            view = new View(activity);
-        }
-        inputMethodManager.hideSoftInputFromWindow(view.getWindowToken(), 0);
-    }
-
     @Override
     public RadioPlayer getRadioPlayer() {
         return radioPlayer;
@@ -511,7 +481,6 @@ public class MainActivity extends FragmentActivity implements
                 MainActivity.this.onError(null);
                 Program program = response.body();
                 if ((program != null) && (program.getRelatedPrograms() != null)) {
-                    // TODO use this code when API returns something real instead of NULL for getVideoProgramId()
                     ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
                     for (RelatedProgram p : program.getRelatedPrograms()) {
                         Object id = p.getVideoProgramId();
@@ -529,39 +498,6 @@ public class MainActivity extends FragmentActivity implements
                     if (relatedProgramIds.size() > 0) {
                         Storage.get().addRelatedPrograms(programId, relatedProgramIds);
                     }
-
-                    // BEGIN WORKAROUND
-//                    // Slug is returned, but programId is null
-//                    ArrayList<String> relatedProgramSlugs = new ArrayList<>(program.getRelatedPrograms().size());
-//                    for (RelatedProgram p : program.getRelatedPrograms()) {
-//                        relatedProgramSlugs.add(p.getSlug());
-//                    }
-//                    // We have to look up slug to get the programId. TODO if the workaround is here to stay: cache this - save slug in program table along with all the other ProgramInfo
-//                    for (String slug : relatedProgramSlugs) {
-//                        RestClient.getApi().getProgram(slug).enqueue(new Callback<Program>() {
-//                            @Override
-//                            public void onResponse(Response<Program> response) {
-//                                MainActivity.this.onError(null);
-//                                Program program = response.body();
-//                                if (program != null) {
-//                                    ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());
-//                                    relatedProgramIds.add(program.getVideoProgramId());
-//                                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId);
-//                                    if (relatedProgramIds.size() > 0) {
-//                                        Storage.get().addRelatedPrograms(programId, relatedProgramIds);
-//                                    }
-//                                }
-//                            }
-//
-//                            @Override
-//                            public void onFailure(Throwable t) {
-//                                MainActivity.this.onError(t.getLocalizedMessage());
-//                                Log.d("JJJ", "fail " + t.getMessage());
-//                                t.printStackTrace();
-//                            }
-//                        });
-//                    }
-                    // END WORKAROUND
                 }
             }
 

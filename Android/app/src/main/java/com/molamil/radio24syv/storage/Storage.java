@@ -158,18 +158,17 @@ public class Storage {
         return database.getRelatedPrograms(programId, limit);
     }
 
-    public int addAlarm(int programId, String programTime) {
-        return database.addAlarm(programId, programTime);
+    public int addAlarm(String programSlug, String programTime) {
+        return database.addAlarm(programSlug, programTime);
     }
 
-    public int getAlarmId(int programId, String programTime) {
-        return database.getAlarmId(programId, programTime);
+    public int getAlarmId(String programSlug, String programTime) {
+        return database.getAlarmId(programSlug, programTime);
     }
 
     public void removeAlarm(int alarmId) {
         database.removeAlarm(alarmId);
     }
-
 
     public void deleteAll(Context context) {
         for (PodcastInfo podcast : database.getPodcasts()) {

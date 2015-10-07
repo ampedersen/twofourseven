@@ -36,6 +36,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 new Intent(context, MainActivity.class),
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
+        // Get app icon as resource ID
         int smallIconId;
         String packageName = context.getApplicationContext().getPackageName();
         try {
@@ -45,7 +46,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
             smallIconId = 0;
         }
 
-        // Get app icon
+        // Get app icon as bitmap
         Bitmap largeIcon;
         try {
             largeIcon = ((BitmapDrawable) context.getPackageManager().getApplicationIcon(context.getPackageName())).getBitmap(); // Get app icon
