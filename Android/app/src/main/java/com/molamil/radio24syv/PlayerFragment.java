@@ -8,8 +8,12 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.TextView;
 
 import com.molamil.radio24syv.player.RadioPlayer;
+import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.RadioPlayerButton;
 
 
@@ -59,17 +63,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         if (getArguments() != null) {
             title = getArguments().getString(ARG_TITLE);
         }
-
-//        if (savedInstanceState != null) {
-//            size = PlayerSize.valueOf(savedInstanceState.getString("size"));
-//        }
     }
-
-//    @Override
-//    public void onSaveInstanceState(Bundle savedInstanceState) {
-//        savedInstanceState.putString("size", size.toString());
-//        super.onSaveInstanceState(savedInstanceState);
-//    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -130,6 +124,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             setSize(PlayerSize.SMALL);
         }
         setupPlaybackButtons(player, getView());
+        updatePlayer();
     }
 
     @Override
@@ -138,13 +133,23 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             setSize(PlayerSize.SMALL);
         }
         setupPlaybackButtons(player, getView());
+        updatePlayer();
+    }
+
+    @Override
+    public void OnStopped(RadioPlayer player) {
+        updatePlayer();
+    }
+
+    @Override
+    public void OnPaused(RadioPlayer player) {
+        updatePlayer();
     }
 
     private void setupPlaybackButtons(RadioPlayer player, View parentView) {
         // Link all buttons to always show current playback status
+        setupButton(player, parentView, R.id.small_play_button);
         setupButton(player, parentView, R.id.play_button);
-        setupButton(player, parentView, R.id.stop_button);
-        setupButton(player, parentView, R.id.pause_button);
         setupButton(player, parentView, R.id.next_button);
         setupButton(player, parentView, R.id.previous_button);
     }
@@ -156,18 +161,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         b.setRadioPlayer(player);
     }
 
-    @Override
-    public void OnStopped(RadioPlayer player) {
-
-    }
-
-    @Override
-    public void OnPaused(RadioPlayer player) {
-
-    }
-
     public void setSize(PlayerSize size) {
-        Log.d("JJJ", "player setsize " + size + " was " + this.size);
+        //Log.d("JJJ", "player setsize " + size + " was " + this.size);
         if (size == this.size) {
             return; // Return, already sized like that
         }
@@ -197,20 +192,59 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             parentView.setVisibility(View.GONE);
         } else {
             parentView.setVisibility(View.VISIBLE);
-            View bigThingy = parentView.findViewById(R.id.big_thingy);
+            View bigPlayer = parentView.findViewById(R.id.big_player);
+            View smallPlayer = parentView.findViewById(R.id.small_player);
             Button expandButton = (Button) parentView.findViewById(R.id.size_button);
             int targetColorId;
             if (size == PlayerSize.BIG) {
-                bigThingy.setVisibility(View.VISIBLE);
+                bigPlayer.setVisibility(View.VISIBLE);
+                smallPlayer.setVisibility(View.GONE);
                 expandButton.setText("Small");
                 targetColorId = R.color.radio_gray_dark;
             } else {
-                bigThingy.setVisibility(View.GONE);
+                bigPlayer.setVisibility(View.GONE);
+                smallPlayer.setVisibility(View.VISIBLE);
                 expandButton.setText("Big");
                 targetColorId = R.color.radio_gray_darker;
             }
             parentView.setBackgroundColor(getResources().getColor(targetColorId));
+            updatePlayer();
         }
+    }
+
+    public void updatePlayer() {
+        int programId = radioPlayerProvider.getRadioPlayer().getProgramId();
+        ProgramInfo p = Storage.get().getProgram(programId);
+        if (p == null) {
+            return; // TODO download if program is not in database (important)
+        }
+
+        View v = getView();
+        if (v == null) {
+            return;
+        }
+        View bigPlayer = v.findViewById(R.id.big_player);
+        View smallPlayer = v.findViewById(R.id.small_player);
+        if (size == PlayerSize.BIG) {
+            updateBigPlayer(bigPlayer, p);
+        } else {
+            updateSmallPlayer(smallPlayer, p);
+        }
+    }
+
+    private void updateBigPlayer(View v, ProgramInfo p) {
+        ((ProgramImageView) v.findViewById(R.id.image)).setImageUrl(p.getImageUrl());
+        ((TextView) v.findViewById(R.id.name_text)).setText(p.getName());
+        ((TextView) v.findViewById(R.id.description_text)).setText(p.getDescription());
+//        ((TextView) v.findViewById(R.id.time_text)).setText(); //TODO
+//        ((TextView) v.findViewById(R.id.podcast_name_text)).setText(); //TODO
+//        ((TextView) v.findViewById(R.id.time_start_text)).setText(); //TODO
+//        ((TextView) v.findViewById(R.id.time_end_text)).setText(); //TODO
+
+    }
+
+    private void updateSmallPlayer(View v, ProgramInfo p) {
+        ((TextView) v.findViewById(R.id.small_name_text)).setText(p.getName());
     }
 
     public PlayerSize getSize() {

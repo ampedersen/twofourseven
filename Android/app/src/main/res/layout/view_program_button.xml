@@ -4,14 +4,18 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/program_button"
     android:layout_width="match_parent"
-    android:layout_height="150dp"
+    android:layout_height="140dp"
     android:background="@color/radio_gray_darker"
+    android:focusable="false"
+    android:clickable="false"
     >
 
     <com.molamil.radio24syv.view.ProgramImageView
         android:id="@+id/image"
         android:layout_width="match_parent"
-        android:layout_height="150dp"
+        android:layout_height="140dp"
+        android:focusable="false"
+        android:clickable="false"
         />
 
     <TextView
@@ -21,6 +25,8 @@
         android:text="Program name that could be a long one with lots of text and interesting stuff blabla"
         android:singleLine="true"
         android:layout_alignParentTop="true"
+        android:focusable="false"
+        android:clickable="false"
         />
 
     <TextView
@@ -31,6 +37,8 @@
         android:maxLines="2"
         android:ellipsize="end"
         android:layout_below="@id/name_text"
+        android:focusable="false"
+        android:clickable="false"
         />
 
     <TextView
@@ -40,6 +48,8 @@
         android:text="Topic"
         android:singleLine="true"
         android:layout_alignParentBottom="true"
+        android:focusable="false"
+        android:clickable="false"
         />
 
     <com.molamil.radio24syv.view.RadioPlayerButton
@@ -49,6 +59,8 @@
         app:action="play"
         android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
+        android:focusable="false"
+        android:clickable="false"
         />
 
 </RelativeLayout>

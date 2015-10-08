@@ -19,5 +19,6 @@
     <declare-styleable name="ProgramImageView">
         <attr name="imageUrl" format="string" />
         <attr name="tintColor" format="color" />
+        <attr name="forceFullQuality" format="boolean" />
     </declare-styleable>
 </resources>

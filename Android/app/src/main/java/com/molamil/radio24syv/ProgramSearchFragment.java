@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
+import android.widget.AdapterView;
 import android.widget.EditText;
 import android.widget.TextView;
 
@@ -20,9 +21,11 @@ import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.view.ProgramButtonView;
+import com.molamil.radio24syv.view.ProgramListView;
 
 import org.apache.http.auth.BasicUserPrincipal;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Callback;
@@ -148,34 +151,38 @@ public class ProgramSearchFragment extends PageFragment {
         if (results == null) {
             resultCount = 0;
         } else {
+            ArrayList<ProgramInfo> programs = new ArrayList<>();
             for (Result r : results) {
                 boolean isProgram = r.getType().equalsIgnoreCase("program");
                 if (isProgram) {
-                    //ProgramInfo program = Storage.get().getProgram(r.getId()); // This ID is from an external search provider and does not make sense to us and the API
+                    //ProgramInfo program = Storage.get().getProgram(r.getId()); // This ID is from an external search provider and does not make sense neither to us nor the API
                     String programSlug = RestClient.getProgramSlugFromUrl(r.getUrl()); // According to Radio24syv this is the way to get the program identifier (slug) from a search result
                     ProgramInfo program = Storage.get().getProgram(programSlug);
                     if (program != null) {
-                        ProgramButtonView button = new ProgramButtonView(content.getContext());
-                        button.setProgram(program);
-                        button.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
-                        button.setOnProgramButtonViewListener(new ProgramButtonView.OnProgramButtonViewListener() {
-                            @Override
-                            public void OnProgramButtonViewClicked(ProgramButtonView view) {
-                                if (listener != null) {
-                                    listener.onProgramSelected(view.getProgram());
-                                }
-                            }
-                        });
-                        content.addView(button);
+                        programs.add(program);
                     } else {
                         Log.d("JJJ", "Program not found for slug " + programSlug); // Search can return programs that getPrograms() does not..!
                     }
                 }
             }
-            resultCount = results.size();
+            addPrograms(content, programs);
+            resultCount = programs.size();
         }
 
         updateStatus();
+    }
+
+    private void addPrograms(ViewGroup content, List<ProgramInfo> programs) {
+        ProgramListView list = new ProgramListView(getActivity(), programs, radioPlayerProvider.getRadioPlayer());
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (listener != null) {
+                    listener.onProgramSelected((ProgramInfo) parent.getAdapter().getItem(position));
+                }
+            }
+        });
+        content.addView(list);
     }
 
     private void updateStatus() {
@@ -184,18 +191,6 @@ public class ProgramSearchFragment extends PageFragment {
             return;
         }
 
-//        TextView statusText = (TextView) v.findViewById(R.id.status_text);
-//        if (resultCount > 0) {
-//            statusText.setVisibility(View.GONE);
-//            getMainActivity().setKeyboardVisible(false); // Hide keyboard to show resultCount
-//        } else {
-//            statusText.setVisibility(View.VISIBLE);
-//            if ((query != null) && (query.length() > 0)) {
-//                statusText.setText(R.string.search_no_results);
-//            } else {
-//                statusText.setText(R.string.search_instructions);
-//            }
-//        }
         TextView statusText = (TextView) v.findViewById(R.id.status_text);
         boolean isShowingResults = (resultCount > 0);
         switch (state) {

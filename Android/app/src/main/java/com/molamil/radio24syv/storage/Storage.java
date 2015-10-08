@@ -178,10 +178,18 @@ public class Storage {
         Log.d("JJJ", "Deleting database");
         database.dropTables();
         database.createTables();
+        deleteImageCache();
     }
 
-    public void deleteHistory(Context context) {
+    public void deleteHistory() {
+        Log.d("JJJ", "Deleting history");
         database.deletePlayerHistory();
+    }
+
+    public void deleteImageCache() {
+        Log.d("JJJ", "Deleting image cache");
+        ImageLibrary.get().clearMemoryCache();
+        ImageLibrary.get().clearDiskCache();
     }
 
     private void clearCache() {

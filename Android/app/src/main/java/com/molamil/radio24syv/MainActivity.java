@@ -439,6 +439,7 @@ public class MainActivity extends FragmentActivity implements
         if (playerFragment.getSize() == PlayerFragment.PlayerSize.BIG) {
             playerFragment.setSize(PlayerFragment.PlayerSize.SMALL); // Small player
         }
+        playerFragment.updatePlayer();
 
         mainFragment.setTabSize(MainFragment.TabSize.NORMAL); // Normal tab size
         mainFragment.setError(null); // Clear error message

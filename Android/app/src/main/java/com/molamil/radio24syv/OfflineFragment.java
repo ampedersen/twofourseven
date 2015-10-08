@@ -53,15 +53,14 @@ public class OfflineFragment extends PageFragment {
         v.findViewById(R.id.delete_history_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Storage.get().deleteHistory(v.getContext());
+                Storage.get().deleteHistory();
             }
         });
 
         v.findViewById(R.id.delete_image_cache_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                ImageLibrary.get().clearMemoryCache();
-                ImageLibrary.get().clearDiskCache();
+                Storage.get().deleteImageCache();
             }
         });
 

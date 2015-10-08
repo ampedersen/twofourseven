@@ -13,10 +13,13 @@ import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Podcast;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.RadioLibrary;
+import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.DateLineView;
 import com.molamil.radio24syv.view.PodcastEpisodeView;
+import com.molamil.radio24syv.view.ProgramImageView;
 
 import org.joda.time.DateTime;
 
@@ -72,7 +75,12 @@ public class ProgramDetailsFragment extends PageFragment implements
         ((TextView) v.findViewById(R.id.name_text)).setText(program.getName());
         ((TextView) v.findViewById(R.id.topic_text)).setText(program.getTopic());
         ((TextView) v.findViewById(R.id.description_text)).setText(program.getDescription());
-        ((TextView) v.findViewById(R.id.image)).setText(program.getImageUrl());
+        ProgramImageView image = ((ProgramImageView) v.findViewById(R.id.image));
+        image.setImageUrl(program.getImageUrl());
+        TopicInfo topic = Storage.get().getTopic(program.getTopicId());
+        if (topic != null) {
+            image.setTintColor(topic.getColorValue());
+        }
 
         Button backButton = (Button) v.findViewById(R.id.back_button);
         backButton.setOnClickListener(new View.OnClickListener() {

@@ -6,6 +6,7 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -28,6 +29,7 @@ public class ProgramImageView extends ImageView {
 
     private String imageUrl;
     private int tintColor;
+    private boolean forceFullQuality;
 
     public ProgramImageView(Context context, AttributeSet attrs) {
         super(context, attrs);
@@ -41,6 +43,7 @@ public class ProgramImageView extends ImageView {
         try {
             setImageUrl(a.getString(R.styleable.ProgramImageView_imageUrl));
             setTintColor(a.getInteger(R.styleable.ProgramImageView_tintColor, getResources().getColor(R.color.radio_gray)));
+            setForceFullQuality(a.getBoolean(R.styleable.ProgramImageView_forceFullQuality, false));
         } finally {
             a.recycle();
         }
@@ -67,6 +70,9 @@ public class ProgramImageView extends ImageView {
 //        }
 //    }
 
+    public void setForceFullQuality(boolean forceFullQuality) {
+        this.forceFullQuality = forceFullQuality;
+    }
 
     public void setImageUrl(String imageUrl) {
         boolean isImageChanged = ((this.imageUrl == null) && (imageUrl != null)) || ((this.imageUrl != null) && (imageUrl == null)) || ((this.imageUrl != null) && !this.imageUrl.equals(imageUrl));
@@ -88,8 +94,11 @@ public class ProgramImageView extends ImageView {
         Runtime rt = Runtime.getRuntime();
         long maxMemory = rt.maxMemory();
         boolean isLowMemory = (maxMemory < 64*1024*1024); // 64 MB
-        if (isLowMemory) {
-            ProgramImageView.this.setScaleType(ScaleType.CENTER_INSIDE); // This will load images in half resolution. The image loader library determines the pixel size of the image to load by reading the layout size of the ImageView.
+        final boolean isLowQuality = isLowMemory && !forceFullQuality;
+        if (isLowQuality) {
+            setScaleType(ScaleType.CENTER_INSIDE); // This will load images in half resolution. The image loader library determines the pixel size of the image to load by reading the layout size of the ImageView.
+        } else {
+            setScaleType(ScaleType.CENTER_CROP);
         }
 
         ImageLibrary.get().displayImage(imageUrl, this, new ImageLoadingListener() {
@@ -105,7 +114,9 @@ public class ProgramImageView extends ImageView {
 
             @Override
             public void onLoadingComplete(String imageUri, View view, Bitmap loadedImage) {
-                ProgramImageView.this.setScaleType(ScaleType.CENTER_CROP); // Fill entire view once downloaded
+                if (isLowQuality) {
+                    setScaleType(ScaleType.CENTER_CROP); // Fill entire view once downloaded
+                }
             }
 
             @Override
