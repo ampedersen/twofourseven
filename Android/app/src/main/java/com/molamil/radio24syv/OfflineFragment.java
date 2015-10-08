@@ -9,6 +9,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.molamil.radio24syv.player.RadioPlayer;
+import com.molamil.radio24syv.storage.ImageLibrary;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.view.PodcastProgramView;
@@ -53,6 +54,14 @@ public class OfflineFragment extends PageFragment {
             @Override
             public void onClick(View v) {
                 Storage.get().deleteHistory(v.getContext());
+            }
+        });
+
+        v.findViewById(R.id.delete_image_cache_button).setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ImageLibrary.get().clearMemoryCache();
+                ImageLibrary.get().clearDiskCache();
             }
         });
 

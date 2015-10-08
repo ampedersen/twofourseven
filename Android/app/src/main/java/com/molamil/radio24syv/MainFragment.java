@@ -147,7 +147,7 @@ public class MainFragment extends Fragment {
     }
 
     public void setDimming(Dimming dimming) {
-        Log.d("JJJ", "main setdimming " + dimming + " was " + this.dimming);
+        //Log.d("JJJ", "main setdimming " + dimming + " was " + this.dimming);
         if (dimming == this.dimming) {
             return; // Return, already dimmed like that
         }

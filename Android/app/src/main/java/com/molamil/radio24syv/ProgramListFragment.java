@@ -1,15 +1,16 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
-import android.content.Context;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.ListAdapter;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
@@ -20,8 +21,8 @@ import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.storage.model.TopicInfo;
-import com.molamil.radio24syv.view.ProgramButtonView;
 import com.molamil.radio24syv.view.ProgramCategoryButton;
+import com.molamil.radio24syv.view.ProgramImageView;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -371,22 +372,78 @@ public class ProgramListFragment extends PageFragment {
         return programs;
     }
 
-    private void addPrograms(final ViewGroup content, List<ProgramInfo> programs) {
-        for (final ProgramInfo p : programs) {
-            ProgramButtonView v = new ProgramButtonView(content.getContext());
-            v.setProgram(p);
-            //v.setAudioUrl(); //TODO get audio url with different api call
-            v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
-            v.setOnProgramButtonViewListener(new ProgramButtonView.OnProgramButtonViewListener() {
-                @Override
-                public void OnProgramButtonViewClicked(ProgramButtonView view) {
-                    if (listener != null) {
-                        listener.onProgramSelected(p);
-                    }
+    private void addPrograms(final ViewGroup content, final List<ProgramInfo> programs) {
+//        for (final ProgramInfo p : programs) {
+//            ProgramButtonView v = new ProgramButtonView(content.getContext());
+//            v.setProgram(p);
+//            //v.setAudioUrl(); //TODO get audio url with different api call
+//            v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
+//            v.setOnProgramButtonViewListener(new ProgramButtonView.OnProgramButtonViewListener() {
+//                @Override
+//                public void OnProgramButtonViewClicked(ProgramButtonView view) {
+//                    if (listener != null) {
+//                        listener.onProgramSelected(p);
+//                    }
+//                }
+//            });
+//            content.addView(v);
+//        }
+        ListView list = new ListView(content.getContext());
+        list.setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
+        list.setAdapter(new ProgramButtonViewArrayAdapter(getActivity(), programs.toArray(new ProgramInfo[0]), radioPlayerProvider.getRadioPlayer()));
+        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                if (listener != null) {
+                    listener.onProgramSelected((ProgramInfo) parent.getAdapter().getItem(position));
                 }
-            });
-            content.addView(v);
+            }
+        });
+//        list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+//            @Override
+//            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+//                if (listener != null) {
+//                    listener.onProgramSelected(programs.get(position));
+//                }
+//            }
+//        });
+//        list.setRecyclerListener(new RecycleHolder()); // This is never called anyway
+        setListViewHeightBasedOnChildren(list); // Expand to full height when put inside a ScrollView
+        content.addView(list);
+    }
+
+//    public class RecycleHolder implements AbsListView.RecyclerListener {
+//        @Override
+//        public void onMovedToScrapHeap(final View view) {
+//            ((ProgramImageView) view.findViewById(R.id.image)).setImageUrl(null);
+//            Log.d("JJJ", "RecyclerListenerRecyclerListenerRecyclerListenerRecyclerListenerRecyclerListenerRecyclerListenerRecyclerListenerRecyclerListenerRecyclerListenerRecyclerListenerRecyclerListener");
+//        }
+//    }
+
+    // From: http://stackoverflow.com/questions/18367522/android-list-view-inside-a-scroll-view
+    /**** Method for Setting the Height of the ListView dynamically.
+     **** Hack to fix the issue of not showing all the items of the ListView
+     **** when placed inside a ScrollView  ****/
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null)
+            return;
+
+        int desiredWidth = View.MeasureSpec.makeMeasureSpec(listView.getWidth(), View.MeasureSpec.UNSPECIFIED);
+        int totalHeight = 0;
+        View view = null;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            view = listAdapter.getView(i, view, listView);
+            if (i == 0)
+                view.setLayoutParams(new ViewGroup.LayoutParams(desiredWidth, ViewGroup.LayoutParams.WRAP_CONTENT));
+
+            view.measure(desiredWidth, View.MeasureSpec.UNSPECIFIED);
+            totalHeight += view.getMeasuredHeight();
         }
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 
     private void getTopicColors(final ViewGroup content) {
@@ -451,6 +508,7 @@ public class ProgramListFragment extends PageFragment {
         super.onDetach();
         listener = null;
     }
+
 
     public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {
         public void onProgramSelected(ProgramInfo program);

@@ -11,6 +11,7 @@ import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.player.RadioPlayer;
+import com.molamil.radio24syv.storage.ImageLibrary;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.storage.model.TopicInfo;
@@ -86,7 +87,7 @@ public class ProgramButtonView extends LinearLayout {
         TopicInfo topic = Storage.get().getTopic(program.getTopicId());
         ProgramImageView image = (ProgramImageView) findViewById(R.id.image);
         image.setImageUrl(program.getImageUrl());
-        image.setColor(topic.getColorValue());
+        image.setTintColor(topic.getColorValue());
 
         RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
         playButton.setProgramId(program.getProgramId());
