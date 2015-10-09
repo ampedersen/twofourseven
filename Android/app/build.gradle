@@ -14,7 +14,7 @@ android {
         }
     }
     defaultConfig {
-        applicationId "com.molamil.radio24syv"
+        applicationId "dk.radio24syv.radio24syv"
         minSdkVersion 15
         targetSdkVersion 22
         versionCode 5

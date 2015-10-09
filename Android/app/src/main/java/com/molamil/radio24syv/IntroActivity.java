@@ -1,9 +1,12 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -30,7 +33,8 @@ public class IntroActivity extends Activity {
     @Override
     protected void onStart() {
         super.onStart();
-        startMainActivity(); // Skip intro
+
+        firstRunCheck();
     }
 
     private void startMainActivity() {
@@ -39,4 +43,18 @@ public class IntroActivity extends Activity {
         finish(); // Stop this activity
     }
 
+    private void firstRunCheck()
+    {
+        String name = getApplicationContext().getPackageName();
+        SharedPreferences settings = getSharedPreferences(name, Context.MODE_PRIVATE);
+
+        if (settings.getBoolean("returningUser", false))
+        {
+            startMainActivity();
+        }
+        else
+        {
+            settings.edit().putBoolean("returningUser", true).commit();
+        }
+    }
 }
