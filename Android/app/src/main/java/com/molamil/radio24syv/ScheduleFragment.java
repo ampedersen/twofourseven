@@ -74,7 +74,7 @@ public class ScheduleFragment extends PageFragment {
                         boolean isDifferentDay = (nextDate.getDayOfYear() != previousDate.getDayOfYear()) || (nextDate.getYear() != previousDate.getYear());
                         if (isDifferentDay) {
                             DateLineView dateLine = new DateLineView(v.getContext());
-                            dateLine.setDate(previousDate, nextDate);
+                            dateLine.setDate(DateTime.now(), nextDate);
                             dateLine.setWhiteBackground(true);
                             content.addView(dateLine);
                         }
