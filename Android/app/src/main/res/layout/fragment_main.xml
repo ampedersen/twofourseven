@@ -50,7 +50,6 @@
             android:id="@+id/player_fragment_container"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:background="#ff00ff"
             />
 
         <android.support.v4.app.FragmentTabHost
