@@ -31,8 +31,8 @@ public class Tooltip {
     protected Context mContext;
     protected PopupWindow mWindow;
     private TextView mHelpTextView;
-    private ImageView mUpImageView;
-    private ImageView mDownImageView;
+    //private ImageView mUpImageView;
+    //private ImageView mDownImageView;
     protected View mView;
     protected Drawable mBackgroundDrawable = null;
     protected ShowListener showListener;
@@ -45,8 +45,8 @@ public class Tooltip {
         LayoutInflater layoutInflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         setContentView(layoutInflater.inflate(viewResource, null));
         mHelpTextView = (TextView) mView.findViewById(R.id.text);
-        mUpImageView = (ImageView) mView.findViewById(R.id.arrow_up);
-        mDownImageView = (ImageView) mView.findViewById(R.id.arrow_down);
+        //mUpImageView = (ImageView) mView.findViewById(R.id.arrow_up);
+        //mDownImageView = (ImageView) mView.findViewById(R.id.arrow_down);
         mHelpTextView.setMovementMethod(ScrollingMovementMethod.getInstance());
     }
 
@@ -72,24 +72,11 @@ public class Tooltip {
         Point screenSize = new Point();
         mWindowManager.getDefaultDisplay().getSize(screenSize);
         final int screenWidth = screenSize.x;
-        final int screenHeight = screenSize.y;
-        boolean onTop = (anchorRect.top > screenHeight / 2);
-        int yPos;
-        if (onTop) {
-            yPos = anchorRect.top - rootHeight;
-        } else {
-            yPos = anchorRect.bottom;
-        }
-        int whichArrow, requestedX;
-        whichArrow = ((onTop) ? R.id.arrow_down : R.id.arrow_up);
-        requestedX = anchorRect.centerX();
-        View arrow = whichArrow == R.id.arrow_up ? mUpImageView : mDownImageView;
-        View hideArrow = whichArrow == R.id.arrow_up ? mDownImageView : mUpImageView;
-        final int arrowWidth = arrow.getMeasuredWidth();
-        arrow.setVisibility(View.VISIBLE);
-        ViewGroup.MarginLayoutParams param = (ViewGroup.MarginLayoutParams) arrow.getLayoutParams();
-        hideArrow.setVisibility(View.INVISIBLE);
-        int xPos = 0;
+
+        int yPos = anchorRect.centerY() - rootHeight/2;
+
+        int xPos = (screenWidth - rootWidth);
+        /*
         // ETXTREME RIGHT CLIKED
         if (anchorRect.left + rootWidth > screenWidth) {
             xPos = (screenWidth - rootWidth);
@@ -100,22 +87,16 @@ public class Tooltip {
         else {
             xPos = (anchorRect.centerX() - (rootWidth / 2));
         }
-        param.leftMargin = (requestedX - xPos) - (arrowWidth / 2);
-        if (onTop) {
-            mHelpTextView.setMaxHeight(anchorRect.top - anchorRect.height());
-        } else {
-            mHelpTextView.setMaxHeight(screenHeight - yPos);
-        }
+        */
+
+        int arrowWidth = 30;//Include right margin
+        int margin = 20;//textview left margin
+        int maxWidth = anchorRect.left - arrowWidth - margin;
+        mHelpTextView.setMaxWidth(maxWidth);
         mWindow.showAtLocation(anchor, Gravity.NO_GRAVITY, xPos, yPos);
 
-        int animationId;
-        if (onTop) {
-            animationId = R.anim.tooltip_appear_up;
-        } else  {
-            animationId = R.anim.tooltip_appear_down;
-        }
         mView.clearAnimation();
-        mView.setAnimation(AnimationUtils.loadAnimation(mContext, animationId));
+        mView.setAnimation(AnimationUtils.loadAnimation(mContext, R.anim.tooltip_appear));
     }
 
     protected void preShow() {
