@@ -27,6 +27,9 @@
     <string name="error_generic">Kunne ikke få forbindelse, beklager.</string>
     <string name="loading">Indlæser...</string>
 
+    <!-- Player -->
+    <string name="audio_description_live">Lige nu på Radio24syv</string>
+
     <!-- Live radio -->
     <string name="live_header">Radio24syv Live</string>
     <string name="live_schedule_button">Se sendeplan</string>

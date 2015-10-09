@@ -24,7 +24,10 @@ import android.util.Log;
 
 import com.molamil.radio24syv.MainActivity;
 import com.molamil.radio24syv.R;
+import com.molamil.radio24syv.api.model.Podcast;
 import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.PodcastInfo;
+import com.molamil.radio24syv.storage.model.ProgramInfo;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -232,15 +235,35 @@ public class RadioPlayerService extends Service implements
             Log.d("JJJ", "Run in foreground " + RadioPlayer.getActionName(action));
             // When running in the foreground, the service also must provide a status bar notification
             // to ensure that users are aware of the running service and allow them to open an activity that can interact with the service.
-            String audioTitle = "Live radio"; // TODO getInstance audio title from AudioInfo class thingy
-            String audioDescription = "This is an audio description"; // TODO audio description
+
 //            String audioInfo = null; // TODO audio info (not needed, remove it if unwanted)
-            int smallIconId = R.drawable.tab_icon; // TODO icon for player state
+            int smallIconId = R.drawable.play_button; // TODO icon for player state
 
             // Start MainActivity when notification is touched
             PendingIntent intent = PendingIntent.getActivity(getApplicationContext(), 0,
                     new Intent(getApplicationContext(), MainActivity.class),
                     PendingIntent.FLAG_UPDATE_CURRENT);
+
+            // Get audio description
+            String audioDescription;
+            if (url != null) {
+                if (url.equals(getString(R.string.url_live_radio))) {
+                    audioDescription = getString(R.string.audio_description_live);
+                } else {
+                    audioDescription = getString(R.string.app_name); // TODO get podcast date
+                }
+            } else {
+                audioDescription = getString(R.string.app_name);
+            }
+
+            // Get audio title
+            String audioTitle;
+            ProgramInfo program = Storage.get().getProgram(programId);
+            if (program != null) {
+                audioTitle = program.getName();
+            } else {
+                audioTitle = audioDescription; // TODO download program info
+            }
 
             // Get app icon
             Bitmap largeIcon;
@@ -389,7 +412,7 @@ public class RadioPlayerService extends Service implements
                 player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
                     @Override
                     public void onCompletion(MediaPlayer mp) {
-                        Log.d("JJJ", "Playback completed");
+                        Log.d("JJJ", "Playback completed " + url);
                         setAction(programId, url, RadioPlayer.ACTION_STOP);
                     }
                 });

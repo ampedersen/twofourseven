@@ -260,13 +260,13 @@ public class RadioPlayer {
     };
 
     public interface OnPlaybackListener {
-        public void OnBusy(RadioPlayer player);
-        public void OnStarted(RadioPlayer player);
-        public void OnStopped(RadioPlayer player);
-        public void OnPaused(RadioPlayer player);
+        void OnBusy(RadioPlayer player);
+        void OnStarted(RadioPlayer player);
+        void OnStopped(RadioPlayer player);
+        void OnPaused(RadioPlayer player);
     }
 
     public interface RadioPlayerProvider {
-        public RadioPlayer getRadioPlayer();
+        RadioPlayer getRadioPlayer();
     }
 }
