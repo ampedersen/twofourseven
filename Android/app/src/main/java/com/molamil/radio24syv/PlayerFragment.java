@@ -3,16 +3,13 @@ package com.molamil.radio24syv;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.player.RadioPlayer;
-import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.RadioPlayerButton;
@@ -31,12 +28,13 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     // Fragment parameters
     static final String ARG_TITLE = "title";
-    String title;
+    private String title;
 
-    OnFragmentInteractionListener mListener;
-    RadioPlayer.RadioPlayerProvider radioPlayerProvider;
+    private OnFragmentInteractionListener mListener;
+    private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
+    private ProgramInfo programInfo = new ProgramInfo(); // TODO get broadcast info from storage if already downloaded, otherwise download it
 
-    PlayerSize size = PlayerSize.NONE;
+    private PlayerSize size = PlayerSize.NONE;
 
     public static PlayerFragment newInstance(String title) {
         PlayerFragment fragment = new PlayerFragment();
@@ -149,8 +147,9 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     private void setupButton(RadioPlayer player, View parentView, int buttonId) {
         RadioPlayerButton b = (RadioPlayerButton)parentView.findViewById(buttonId);
-        b.setProgramId(player.getProgramId());
         b.setUrl(player.getUrl());
+        b.setTitle(player.getTitle());
+        b.setDescription(player.getDescription());
         b.setRadioPlayer(player);
     }
 
@@ -206,11 +205,9 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     }
 
     public void updatePlayer() {
-        int programId = radioPlayerProvider.getRadioPlayer().getProgramId();
-        ProgramInfo p = Storage.get().getProgram(programId);
-        if (p == null) {
-            return; // TODO download if program is not in database (important). Really should get broadcast info instead!
-        }
+        RadioPlayer player = radioPlayerProvider.getRadioPlayer();
+        programInfo.setName(player.getTitle());
+        programInfo.setDescription(player.getDescription());
 
         View v = getView();
         if (v == null) {
@@ -219,10 +216,15 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         View bigPlayer = v.findViewById(R.id.big_player);
         View smallPlayer = v.findViewById(R.id.small_player);
         if (size == PlayerSize.BIG) {
-            updateBigPlayer(bigPlayer, p);
+            updateBigPlayer(bigPlayer, programInfo);
         } else {
-            updateSmallPlayer(smallPlayer, p);
+            updateSmallPlayer(smallPlayer, programInfo);
         }
+    }
+
+    public void setImageUrl(String imageUrl) {
+        programInfo.setImageUrl(imageUrl);
+        updatePlayer();
     }
 
     private void updateBigPlayer(View v, ProgramInfo p) {
@@ -249,7 +251,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
      * fragment to allow an interaction in this fragment to be communicated
      * to the activity and potentially other fragments contained in that
      * activity.
-     * <p/>
+     * <programInfo/>
      * See the Android Training lesson <a href=
      * "http://developer.android.com/training/basics/fragments/communicating.html"
      * >Communicating with Other Fragments</a> for more information.

@@ -99,12 +99,16 @@ public class Storage {
         return database.getPodcast(podcastId);
     }
 
-    public List<PodcastInfo> getPodcasts(int programId) {
-        return database.getPodcasts(programId);
+    public PodcastInfo getPodcast(String url) {
+        return database.getPodcast(url);
     }
 
-    public int getPodcastCount(int programId) {
-        return database.getPodcastCount(programId);
+    public List<PodcastInfo> getPodcastsInLibrary(int programId) {
+        return database.getPodcastsInLibrary(programId);
+    }
+
+    public int getPodcastsInLibraryCount(int programId) {
+        return database.getPodcastsInLibraryCount(programId);
     }
 
     public void removePodcast(int podcastId) {

@@ -272,7 +272,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     }
 
     public List<ProgramInfo> getProgramsWithPodcastsInLibrary() {
-        String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " IN (SELECT " + KEY_PROGRAM_ID + " FROM " + TABLE_PODCAST + ")";
+        String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " IN (SELECT " + KEY_PROGRAM_ID + " FROM " + TABLE_PODCAST + " WHERE " + KEY_PODCAST_ID + " IN (SELECT " + KEY_PODCAST_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_DOWNLOAD_ID + " != " + Storage.DOWNLOAD_ID_UNKNOWN + "))";
         Log.d("JJJ", query);
 
         ArrayList<ProgramInfo> programs = new ArrayList<>();
@@ -311,7 +311,22 @@ public class StorageDatabase extends SQLiteOpenHelper {
             return podcast;
         }
         Log.d("JJJ", "podcastId not found " + podcastId);
-        return new PodcastInfo();
+        return null;
+    }
+
+    public PodcastInfo getPodcast(String audioUrl) {
+        String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_AUDIO_URL + " = '" + audioUrl + "' LIMIT 1";
+        Log.d("JJJ", query);
+
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            PodcastInfo podcast = readPodcastInfo(c);
+            c.close();
+            Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
+            return podcast;
+        }
+        Log.d("JJJ", "podcast with audioUrl not found " + audioUrl);
+        return null;
     }
 
     public List<PodcastInfo> getPodcasts() {
@@ -334,8 +349,8 @@ public class StorageDatabase extends SQLiteOpenHelper {
         return podcasts;
     }
 
-    public List<PodcastInfo> getPodcasts(int programId) {
-        String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " ORDER BY " + KEY_DATE + " DESC";
+    public List<PodcastInfo> getPodcastsInLibrary(int programId) {
+        String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " AND " + KEY_PODCAST_ID + " IN (SELECT " + KEY_PODCAST_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_DOWNLOAD_ID + " != " + Storage.DOWNLOAD_ID_UNKNOWN + ") ORDER BY " + KEY_DATE + " DESC";
         Log.d("JJJ", query);
 
         ArrayList<PodcastInfo> podcasts = new ArrayList<>();
@@ -344,24 +359,24 @@ public class StorageDatabase extends SQLiteOpenHelper {
             do {
                 PodcastInfo podcast = readPodcastInfo(c);
                 podcasts.add(podcast);
-                Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId() + " date " + podcast.getDate());
+                Log.d("JJJ", "podcast in library " + podcast.getTitle() + " id " + podcast.getPodcastId() + " date " + podcast.getDate());
             } while (c.moveToNext());
             c.close();
         }
         if (podcasts.size() == 0) {
-            Log.d("JJJ", "no podcasts found");
+            Log.d("JJJ", "no podcasts in library found");
         }
         return podcasts;
     }
 
-    public int getPodcastCount(int programId) {
-        String query = "SELECT COUNT(*) FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId;
+    public int getPodcastsInLibraryCount(int programId) {
+        String query = "SELECT COUNT(*) FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " AND " + KEY_PODCAST_ID + " IN (SELECT " + KEY_PODCAST_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_DOWNLOAD_ID + " != " + Storage.DOWNLOAD_ID_UNKNOWN + ")";
         Log.d("JJJ", query);
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             int count = c.getInt(0);
             c.close();
-            Log.d("JJJ", "podcast count " + count + " for programId " + programId);
+            Log.d("JJJ", "podcasts in library count " + count + " for programId " + programId);
             return count;
         }
         Log.d("JJJ", "programId not found " + programId);

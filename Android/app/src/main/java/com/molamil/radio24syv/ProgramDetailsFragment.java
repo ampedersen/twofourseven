@@ -132,6 +132,8 @@ public class ProgramDetailsFragment extends PageFragment implements
                     v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
                     v.setOnPodcastEpisodeViewUpdatedListener(ProgramDetailsFragment.this);
                     content.addView(v);
+
+                    Storage.get().addPodcast(p);
                 }
 
                 boolean isBatchFull = (response.body().size() == amount);

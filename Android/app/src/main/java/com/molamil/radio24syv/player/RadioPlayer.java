@@ -53,19 +53,23 @@ public class RadioPlayer {
         }
     }
 
-    // URL value when unassigned
-    public final static String URL_UNASSIGNED = null;
+    public final static String URL_UNASSIGNED = null; // URL value when unassigned
+    public final static String TITLE_UNASSIGNED = null;
+    public final static String DESCRIPTION_UNASSIGNED = null;
 
-    ArrayList<OnPlaybackListener> listenerList = new ArrayList<>();
+    private ArrayList<OnPlaybackListener> listenerList = new ArrayList<>();
     private String url = URL_UNASSIGNED; // Keeps track of the url that was most recently set an action with
-    private int programId = Storage.PROGRAM_ID_UNKNOWN;
-    Context context;
-    RadioPlayerService service = null;
-    boolean isBoundToService;
+    private String title = TITLE_UNASSIGNED;
+    private String description = DESCRIPTION_UNASSIGNED;
+    private Context context;
+    private RadioPlayerService service = null;
+    private boolean isBoundToService;
 
-    int pendingAction = ACTION_UNASSIGNED; // If the service is not yet bound this action will getInstance performed once bound
-    String pendingUrl = URL_UNASSIGNED;
-    int pendingProgramId = Storage.PROGRAM_ID_UNKNOWN;
+    private int pendingAction = ACTION_UNASSIGNED; // If the service is not yet bound this action will getInstance performed once bound
+    private String pendingUrl = URL_UNASSIGNED;
+    private String pendingTitle = TITLE_UNASSIGNED;
+    private String pendingDescription = DESCRIPTION_UNASSIGNED;
+
 
     public RadioPlayer(Context context) {
         Log.d("JJJ", "Create RadioPlayer - starting radio service");
@@ -98,21 +102,39 @@ public class RadioPlayer {
         listenerList.clear();
     }
 
-    public int getProgramId() {
-        if (isBoundToService) {
-            return service.getProgramId(); // The actual playing url. Might be different from this.url if the call has not gone through yet.
-        } else {
-            Log.d("JJJ", "Unable to getInstance program ID from service because it is not connected");
-            return Storage.PROGRAM_ID_UNKNOWN;
-        }
-    }
+//    public int getProgramId() {
+//        if (isBoundToService) {
+//            return service.getProgramId(); // The actual playing url. Might be different from this.url if the call has not gone through yet.
+//        } else {
+//            Log.d("JJJ", "Unable to getInstance program ID from service because it is not connected");
+//            return Storage.PROGRAM_ID_UNKNOWN;
+//        }
+//    }
 
     public String getUrl() {
         if (isBoundToService) {
             return service.getUrl(); // The actual playing url. Might be different from this.url if the call has not gone through yet.
         } else {
-            Log.d("JJJ", "Unable to getInstance URL from service because it is not connected");
+            Log.d("JJJ", "Unable to get URL from service because it is not connected");
             return URL_UNASSIGNED;
+        }
+    }
+
+    public String getTitle() {
+        if (isBoundToService) {
+            return service.getTitle(); // The actual playing url. Might be different from this.url if the call has not gone through yet.
+        } else {
+            Log.d("JJJ", "Unable to get title from service because it is not connected");
+            return TITLE_UNASSIGNED;
+        }
+    }
+
+    public String getDescription() {
+        if (isBoundToService) {
+            return service.getDescription(); // The actual playing url. Might be different from this.url if the call has not gone through yet.
+        } else {
+            Log.d("JJJ", "Unable to get description from service because it is not connected");
+            return DESCRIPTION_UNASSIGNED;
         }
     }
 
@@ -172,48 +194,73 @@ public class RadioPlayer {
         return (url == RadioPlayer.URL_UNASSIGNED) || (!url.startsWith("http://"));
     }
 
-    public void play(int programId, String url) {
-        this.programId = programId;
+    public void play(String url, String title, String description) {
         this.url = url;
-        setAction(programId, url, ACTION_PLAY);
+        this.title = title;
+        this.description = description;
+        setAction(url, title, description, ACTION_PLAY);
     }
 
     public void stop() {
-        setAction(programId, url, ACTION_STOP);
+        setAction(url, title, description, ACTION_STOP);
     }
 
     public void pause() {
-        setAction(programId, url, ACTION_PAUSE);
+        setAction(url, title, description, ACTION_PAUSE);
     }
 
-    public void next() { setAction(programId, url, ACTION_NEXT); }
+    public void next() { setAction(url, title, description, ACTION_NEXT); }
 
-    public void previous() { setAction(programId, url, ACTION_PREVIOUS); }
+    public void previous() { setAction(url, title, description, ACTION_PREVIOUS); }
 
-    private void setAction(int programId, final String url, int action) {
-        Log.d("JJJ", "setAction " + action + " isBound " + isBoundToService + " " + service + " programId " + programId + " url " + url);
+    private void setAction(final String url, String title, String description, int action) {
+        Log.d("JJJ", "setAction " + action + " isBound " + isBoundToService + " " + service + " url " + url + " title " + title + " description " + description);
         if (isBoundToService) {
-            service.setAction(programId, url, action);
+
+            /*
+            // Get audio description
+            String audioDescription;
+            if (url != null) {
+                if (url.equals(getString(R.string.url_live_radio))) {
+                    audioDescription = getString(R.string.audio_description_live);
+                } else {
+                    audioDescription = getString(R.string.app_name); // TODO get podcast date
+                }
+            } else {
+                audioDescription = getString(R.string.app_name);
+            }
+
+            // Get audio title
+            String audioTitle;
+            ProgramInfo program = Storage.get().getProgram(programId);
+            if (program != null) {
+                audioTitle = program.getName();
+            } else {
+                audioTitle = audioDescription; // TODO download program info
+            }
+            */
+            service.setAction(url, title, description, action);
             clearPendingAction(); // We got hole through to the service, clear pending action
         } else {
             Log.d("JJJ", "Unable to set action for service because service is not bound - will set the action when it getInstance bound");
-            setPendingAction(programId, url, action);
+            setPendingAction(url, title, description, action);
         }
     }
 
     private void clearPendingAction() {
-        setPendingAction(Storage.PROGRAM_ID_UNKNOWN, URL_UNASSIGNED, ACTION_UNASSIGNED);
+        setPendingAction(URL_UNASSIGNED, TITLE_UNASSIGNED, DESCRIPTION_UNASSIGNED,  ACTION_UNASSIGNED);
     }
 
     private boolean isPendingAction() {
         return (pendingUrl != null) && (!pendingUrl.equals(URL_UNASSIGNED)) && (pendingAction != ACTION_UNASSIGNED);
     }
 
-    private void setPendingAction(int programId, String url, int action) {
-        Log.d("JJJ", "set pending action " + getActionName(action) + " url " + url + " programId " + programId);
-        pendingProgramId = programId;
+    private void setPendingAction(String url, String title, String description, int action) {
+        Log.d("JJJ", "set pending action " + getActionName(action) + " url " + url + " title " + title);
         pendingUrl = url;
         pendingAction = action;
+        pendingTitle = title;
+        pendingDescription = description;
     }
 
     // Defines callbacks for service binding, passed to bindService()
@@ -229,7 +276,7 @@ public class RadioPlayer {
 
             if (isPendingAction()) {
                 Log.d("JJJ", "Executing pending action " + getActionName(pendingAction) + " url " + pendingUrl);
-                setAction(pendingProgramId, pendingUrl, pendingAction);
+                setAction(pendingUrl, pendingTitle, pendingDescription, pendingAction);
             } else {
                 callback(); // Make a callback to all listeners about the state of the player service
             }

@@ -17,8 +17,10 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
+import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.api.model.Broadcast;
 import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.api.model.RelatedProgram;
 import com.molamil.radio24syv.player.RadioPlayer;
@@ -26,6 +28,7 @@ import com.molamil.radio24syv.receiver.AlarmNotificationReceiver;
 import com.molamil.radio24syv.storage.ImageLibrary;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.BroadcastInfo;
+import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
 import com.molamil.radio24syv.storage.model.TopicInfo;
@@ -40,6 +43,7 @@ import org.joda.time.DateTime;
 
 import java.util.ArrayList;
 import java.util.IllegalFormatException;
+import java.util.List;
 
 import retrofit.Callback;
 import retrofit.Response;
@@ -467,9 +471,90 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public void OnStarted(RadioPlayer player) {
-        final int programId = player.getProgramId();
+    public void OnStarted(final RadioPlayer player) {
+        // This determines the programId by looking at the player's URL. Maybe this should be used other places (and put in the RadioPlayer class) to figure out what is playing. Or maybe something else. This is very WIP.
+        String url = player.getUrl();
+        String liveUrlStartsWith = getString(R.string.url_live_radio);
+        String streamingUrlStartsWith = getString(R.string.url_offline_radio);
+        String localUrlStartsWith = "file";
 
+        if (url != RadioPlayer.URL_UNASSIGNED) {
+            if (url.startsWith(liveUrlStartsWith)) {
+                // Live stream
+                RestClient.getApi().getCurrentBroadcast().enqueue(new Callback<List<Broadcast>>() {
+                    @Override
+                    public void onResponse(Response<List<Broadcast>> response) {
+                        onError(null);
+
+                        List<Broadcast> body = response.body();
+                        if (body != null) {
+                            Broadcast broadcast = body.get(0);
+                            addToPlayerHistory(broadcast.getVideoProgramId()); // Add program ID to player history
+
+                            PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
+                            if (playerFragment != null) {
+                                playerFragment.setImageUrl(broadcast.getImageUrl());
+                            }
+                        } else {
+                            onError(response.message());
+                        }
+                    }
+
+                    @Override
+                    public void onFailure(Throwable t) {
+                        Log.d("JJJ", "fail " + t.getMessage());
+                        t.printStackTrace();
+                        onError(t.getLocalizedMessage());
+                    }
+                });
+            } else {
+                int programId = Storage.PROGRAM_ID_UNKNOWN;
+                if (url.startsWith(streamingUrlStartsWith)) {
+                    // Online stream
+                    url = url.substring(getString(R.string.url_offline_radio).length()); // Podcast URL = cut off server part of the path
+                    PodcastInfo podcast = Storage.get().getPodcast(url);
+                    if (podcast != null) {
+                        programId = podcast.getProgramId(); // Program ID from database
+                    } else {
+                        Log.w("JJJ", "Unable to get podcast's programId because we are playing an online podcast that is not in the database - this should be impossible?!");
+                    }
+                } else if (url.startsWith(localUrlStartsWith)) {
+                    // Local stream
+                    int podcastId;
+                    try {
+                        podcastId = Integer.parseInt(url.substring(url.lastIndexOf("/") + 1, url.lastIndexOf("."))); // Podcast ID = filename without extension. This is a bit dangerous but we are in charge of naming our downloaded files.
+                    } catch (NumberFormatException e) {
+                        podcastId = Storage.PODCAST_ID_UNKNOWN;
+                    }
+                    if (podcastId != Storage.PODCAST_ID_UNKNOWN) {
+                        PodcastInfo podcast = Storage.get().getPodcast(podcastId);
+                        if (podcast != null) {
+                            programId = podcast.getProgramId(); // Program ID from database
+                        }
+                    } else {
+                        Log.w("JJJ", "Unable to get podcast's programId because we are playing a podcast from a file without podcastId in the filename - this should be impossible?!");
+                    }
+                }
+                Log.d("JJJ", "programId" + programId);
+                if (programId != Storage.PROGRAM_ID_UNKNOWN) {
+                    addToPlayerHistory(programId);
+
+                    ProgramInfo program = Storage.get().getProgram(programId); // TODO download program if not in database
+                    if (program != null) {
+                        PlayerFragment playerFragment = (PlayerFragment) mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
+                        if (playerFragment != null) {
+                            playerFragment.setImageUrl(program.getImageUrl());
+                        }
+                    }
+                }
+            }
+        }
+
+
+
+    }
+
+    private void addToPlayerHistory(final int programId) {
         // Store player history
         String date = DateTime.now().toString(RestClient.getDateFormat());
         Log.d("JJJ", "addPlayerHistory programId " + programId + " date " + date);
@@ -495,7 +580,7 @@ public class MainActivity extends FragmentActivity implements
                             }
                         }
                     }
-                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId);
+                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId + " " + program.getName());
                     if (relatedProgramIds.size() > 0) {
                         Storage.get().addRelatedPrograms(programId, relatedProgramIds);
                     }

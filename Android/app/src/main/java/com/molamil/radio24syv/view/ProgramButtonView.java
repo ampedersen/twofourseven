@@ -91,7 +91,7 @@ public class ProgramButtonView extends LinearLayout {
         image.setTintColor(topic.getColorValue());
 
         RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
-        playButton.setProgramId(program.getProgramId());
+        // TODO get url for program button's latest podcast
     }
 
     public ProgramInfo getProgram() {

@@ -10,9 +10,14 @@ import android.view.ViewGroup;
 
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.ImageLibrary;
+import com.molamil.radio24syv.storage.RadioLibrary;
 import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.view.PodcastProgramView;
+
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -69,7 +74,11 @@ public class OfflineFragment extends PageFragment {
             PodcastProgramView p = new PodcastProgramView(v.getContext());
             p.setProgram(program);
             p.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
-            p.setPodcasts(Storage.get().getPodcasts(program.getProgramId()));
+            ArrayList<PodcastInfo> podcasts = new ArrayList<>();
+            for (PodcastInfo podcast : Storage.get().getPodcastsInLibrary(program.getProgramId())) {
+                podcasts.add(podcast); // Only show podcasts that known by the download manager
+            }
+            p.setPodcasts(podcasts);
             content.addView(p);
         }
 

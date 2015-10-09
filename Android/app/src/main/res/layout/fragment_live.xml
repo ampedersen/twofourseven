@@ -86,7 +86,7 @@
                 android:layout_height="100dp"
                 android:background="@drawable/play_button"
                 app:action="play"
-                app:url="@string/url_live_radio"
+                app:audioUrl="@string/url_live_radio"
                 />
 
         </LinearLayout>

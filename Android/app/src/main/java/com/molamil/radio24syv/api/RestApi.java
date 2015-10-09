@@ -29,6 +29,9 @@ public interface RestApi {
     @GET("/broadcasts/next/{limit}/{offset}")
     Call<List<Broadcast>> getNextBroadcasts(@Path("limit") Integer amount, @Path("offset") Integer offsetHours);
 
+    @GET("/broadcasts/next/1/0")
+    Call<List<Broadcast>> getCurrentBroadcast();
+
     // Hosts
 
     @GET("/hosts")

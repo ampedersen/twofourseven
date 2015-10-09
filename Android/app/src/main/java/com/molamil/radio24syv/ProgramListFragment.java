@@ -225,14 +225,14 @@ public class ProgramListFragment extends PageFragment {
             final List<ProgramInfo> recentPrograms = Storage.get().getPlayerHistory(4); // Get one more than we need because if a program is playing it should not be shown
             if (recentPrograms.size() > 0) {
                 // Remove the extra program
-                int playingProgramId = radioPlayerProvider.getRadioPlayer().getProgramId();
+//                int playingProgramId = radioPlayerProvider.getRadioPlayer().getProgramId();
                 ProgramInfo removeProgram = null;
-                for (ProgramInfo p : recentPrograms) {
-                    if (p.getProgramId() == playingProgramId) {
-                        removeProgram = p; // Remove currently playing program
-                        break;
-                    }
-                }
+//                for (ProgramInfo p : recentPrograms) {
+//                    if (p.getProgramId() == playingProgramId) {
+//                        removeProgram = p; // Remove currently playing program
+//                        break;
+//                    }
+//                }
                 if ((removeProgram == null) && (recentPrograms.size() > 3)) {
                     removeProgram = recentPrograms.get(recentPrograms.size() - 1); // Remove last program
                 }

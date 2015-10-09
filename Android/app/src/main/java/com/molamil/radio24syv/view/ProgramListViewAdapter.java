@@ -72,7 +72,9 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
             holder.image.setTintColor(topic.getColorValue());
         }
         holder.image.setImageUrl(program.getImageUrl());
-        holder.playButton.setProgramId(program.getProgramId());
+        //holder.playButton.setUrl(); // TODO set url for program button
+        holder.playButton.setTitle(program.getName());
+        holder.playButton.setDescription(program.getDescription());
         holder.playButton.setRadioPlayer(radioPlayer);
 
         return v;

@@ -199,7 +199,7 @@ public class PodcastProgramView extends LinearLayout implements
         expandedLayout.removeView(view);
         RadioLibrary.getInstance().remove(getContext(), podcast);
 
-        int count = Storage.get().getPodcastCount(program.getProgramId());
+        int count = Storage.get().getPodcastsInLibraryCount(program.getProgramId());
         if (count > 0) {
             updatePodcastCount(count);
         } else {

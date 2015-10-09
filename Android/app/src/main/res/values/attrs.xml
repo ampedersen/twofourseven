@@ -8,8 +8,9 @@
             <enum name="next" value="3"/>
             <enum name="previous" value="4"/>
         </attr>
-        <attr name="url" format="string" />
-        <attr name="programId" format="integer" />
+        <attr name="audioUrl" format="string" />
+        <attr name="audioTitle" format="string" />
+        <attr name="audioDescription" format="string" />
         <attr name="adaptActionAfterPlay" format="boolean" />
     </declare-styleable>
 

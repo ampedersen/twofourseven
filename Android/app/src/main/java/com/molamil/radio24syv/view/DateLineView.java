@@ -71,6 +71,7 @@ public class DateLineView extends LinearLayout {
 
     public void setDate(DateTime previousDate, DateTime nextDate) {
         TextView v = (TextView) findViewById(R.id.date_text);
+        //String s = DateUtils.getRelativeTimeSpanString(nextDate.getMillis(), previousDate.getMillis(), DateUtils.DAY_IN_MILLIS, 0).toString();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(nextDate.getMillis());
         String s = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());

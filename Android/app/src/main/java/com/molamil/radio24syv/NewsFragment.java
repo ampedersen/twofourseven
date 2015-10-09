@@ -133,7 +133,9 @@ public class NewsFragment extends Fragment {
         RadioPlayerButton playButton = (RadioPlayerButton) v.findViewById(R.id.play_button);
         if (podcast != null) {
             playButton.setVisibility(View.VISIBLE);
-            playButton.setProgramId(podcast.getProgramId());
+            playButton.setUrl(podcast.getAudioUrl());
+            playButton.setTitle(podcast.getTitle());
+            playButton.setDescription(podcast.getDescription());
             String url = RadioLibrary.getUrl(getView().getContext(), podcast.getAudioUrl());
             playButton.setUrl(url);
             playButton.setRadioPlayer(radioPlayerProvider.getRadioPlayer());

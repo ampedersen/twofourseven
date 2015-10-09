@@ -23,7 +23,8 @@ public class RadioPlayerButton extends Button implements
 
     private int action;
     private String url;
-    private int programId;
+    private String title;
+    private String description;
     private boolean adaptActionAfterPlay = true; // This is really a terrible name I know. It means that if the action was PLAY, the button will change to PAUSE or STOP depending on the audio source (local or streamed).
 
     private RadioPlayer player;
@@ -40,8 +41,9 @@ public class RadioPlayerButton extends Button implements
 
         try {
             setAction(a.getInteger(R.styleable.RadioPlayerButton_action, RadioPlayer.ACTION_PLAY));
-            setUrl(a.getString(R.styleable.RadioPlayerButton_url));
-            setProgramId(a.getInteger(R.styleable.RadioPlayerButton_programId, Storage.PROGRAM_ID_UNKNOWN));
+            setUrl(a.getString(R.styleable.RadioPlayerButton_audioUrl));
+            setTitle(a.getString(R.styleable.RadioPlayerButton_audioTitle));
+            setDescription(a.getString(R.styleable.RadioPlayerButton_audioDescription));
             setAdaptActionAfterPlay(a.getBoolean(R.styleable.RadioPlayerButton_adaptActionAfterPlay, true));
         } finally {
             a.recycle();
@@ -66,12 +68,20 @@ public class RadioPlayerButton extends Button implements
         this.url = url;
     }
 
-    public int getProgramId() {
-        return programId;
+    public String getTitle() {
+        return title;
     }
 
-    public void setProgramId(int programId) {
-        this.programId = programId;
+    public void setTitle(String title) {
+        this.title = title;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
     }
 
     public boolean getAdaptActionAfterPlay() {
@@ -105,7 +115,7 @@ public class RadioPlayerButton extends Button implements
 
     @Override
     public void onClick(View v) {
-        Log.d("JJJ", "action " + action + " player " + player + " programId " + programId + " url " + url);
+        Log.d("JJJ", "action " + action + " player " + player + " url " + url + " title " + title);
         if (player == null) {
             return;
         }
@@ -117,7 +127,7 @@ public class RadioPlayerButton extends Button implements
 
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                player.play(getProgramId(), getUrl());
+                player.play(getUrl(), getTitle(), getDescription());
                 break;
             case RadioPlayer.ACTION_STOP:
                 player.stop();
@@ -210,6 +220,8 @@ public class RadioPlayerButton extends Button implements
                         } else {
                             setAction(RadioPlayer.ACTION_STOP);
                         }
+                    } else {
+                        setAction(RadioPlayer.ACTION_PLAY);
                     }
                     setIsAvailable(true);
                 } else {
@@ -217,9 +229,19 @@ public class RadioPlayerButton extends Button implements
                 }
                 break;
             case RadioPlayer.ACTION_STOP:
+                if (adaptActionAfterPlay) {
+                    if (!isPlayingMyUrl(player)) {
+                        setAction(RadioPlayer.ACTION_PLAY);
+                    }
+                }
                 setIsAvailable(true);
                 break;
             case RadioPlayer.ACTION_PAUSE:
+                if (adaptActionAfterPlay) {
+                    if (!isPlayingMyUrl(player)) {
+                        setAction(RadioPlayer.ACTION_PLAY);
+                    }
+                }
                 setIsAvailable(true);
                 break;
             case RadioPlayer.ACTION_NEXT:
@@ -304,5 +326,6 @@ public class RadioPlayerButton extends Button implements
 
         return (playerUrl != null) && (playerUrl.equals(url));
     }
+
 
 }
