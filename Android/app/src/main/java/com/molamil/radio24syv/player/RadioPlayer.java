@@ -168,6 +168,10 @@ public class RadioPlayer {
         }
     }
 
+    public static boolean isLocalUrl(final String url) {
+        return (url == RadioPlayer.URL_UNASSIGNED) || (!url.startsWith("http://"));
+    }
+
     public void play(int programId, String url) {
         this.programId = programId;
         this.url = url;

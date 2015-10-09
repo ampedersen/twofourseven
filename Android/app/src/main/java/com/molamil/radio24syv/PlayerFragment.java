@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.FrameLayout;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.player.RadioPlayer;
@@ -27,7 +28,6 @@ import com.molamil.radio24syv.view.RadioPlayerButton;
  */
 public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackListener {
     public enum PlayerSize { NONE, SMALL, BIG };
-    public enum PlayerAction { PLAY, STOP };
 
     // Fragment parameters
     static final String ARG_TITLE = "title";
@@ -38,13 +38,6 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     PlayerSize size = PlayerSize.NONE;
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param title Track title.
-     * @return A new instance of fragment PlayerFragment.
-     */
     public static PlayerFragment newInstance(String title) {
         PlayerFragment fragment = new PlayerFragment();
         Bundle args = new Bundle();
@@ -216,7 +209,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         int programId = radioPlayerProvider.getRadioPlayer().getProgramId();
         ProgramInfo p = Storage.get().getProgram(programId);
         if (p == null) {
-            return; // TODO download if program is not in database (important)
+            return; // TODO download if program is not in database (important). Really should get broadcast info instead!
         }
 
         View v = getView();

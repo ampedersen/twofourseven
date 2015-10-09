@@ -17,6 +17,7 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -106,15 +107,12 @@ public class RadioPlayerService extends Service implements
         }
     }
 
-    private boolean isLocalUrl(final String url) {
-        return (url == RadioPlayer.URL_UNASSIGNED) || (!url.startsWith("http://"));
-    }
     private boolean isConnectedToInternetIfNeeded(final String url, int action) {
         if (action == RadioPlayer.ACTION_STOP) {
             return true; // Does not need internet
         }
 
-        if (isLocalUrl(url)) {
+        if (RadioPlayer.isLocalUrl(url)) {
             return true; // Does not need internet
         } else {
             ConnectivityManager connMgr = (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE);
@@ -219,7 +217,7 @@ public class RadioPlayerService extends Service implements
     }
 
     private void updateWifiLock() {
-        boolean isPlayingOnlineStream = (action == RadioPlayer.ACTION_PLAY) && (!isLocalUrl(url));
+        boolean isPlayingOnlineStream = (action == RadioPlayer.ACTION_PLAY) && (!RadioPlayer.isLocalUrl(url));
         if (isPlayingOnlineStream) {
             Log.d("JJJ", "Wifi lock on");
             wifiLock.acquire();
@@ -388,6 +386,13 @@ public class RadioPlayerService extends Service implements
                 player = new MediaPlayer();
                 player.setAudioStreamType(AudioManager.STREAM_MUSIC);
                 player.setWakeMode(getApplicationContext(), PowerManager.PARTIAL_WAKE_LOCK); // Keep CPU awake while playback is started and release the CPU when stopped/paused
+                player.setOnCompletionListener(new MediaPlayer.OnCompletionListener() {
+                    @Override
+                    public void onCompletion(MediaPlayer mp) {
+                        Log.d("JJJ", "Playback completed");
+                        setAction(programId, url, RadioPlayer.ACTION_STOP);
+                    }
+                });
             } else {
                 if (player.isPlaying()) {
                     player.stop();

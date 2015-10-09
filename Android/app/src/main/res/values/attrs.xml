@@ -10,6 +10,7 @@
         </attr>
         <attr name="url" format="string" />
         <attr name="programId" format="integer" />
+        <attr name="adaptActionAfterPlay" format="boolean" />
     </declare-styleable>
 
     <declare-styleable name="DateLineView">

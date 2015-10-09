@@ -24,6 +24,7 @@ public class RadioPlayerButton extends Button implements
     private int action;
     private String url;
     private int programId;
+    private boolean adaptActionAfterPlay = true; // This is really a terrible name I know. It means that if the action was PLAY, the button will change to PAUSE or STOP depending on the audio source (local or streamed).
 
     private RadioPlayer player;
     private boolean isAvailable = true;
@@ -41,6 +42,7 @@ public class RadioPlayerButton extends Button implements
             setAction(a.getInteger(R.styleable.RadioPlayerButton_action, RadioPlayer.ACTION_PLAY));
             setUrl(a.getString(R.styleable.RadioPlayerButton_url));
             setProgramId(a.getInteger(R.styleable.RadioPlayerButton_programId, Storage.PROGRAM_ID_UNKNOWN));
+            setAdaptActionAfterPlay(a.getBoolean(R.styleable.RadioPlayerButton_adaptActionAfterPlay, true));
         } finally {
             a.recycle();
         }
@@ -70,6 +72,14 @@ public class RadioPlayerButton extends Button implements
 
     public void setProgramId(int programId) {
         this.programId = programId;
+    }
+
+    public boolean getAdaptActionAfterPlay() {
+        return adaptActionAfterPlay;
+    }
+
+    public void setAdaptActionAfterPlay(boolean adaptActionAfterPlay) {
+        this.adaptActionAfterPlay = adaptActionAfterPlay;
     }
 
     public void setRadioPlayer(RadioPlayer player) {
@@ -192,8 +202,19 @@ public class RadioPlayerButton extends Button implements
     public void OnStarted(RadioPlayer player) {
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                boolean isPlayingMyUrl = (player.getUrl().equals(getUrl()));
-                setIsAvailable(!isPlayingMyUrl); // Enable if not playing our stream
+                boolean isPlayingMyUrl = isPlayingMyUrl(player);
+                if (adaptActionAfterPlay) {
+                    if (isPlayingMyUrl) {
+                        if (RadioPlayer.isLocalUrl(player.getUrl())) {
+                            setAction(RadioPlayer.ACTION_PAUSE);
+                        } else {
+                            setAction(RadioPlayer.ACTION_STOP);
+                        }
+                    }
+                    setIsAvailable(true);
+                } else {
+                    setIsAvailable(!isPlayingMyUrl); // Enable if not playing our stream
+                }
                 break;
             case RadioPlayer.ACTION_STOP:
                 setIsAvailable(true);
@@ -217,7 +238,7 @@ public class RadioPlayerButton extends Button implements
                 setIsAvailable(true);
                 break;
             case RadioPlayer.ACTION_STOP:
-                setIsAvailable(false);
+                setIsAvailableAndPlayAction(player);
                 break;
             case RadioPlayer.ACTION_PAUSE:
                 setIsAvailable(false);
@@ -241,7 +262,7 @@ public class RadioPlayerButton extends Button implements
                 setIsAvailable(true);
                 break;
             case RadioPlayer.ACTION_PAUSE:
-                setIsAvailable(false);
+                setIsAvailableAndPlayAction(player);
                 break;
             case RadioPlayer.ACTION_NEXT:
                 setIsAvailable(true);
@@ -259,6 +280,29 @@ public class RadioPlayerButton extends Button implements
     private void setIsAvailable(boolean isAvailable) {
         this.isAvailable = isAvailable;
         postInvalidate(); // Redraw view next frame
+    }
+
+    private void setIsAvailableAndPlayAction(RadioPlayer player) {
+        if (adaptActionAfterPlay) {
+            boolean isPlayingMyUrl = isPlayingMyUrl(player);
+            if (isPlayingMyUrl) {
+                setAction(RadioPlayer.ACTION_PLAY);
+            }
+            setIsAvailable(isPlayingMyUrl);
+        } else {
+            setIsAvailable(false);
+        }
+    }
+
+    private boolean isPlayingMyUrl(RadioPlayer player) {
+        String playerUrl;
+        if (player == null) {
+            playerUrl = null;
+        } else {
+            playerUrl = player.getUrl();
+        }
+
+        return (playerUrl != null) && (playerUrl.equals(url));
     }
 
 }

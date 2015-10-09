@@ -11,29 +11,28 @@ import android.widget.TextView;
 import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.storage.model.BroadcastInfo;
-import com.molamil.radio24syv.storage.model.ProgramInfo;
 
 import java.util.Locale;
 
 /**
  * Created by jens on 21/09/15.
  */
-public class ProgramScheduleButtonView extends LinearLayout {
+public class ProgramScheduleButton extends LinearLayout {
 
     private OnProgramScheduleButtonViewListener listener;
     private BroadcastInfo broadcast;
 
-    public ProgramScheduleButtonView(Context context) {
+    public ProgramScheduleButton(Context context) {
         super(context);
         initializeViews(context);
     }
 
-    public ProgramScheduleButtonView(Context context, AttributeSet attrs) {
+    public ProgramScheduleButton(Context context, AttributeSet attrs) {
         super(context, attrs);
         initializeViews(context);
     }
 
-    public ProgramScheduleButtonView(Context context, AttributeSet attrs, int defStyle) {
+    public ProgramScheduleButton(Context context, AttributeSet attrs, int defStyle) {
         super(context, attrs, defStyle);
         initializeViews(context);
     }
@@ -84,7 +83,7 @@ public class ProgramScheduleButtonView extends LinearLayout {
             @Override
             public void onClick(View v) {
                 if (listener != null) {
-                    listener.OnProgramScheduleButtonClicked(ProgramScheduleButtonView.this);
+                    listener.OnProgramScheduleButtonClicked(ProgramScheduleButton.this);
                 }
             }
         });
@@ -98,7 +97,7 @@ public class ProgramScheduleButtonView extends LinearLayout {
                 @Override
                 public void onClick(View v) {
                     if (listener != null) {
-                        listener.OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView.this, (CheckBox) v);
+                        listener.OnProgramScheduleNotificationButtonClicked(ProgramScheduleButton.this, (CheckBox) v);
                     }
                 }
             });
@@ -124,7 +123,7 @@ public class ProgramScheduleButtonView extends LinearLayout {
     }
 
     public interface OnProgramScheduleButtonViewListener {
-        void OnProgramScheduleButtonClicked(ProgramScheduleButtonView view);
-        void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view, CheckBox clickedView);
+        void OnProgramScheduleButtonClicked(ProgramScheduleButton view);
+        void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButton view, CheckBox clickedView);
     }
 }

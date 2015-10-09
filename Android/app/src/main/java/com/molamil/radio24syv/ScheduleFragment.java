@@ -13,12 +13,10 @@ import com.molamil.radio24syv.api.model.Broadcast;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.BroadcastInfo;
 import com.molamil.radio24syv.view.DateLineView;
-import com.molamil.radio24syv.view.ProgramScheduleButtonView;
+import com.molamil.radio24syv.view.ProgramScheduleButton;
 
 import org.joda.time.DateTime;
 
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 import retrofit.Callback;
@@ -36,7 +34,7 @@ import retrofit.Response;
 public class ScheduleFragment extends PageFragment {
 
     private PageFragment.OnFragmentInteractionListener listener;
-    private ProgramScheduleButtonView.OnProgramScheduleButtonViewListener buttonListener;
+    private ProgramScheduleButton.OnProgramScheduleButtonViewListener buttonListener;
 
     public ScheduleFragment() {
         // Required empty public constructor
@@ -84,7 +82,7 @@ public class ScheduleFragment extends PageFragment {
                     }
 
                     // Scheduled program button
-                    ProgramScheduleButtonView programButton = new ProgramScheduleButtonView(v.getContext());
+                    ProgramScheduleButton programButton = new ProgramScheduleButton(v.getContext());
                     programButton.setBroadcast(b);
                     programButton.setOnProgramScheduleButtonViewListener(buttonListener);
                     int alarmId = Storage.get().getAlarmId(b.getProgramSlug(), b.getTimeBegin()); // Check if there is an alarm for this program and time
@@ -131,7 +129,7 @@ public class ScheduleFragment extends PageFragment {
                     + " must implement ScheduleFragment.OnFragmentInteractionListener");
         }
         try {
-            buttonListener = (ProgramScheduleButtonView.OnProgramScheduleButtonViewListener) activity;
+            buttonListener = (ProgramScheduleButton.OnProgramScheduleButtonViewListener) activity;
         } catch (ClassCastException e) {
             throw new ClassCastException(activity.toString()
                     + " must implement ProgramScheduleButtonView.OnProgramScheduleButtonViewListener");

@@ -1,23 +1,14 @@
 package com.molamil.radio24syv.view;
 
 import android.app.Activity;
-import android.content.Context;
-import android.util.AttributeSet;
-import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.TextView;
 
-import com.molamil.radio24syv.ProgramButtonViewArrayAdapter;
-import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -30,7 +21,7 @@ public class ProgramListView extends ListView {
         super(activity);
 
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
-        setAdapter(new ProgramButtonViewArrayAdapter(activity, programs.toArray(new ProgramInfo[0]), radioPlayer));
+        setAdapter(new ProgramListViewAdapter(activity, programs.toArray(new ProgramInfo[0]), radioPlayer));
 //        setRecyclerListener(new RecycleHolder()); // This is never called anyway
         setListViewHeightBasedOnChildren(this); // Expand to full height when put inside a ScrollView
     }

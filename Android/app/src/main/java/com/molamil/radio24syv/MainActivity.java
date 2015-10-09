@@ -19,7 +19,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
 
 import com.molamil.radio24syv.api.RestClient;
-import com.molamil.radio24syv.api.model.Broadcast;
 import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.api.model.RelatedProgram;
 import com.molamil.radio24syv.player.RadioPlayer;
@@ -30,7 +29,7 @@ import com.molamil.radio24syv.storage.model.BroadcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
 import com.molamil.radio24syv.storage.model.TopicInfo;
-import com.molamil.radio24syv.view.ProgramScheduleButtonView;
+import com.molamil.radio24syv.view.ProgramScheduleButton;
 import com.molamil.radio24syv.view.RadioViewPager;
 import com.molamil.radio24syv.view.Tooltip;
 
@@ -40,7 +39,6 @@ import net.hockeyapp.android.UpdateManager;
 import org.joda.time.DateTime;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.IllegalFormatException;
 
 import retrofit.Callback;
@@ -60,7 +58,7 @@ public class MainActivity extends FragmentActivity implements
         OfflineFragment.OnFragmentInteractionListener,
         PlayerFragment.OnFragmentInteractionListener,
         ProgramSearchFragment.OnFragmentInteractionListener,
-        ProgramScheduleButtonView.OnProgramScheduleButtonViewListener {
+        ProgramScheduleButton.OnProgramScheduleButtonViewListener {
 
     public static final int NOTIFICATION_ALARM_MINUTES = 5; // How many minutes before program start the notification should be shown
     private static final int NOTIFICATION_ALARM_MILLISECONDS = 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
@@ -261,7 +259,7 @@ public class MainActivity extends FragmentActivity implements
 
 
     @Override
-    public void OnProgramScheduleButtonClicked(ProgramScheduleButtonView view) {
+    public void OnProgramScheduleButtonClicked(ProgramScheduleButton view) {
         String programSlug = view.getBroadcast().getProgramSlug(); // ACHTUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
 
         // Try to get program instantly from local storage
@@ -294,7 +292,7 @@ public class MainActivity extends FragmentActivity implements
     }
 
     @Override
-    public void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButtonView view, CheckBox clickedView) {
+    public void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButton view, CheckBox clickedView) {
         BroadcastInfo broadcast = view.getBroadcast();
         String programSlug = broadcast.getProgramSlug(); // ACHTUNG programId is sometimes PROGRAM_ID_UNKNOWN --> use programSlug to look up the program info !
         String programTime = broadcast.getTimeBegin();

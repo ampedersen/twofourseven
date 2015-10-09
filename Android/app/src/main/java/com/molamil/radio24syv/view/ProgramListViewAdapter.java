@@ -1,4 +1,4 @@
-package com.molamil.radio24syv;
+package com.molamil.radio24syv.view;
 
 import android.app.Activity;
 import android.view.LayoutInflater;
@@ -9,6 +9,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
@@ -20,7 +21,7 @@ import com.molamil.radio24syv.view.RadioPlayerButton;
 /**
  * Created by jens on 08/10/15.
  */
-public class ProgramButtonViewArrayAdapter extends ArrayAdapter<ProgramInfo> {
+public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
     private final Activity context;
     private final ProgramInfo[] programs;
     private RadioPlayer radioPlayer;
@@ -33,7 +34,7 @@ public class ProgramButtonViewArrayAdapter extends ArrayAdapter<ProgramInfo> {
         public RadioPlayerButton playButton;
     }
 
-    public ProgramButtonViewArrayAdapter(Activity context, ProgramInfo[] programs, RadioPlayer radioPlayer) {
+    public ProgramListViewAdapter(Activity context, ProgramInfo[] programs, RadioPlayer radioPlayer) {
         super(context, R.layout.view_program_button, programs);
         this.context = context;
         this.programs = programs;

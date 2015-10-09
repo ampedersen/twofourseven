@@ -6,7 +6,9 @@ import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.graphics.ColorFilter;
 import android.graphics.PorterDuff;
+import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.ColorDrawable;
+import android.graphics.drawable.Drawable;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.View;
@@ -57,7 +59,7 @@ public class ProgramImageView extends ImageView {
 
     public void setTintColor(int tintColor) {
         this.tintColor = tintColor;
-        setColorFilter(tintColor, PorterDuff.Mode.OVERLAY);
+        setColorFilter(tintColor, PorterDuff.Mode.SCREEN); // TODO if imageUrl is null, use a single white pixel as background and streatch to fill view. Then we always have something to tint.
     }
 
     // This does not work anyway...
@@ -79,18 +81,31 @@ public class ProgramImageView extends ImageView {
         this.imageUrl = imageUrl;
 
         if (isImageChanged) {
+            releaseImage();
             if (imageUrl != null) {
                 loadImage();
-            } else {
-                ImageLibrary.get().cancelDisplayTask(this);
-                setImageDrawable(null);
-                setImageBitmap(null);
             }
         }
     }
 
+    private void releaseImage() {
+        ImageLibrary.get().cancelDisplayTask(this);
+
+        // Release the memory held the best we can
+        Drawable drawable = getDrawable();
+        if (drawable != null) {
+            if (drawable instanceof BitmapDrawable) {
+                BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
+                Bitmap bitmap = bitmapDrawable.getBitmap();
+                bitmap.recycle();
+            }
+        }
+        setImageDrawable(null);
+        setImageBitmap(null);
+    }
+
     private void loadImage() {
-        // Load half resolution if low memory
+        // Load half resolution if low memory (quick-fix)
         Runtime rt = Runtime.getRuntime();
         long maxMemory = rt.maxMemory();
         boolean isLowMemory = (maxMemory < 64*1024*1024); // 64 MB
