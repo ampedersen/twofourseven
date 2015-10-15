@@ -79,4 +79,16 @@
     <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>
     <string name="url_api">http://api.radio24syv.dk</string>
     <string name="url_offline_radio">http://arkiv.radio24syv.dk</string>
+
+    <!-- Onboarding -->
+    <string name="onboarding_welcome">Velkommen til Radio24syvs nye radio-app.</string>
+    <string name="onboarding_intro_message">Vi har forberedt en masse nye funktioner til dig.</string>
+    <string name="onboarding_intro_hint">Swipe for at høre mere om dem</string>
+    <string name="onboarding_message_0">Lyt til live radio i appen og swipe for at se sendeplan</string>
+    <string name="onboarding_message_1">Find podcasts og download til offline brug</string>
+    <string name="onboarding_message_2">Få de seneste nyheder. Opdateres hver time</string>
+    <string name="onboarding_message_3">Se de podcasts du har downloadet og lyt uden internetforbindelse</string> //Se de podcasts du har downloadet og lyt uden internetforbindelse
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_done">Færdig</string>
+
 </resources>

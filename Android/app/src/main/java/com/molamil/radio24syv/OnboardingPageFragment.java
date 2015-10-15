@@ -51,7 +51,7 @@ public class OnboardingPageFragment extends Fragment
                 break;
             case 2:
                 videoPath = "android.resource://" + packageName + "/"+R.raw.news;
-                mVideoWidth = 720;
+                mVideoWidth = 714;
                 posterId = R.drawable.video_poster_news;
                 break;
             case 3:
