@@ -9,6 +9,7 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
@@ -36,27 +37,22 @@ public class IntroActivity extends FragmentActivity {
         pager.setAdapter(new IntroPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
         //pager.setPageTransformer(false, pageTransformer);
         pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
-        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener()
-        {
+        pager.setOnPageChangeListener(new ViewPager.OnPageChangeListener() {
             @Override
-            public void onPageScrollStateChanged(int state)
-            {
-                if(state == ViewPager.SCROLL_STATE_IDLE)
-                {
+            public void onPageScrollStateChanged(int state) {
+                if (state == ViewPager.SCROLL_STATE_IDLE) {
                     updateOnPageChange();
                 }
             }
 
             @Override
-            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels)
-            {
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
 
             }
 
             @Override
-            public void onPageSelected(int position)
-            {
-                previousPage = currentPage;
+            public void onPageSelected(int position) {
+                //previousPage = currentPage;
                 currentPage = position;
 
             }
@@ -95,8 +91,16 @@ public class IntroActivity extends FragmentActivity {
 
     private void updateOnPageChange()
     {
-        cleanupVideo(previousPage);
+        if(previousPage == currentPage)
+        {
+            return;
+        }
+        Log.i("PAGE", "previousPage: " + previousPage + ", currentPage: " + currentPage);
 
+        previousPage = currentPage;
+
+
+        cleanupVideo(previousPage);
         updateUI(currentPage);
 
         if(currentPage == 0)

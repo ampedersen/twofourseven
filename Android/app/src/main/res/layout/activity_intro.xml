@@ -58,45 +58,66 @@
         </LinearLayout>
 
         <LinearLayout
-            android:layout_gravity="bottom|right"
-            android:layout_marginRight="25dp"
-            android:layout_marginBottom="25dp"
-
             android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
+            android:layout_gravity="bottom|right"
             android:orientation="horizontal">
 
-            <FrameLayout
-                android:id="@+id/page_dot_0"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_marginRight="15dp"
-                android:background="@drawable/onboarding_page_dot"/>
-            <FrameLayout
-                android:id="@+id/page_dot_1"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_marginRight="15dp"
-                android:background="@drawable/onboarding_page_dot"/>
-            <FrameLayout
-                android:id="@+id/page_dot_2"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_marginRight="15dp"
-                android:background="@drawable/onboarding_page_dot"/>
-            <FrameLayout
-                android:id="@+id/page_dot_3"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:layout_marginRight="15dp"
-                android:background="@drawable/onboarding_page_dot"/>
-            <FrameLayout
-                android:id="@+id/page_dot_4"
-                android:layout_width="10dp"
-                android:layout_height="10dp"
-                android:background="@drawable/onboarding_page_dot"/>
+            <LinearLayout
 
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="bottom|right"
+                android:layout_marginBottom="25dp"
+                android:orientation="horizontal">
+
+                <FrameLayout
+                    android:id="@+id/page_dot_0"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+
+                    android:layout_marginRight="15dp"
+                    android:background="@drawable/onboarding_page_dot"/>
+                <FrameLayout
+                    android:id="@+id/page_dot_1"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginRight="15dp"
+                    android:background="@drawable/onboarding_page_dot"/>
+                <FrameLayout
+                    android:id="@+id/page_dot_2"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginRight="15dp"
+                    android:background="@drawable/onboarding_page_dot"/>
+                <FrameLayout
+                    android:id="@+id/page_dot_3"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:layout_marginRight="15dp"
+                    android:background="@drawable/onboarding_page_dot"/>
+                <FrameLayout
+                    android:id="@+id/page_dot_4"
+                    android:layout_width="10dp"
+                    android:layout_height="10dp"
+                    android:background="@drawable/onboarding_page_dot"/>
+
+            </LinearLayout>
+
+
+            <Button
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:paddingLeft="25dp"
+                android:paddingRight="25dp"
+                android:textSize="13dp"
+                android:text="@string/onboarding_skip"
+                android:background="@color/transparent"
+                android:layout_gravity="bottom"
+                android:minHeight="60dp"
+                android:minWidth="0dp"/>
         </LinearLayout>
+
 
     </FrameLayout>
 </RelativeLayout>
