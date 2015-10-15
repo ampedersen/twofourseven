@@ -13,6 +13,7 @@ import android.util.Log;
 import android.util.SparseArray;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.FrameLayout;
 
 import com.molamil.radio24syv.view.RadioViewPager;
@@ -26,12 +27,22 @@ public class IntroActivity extends FragmentActivity {
     private FrameLayout[] dots;
     private FrameLayout[] selectedDots;
 
+    private Button skipButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
 
-        updateUI(0);
+        skipButton = (Button) findViewById(R.id.skip_button);
+        skipButton.setOnClickListener(new View.OnClickListener()
+        {
+            @Override
+            public void onClick(View v)
+            {
+                startMainActivity();
+            }
+        });
 
         pager = (RadioViewPager) findViewById(R.id.pager);
         pager.setAdapter(new IntroPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
@@ -58,6 +69,9 @@ public class IntroActivity extends FragmentActivity {
             }
 
         });
+
+        updateUI(0);
+
     }
 
     @Override
@@ -142,6 +156,8 @@ public class IntroActivity extends FragmentActivity {
             dots[i].setVisibility(k? View.VISIBLE:View.GONE);
             selectedDots[i].setVisibility(k? View.GONE:View.VISIBLE);
         }
+
+        skipButton.setText(page<4?getResources().getString(R.string.onboarding_skip):getResources().getString(R.string.onboarding_done));
     }
 
     /*

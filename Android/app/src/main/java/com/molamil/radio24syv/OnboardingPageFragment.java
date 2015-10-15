@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.VideoView;
 
 import com.molamil.radio24syv.util.DisplayUtil;
@@ -23,9 +24,11 @@ public class OnboardingPageFragment extends Fragment
     private int mVideoWidth = 720;
     private int mVideoHeight = 720;
     private String videoPath;
+    private String videoMessage;
     private VideoView videoView;
     private FrameLayout videoWrapper;
     private ImageView videoPoster;
+    private TextView videoTv;
     private int posterId = 0;
 
     @Override
@@ -41,21 +44,25 @@ public class OnboardingPageFragment extends Fragment
         {
             case 0:
                 videoPath = "android.resource://" + packageName + "/"+R.raw.live;
+                videoMessage = getResources().getString(R.string.onboarding_message_0);
                 mVideoWidth = 718;
                 posterId = R.drawable.video_poster_live;
                 break;
             case 1:
                 videoPath = "android.resource://" + packageName + "/"+R.raw.programmer;
+                videoMessage = getResources().getString(R.string.onboarding_message_1);
                 mVideoWidth = 716;
                 posterId = R.drawable.video_poster_programmer;
                 break;
             case 2:
                 videoPath = "android.resource://" + packageName + "/"+R.raw.news;
+                videoMessage = getResources().getString(R.string.onboarding_message_2);
                 mVideoWidth = 714;
                 posterId = R.drawable.video_poster_news;
                 break;
             case 3:
                 videoPath = "android.resource://" + packageName + "/"+R.raw.offline;
+                videoMessage = getResources().getString(R.string.onboarding_message_3);
                 mVideoWidth = 718;
                 posterId = R.drawable.video_poster_offline;
                 break;
@@ -79,11 +86,17 @@ public class OnboardingPageFragment extends Fragment
         videoView = (VideoView)v.findViewById(R.id.video);
         videoWrapper = (FrameLayout)v.findViewById(R.id.video_wrapper);
         videoPoster = (ImageView)v.findViewById(R.id.video_poster);
+        videoTv = (TextView)v.findViewById(R.id.video_text);
 
         if(videoPoster != null)
         {
             Log.i("YUP", ""+videoPoster.getHeight());
             videoPoster.setImageResource(posterId);
+        }
+
+        if(videoTv != null)
+        {
+            videoTv.setText(videoMessage);
         }
 
         return v;
