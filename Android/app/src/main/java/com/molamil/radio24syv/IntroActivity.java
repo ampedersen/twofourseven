@@ -10,7 +10,9 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
 import android.util.SparseArray;
+import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 
 import com.molamil.radio24syv.view.RadioViewPager;
 
@@ -19,10 +21,16 @@ public class IntroActivity extends FragmentActivity {
     private RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
     private int currentPage = 0;
     private int previousPage = -1;
+
+    private FrameLayout[] dots;
+    private FrameLayout[] selectedDots;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_intro);
+
+        updateUI(0);
 
         pager = (RadioViewPager) findViewById(R.id.pager);
         pager.setAdapter(new IntroPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
@@ -89,6 +97,8 @@ public class IntroActivity extends FragmentActivity {
     {
         cleanupVideo(previousPage);
 
+        updateUI(currentPage);
+
         if(currentPage == 0)
         {
             //
@@ -101,6 +111,34 @@ public class IntroActivity extends FragmentActivity {
         else
         {
             playVideo(currentPage);
+        }
+    }
+
+    /*UI*/
+    private void updateUI(int page)
+    {
+        if(dots == null)
+        {
+
+            dots = new FrameLayout[5];
+            selectedDots = new FrameLayout[5];
+            dots[0] = (FrameLayout)findViewById(R.id.page_dot_0);
+            dots[1] = (FrameLayout)findViewById(R.id.page_dot_1);
+            dots[2] = (FrameLayout)findViewById(R.id.page_dot_2);
+            dots[3] = (FrameLayout)findViewById(R.id.page_dot_3);
+            dots[4] = (FrameLayout)findViewById(R.id.page_dot_4);
+            selectedDots[0] = (FrameLayout)findViewById(R.id.selected_page_dot_0);
+            selectedDots[1] = (FrameLayout)findViewById(R.id.selected_page_dot_1);
+            selectedDots[2] = (FrameLayout)findViewById(R.id.selected_page_dot_2);
+            selectedDots[3] = (FrameLayout)findViewById(R.id.selected_page_dot_3);
+            selectedDots[4] = (FrameLayout)findViewById(R.id.selected_page_dot_4);
+        }
+
+        for(int i=0;i<5;i++)
+        {
+            boolean k = i>page;
+            dots[i].setVisibility(k? View.VISIBLE:View.GONE);
+            selectedDots[i].setVisibility(k? View.GONE:View.VISIBLE);
         }
     }
 

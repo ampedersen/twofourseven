@@ -16,5 +16,87 @@
         android:layout_height="100dp"
         android:layout_alignParentBottom="true">
 
+        <LinearLayout
+            android:layout_gravity="bottom|left"
+            android:layout_marginLeft="25dp"
+            android:layout_marginBottom="25dp"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:id="@+id/selected_page_dot_0"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/onboarding_page_dot_selected"/>
+            <FrameLayout
+                android:id="@+id/selected_page_dot_1"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/onboarding_page_dot_selected"/>
+            <FrameLayout
+                android:id="@+id/selected_page_dot_2"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/onboarding_page_dot_selected"/>
+            <FrameLayout
+                android:id="@+id/selected_page_dot_3"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/onboarding_page_dot_selected"/>
+            <FrameLayout
+                android:id="@+id/selected_page_dot_4"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/onboarding_page_dot_selected"/>
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_gravity="bottom|right"
+            android:layout_marginRight="25dp"
+            android:layout_marginBottom="25dp"
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <FrameLayout
+                android:id="@+id/page_dot_0"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/onboarding_page_dot"/>
+            <FrameLayout
+                android:id="@+id/page_dot_1"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/onboarding_page_dot"/>
+            <FrameLayout
+                android:id="@+id/page_dot_2"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/onboarding_page_dot"/>
+            <FrameLayout
+                android:id="@+id/page_dot_3"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:layout_marginRight="15dp"
+                android:background="@drawable/onboarding_page_dot"/>
+            <FrameLayout
+                android:id="@+id/page_dot_4"
+                android:layout_width="10dp"
+                android:layout_height="10dp"
+                android:background="@drawable/onboarding_page_dot"/>
+
+        </LinearLayout>
+
     </FrameLayout>
 </RelativeLayout>
