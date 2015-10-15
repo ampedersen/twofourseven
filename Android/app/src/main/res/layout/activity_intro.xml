@@ -20,5 +20,16 @@
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
+        android:layout_above="@+id/box"
+        android:layout_alignParentTop="true"
         />
+
+    <FrameLayout
+        android:id="@+id/box"
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_alignParentBottom="true"
+        android:background="@color/radio_gray">
+
+    </FrameLayout>
 </RelativeLayout>
