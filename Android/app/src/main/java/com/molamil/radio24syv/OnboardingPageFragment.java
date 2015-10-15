@@ -110,6 +110,7 @@ public class OnboardingPageFragment extends Fragment
                 @Override
                 public void onPrepared(MediaPlayer mp) {
 
+                    mp.setLooping(true);
                     videoView.start();
                     //HACK: Show videoview AFTER it has started playing
                     new Handler().post(new Runnable() {
