@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#E6041F"
+    android:clipChildren="true"
     tools:context="com.molamil.radio24syv.PageFragment">
 
     <ImageView
@@ -10,7 +11,7 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="top|center"
-        android:layout_marginBottom="100dp"
+        android:layout_marginBottom="@dimen/onboarding_bottom_margin_size"
         android:scaleType="centerCrop" />
 
     <FrameLayout
@@ -31,5 +32,16 @@
 
     </FrameLayout>
 
+    <TextView
+        android:id="@+id/video_text"
+        android:textColor="@color/radio_white"
+        android:layout_gravity="bottom"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="25dp"
+        android:layout_marginRight="25dp"
+        android:layout_marginBottom="75dp"
+        android:textSize="21sp"
+        android:text="@string/onboarding_message_0" />
 
 </FrameLayout>

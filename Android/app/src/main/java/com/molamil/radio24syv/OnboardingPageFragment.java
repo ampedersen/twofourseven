@@ -94,7 +94,8 @@ public class OnboardingPageFragment extends Fragment
     {
         if(videoView != null && videoPath != null)
         {
-            int height = videoWrapper.getHeight() - DisplayUtil.dpToPx(getActivity().getApplicationContext(), 100); //Subtract height for UI. See activity_intro.xml
+            //int height = videoWrapper.getHeight() - DisplayUtil.dpToPx(getActivity().getApplicationContext(), 120);
+            int height = videoWrapper.getHeight() - (int)getResources().getDimension(R.dimen.onboarding_bottom_margin_size);
             int width = (int)((mVideoWidth/(float)mVideoHeight) * height);
 
             ViewGroup.LayoutParams videoParams = videoView.getLayoutParams();

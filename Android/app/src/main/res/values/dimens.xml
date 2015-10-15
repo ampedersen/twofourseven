@@ -11,4 +11,6 @@
     <dimen name="program_category_text_size">28sp</dimen>
     <dimen name="schedule_time_text_size">14sp</dimen>
     <dimen name="date_text_size">12sp</dimen>
+
+    <dimen name="onboarding_bottom_margin_size">150dp</dimen>
 </resources>

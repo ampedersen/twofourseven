@@ -52,7 +52,7 @@ public class IntroActivity extends FragmentActivity {
 
             @Override
             public void onPageSelected(int position) {
-                //previousPage = currentPage;
+                previousPage = currentPage;
                 currentPage = position;
 
             }
@@ -95,10 +95,8 @@ public class IntroActivity extends FragmentActivity {
         {
             return;
         }
-        Log.i("PAGE", "previousPage: " + previousPage + ", currentPage: " + currentPage);
 
-        previousPage = currentPage;
-
+        //previousPage = currentPage;
 
         cleanupVideo(previousPage);
         updateUI(currentPage);
