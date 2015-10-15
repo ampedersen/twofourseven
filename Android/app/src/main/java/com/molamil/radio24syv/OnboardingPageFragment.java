@@ -1,28 +1,18 @@
 package com.molamil.radio24syv;
 
-import android.app.ActionBar;
-import android.content.res.AssetFileDescriptor;
-import android.graphics.SurfaceTexture;
 import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.Surface;
-import android.view.SurfaceHolder;
-import android.view.SurfaceView;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.VideoView;
 
-import com.molamil.radio24syv.videoView.AspectFillVideoView;
-
-import java.io.IOException;
-import java.lang.reflect.Type;
+import com.molamil.radio24syv.util.DisplayUtil;
 
 /**
  * Created by patriksvensson on 09/10/15.
@@ -37,9 +27,6 @@ public class OnboardingPageFragment extends Fragment
     private FrameLayout videoWrapper;
     private ImageView videoPoster;
     private int posterId = 0;
-    //private TextureView textureView;
-    //private MediaPlayer mMediaPlayer;
-
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -92,8 +79,10 @@ public class OnboardingPageFragment extends Fragment
         videoView = (VideoView)v.findViewById(R.id.video);
         videoWrapper = (FrameLayout)v.findViewById(R.id.video_wrapper);
         videoPoster = (ImageView)v.findViewById(R.id.video_poster);
+
         if(videoPoster != null)
         {
+            Log.i("YUP", ""+videoPoster.getHeight());
             videoPoster.setImageResource(posterId);
         }
 
@@ -103,19 +92,18 @@ public class OnboardingPageFragment extends Fragment
     // Video control
     public void playVideo()
     {
-        Log.i("PS", "playVideo (called from pager)");
-        //Using SurfaceView and MediaPlayer
-        //surfaceView.setVisibility(View.VISIBLE);
-
-        //Using VideoView
         if(videoView != null && videoPath != null)
         {
-            int height = videoView.getHeight();
+            int height = videoWrapper.getHeight() - DisplayUtil.dpToPx(getActivity().getApplicationContext(), 100); //Subtract height for UI. See activity_intro.xml
             int width = (int)((mVideoWidth/(float)mVideoHeight) * height);
 
             ViewGroup.LayoutParams videoParams = videoView.getLayoutParams();
             videoParams.width = width;
             videoParams.height = height;
+
+//            ViewGroup.LayoutParams posterParams = videoPoster.getLayoutParams();
+//            posterParams.width = width;
+//            posterParams.height = height;
 
             videoView.setVisibility(View.VISIBLE);
             videoView.setAlpha(0);
@@ -135,6 +123,7 @@ public class OnboardingPageFragment extends Fragment
                                 //View placeholder = findViewById(R.id.placeholder);
                                 //placeholder.setVisibility(View.GONE);
                                 videoView.setAlpha(1);
+                                videoPoster.setAlpha(0f);
                             } else {
                                 new Handler().postDelayed(this, 50);
                             }
@@ -143,9 +132,6 @@ public class OnboardingPageFragment extends Fragment
                 }
             });
 
-
-            //videoView.start();
-            //videoView.setVideoSize(mVideoWidth, mVideoWidth);
             videoView.setVideoPath(videoPath);
         }
     }
@@ -154,16 +140,14 @@ public class OnboardingPageFragment extends Fragment
     {
         if(videoView != null)
         {
-            Log.i("PS", "cleanup video (called from pager)");
-
             ViewGroup.LayoutParams params = videoView.getLayoutParams();
             params.width = 100;
             params.height = 100;
             
             videoView.stopPlayback();
-
             videoView.setVisibility(View.GONE);
             videoView.setAlpha(0);
+            videoPoster.setAlpha(1f);
         }
     }
 

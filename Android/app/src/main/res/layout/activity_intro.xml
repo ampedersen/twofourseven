@@ -3,33 +3,18 @@
     android:layout_height="match_parent"
     tools:context="com.molamil.radio24syv.IntroActivity">
 
-    <!--
-    <TextView android:text="@string/title_activity_intro" android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
-
-    <Button
-        android:id="@+id/next_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_centerInParent="true"
-        android:text="@string/intro_next"
-        />
-    -->
-
     <com.molamil.radio24syv.view.RadioViewPager
         android:id="@+id/pager"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/box"
         android:layout_alignParentTop="true"
         />
 
     <FrameLayout
-        android:id="@+id/box"
+        android:id="@+id/ui_wrapper"
         android:layout_width="match_parent"
         android:layout_height="100dp"
-        android:layout_alignParentBottom="true"
-        android:background="@color/radio_gray">
+        android:layout_alignParentBottom="true">
 
     </FrameLayout>
 </RelativeLayout>

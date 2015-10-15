@@ -1,30 +1,18 @@
 package com.molamil.radio24syv;
 
-import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.os.Handler;
+import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.support.v7.app.ActionBarActivity;
-import android.os.Bundle;
-import android.util.Log;
 import android.util.SparseArray;
-import android.view.Menu;
-import android.view.MenuItem;
-import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
-import android.widget.VideoView;
 
 import com.molamil.radio24syv.view.RadioViewPager;
-
-import net.hockeyapp.android.CrashManager;
-import net.hockeyapp.android.UpdateManager;
 
 public class IntroActivity extends FragmentActivity {
 
@@ -112,7 +100,6 @@ public class IntroActivity extends FragmentActivity {
         }
         else
         {
-            //prepare video
             playVideo(currentPage);
         }
     }
