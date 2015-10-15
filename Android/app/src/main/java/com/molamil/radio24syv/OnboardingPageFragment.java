@@ -33,6 +33,7 @@ public class OnboardingPageFragment extends Fragment
     private int mVideoHeight = 720;
     private String videoPath;
     private VideoView videoView;
+    private FrameLayout videoWrapper;
 
     //private TextureView textureView;
     //private MediaPlayer mMediaPlayer;
@@ -83,6 +84,7 @@ public class OnboardingPageFragment extends Fragment
 
         View v = inflater.inflate(resourceID, container, false);
         videoView = (VideoView)v.findViewById(R.id.video);
+        videoWrapper = (FrameLayout)v.findViewById(R.id.video_wrapper);
 
         return v;
     }
@@ -97,13 +99,12 @@ public class OnboardingPageFragment extends Fragment
         //Using VideoView
         if(videoView != null && videoPath != null)
         {
+            int height = videoView.getHeight();
+            int width = (int)((mVideoWidth/(float)mVideoHeight) * height);
 
-            ViewGroup.LayoutParams params = videoView.getLayoutParams();
-            //Log.i("PS", "videoView.getWidth(): "+videoView.getWidth());
-            //Log.i("PS", "videoView.getHeight(): "+videoView.getHeight());
-            params.width = videoView.getWidth()*3;
-            params.height = videoView.getHeight();
-
+            ViewGroup.LayoutParams videoParams = videoView.getLayoutParams();
+            videoParams.width = width;
+            videoParams.height = height;
 
             videoView.setVisibility(View.VISIBLE);
             videoView.setAlpha(0);

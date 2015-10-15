@@ -5,13 +5,22 @@
     android:background="@color/radio_red"
     tools:context="com.molamil.radio24syv.PageFragment">
 
-    <VideoView
-        android:id="@+id/video"
+    <FrameLayout
+        android:id="@+id/video_wrapper"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:alpha="0"/>
+        android:layout_height="match_parent">
 
-    <TextView android:layout_width="match_parent" android:layout_height="match_parent"
-        android:text="Video page" />
+        <VideoView
+            android:layout_gravity="center"
+            android:id="@+id/video"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:alpha="0"/>
+
+        <TextView android:layout_width="match_parent" android:layout_height="match_parent"
+            android:text="Video page" />
+
+    </FrameLayout>
+
 
 </FrameLayout>
