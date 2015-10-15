@@ -2,7 +2,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/radio_red"
+    android:background="#E6041F"
     tools:context="com.molamil.radio24syv.PageFragment">
 
     <ImageView
@@ -24,6 +24,10 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:alpha="0"/>
+
+        <!-- Prevents black flicker? -->
+        <TextView android:layout_width="match_parent" android:layout_height="match_parent"
+            android:text="" />
 
     </FrameLayout>
 
