@@ -16,6 +16,7 @@ import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
+import android.widget.ImageView;
 import android.widget.VideoView;
 
 import com.molamil.radio24syv.videoView.AspectFillVideoView;
@@ -34,7 +35,8 @@ public class OnboardingPageFragment extends Fragment
     private String videoPath;
     private VideoView videoView;
     private FrameLayout videoWrapper;
-
+    private ImageView videoPoster;
+    private int posterId = 0;
     //private TextureView textureView;
     //private MediaPlayer mMediaPlayer;
 
@@ -53,18 +55,22 @@ public class OnboardingPageFragment extends Fragment
             case 0:
                 videoPath = "android.resource://" + packageName + "/"+R.raw.live;
                 mVideoWidth = 718;
+                posterId = R.drawable.video_poster_live;
                 break;
             case 1:
                 videoPath = "android.resource://" + packageName + "/"+R.raw.programmer;
                 mVideoWidth = 716;
+                posterId = R.drawable.video_poster_programmer;
                 break;
             case 2:
                 videoPath = "android.resource://" + packageName + "/"+R.raw.news;
                 mVideoWidth = 720;
+                posterId = R.drawable.video_poster_news;
                 break;
             case 3:
                 videoPath = "android.resource://" + packageName + "/"+R.raw.offline;
                 mVideoWidth = 718;
+                posterId = R.drawable.video_poster_offline;
                 break;
         }
     }
@@ -85,6 +91,11 @@ public class OnboardingPageFragment extends Fragment
         View v = inflater.inflate(resourceID, container, false);
         videoView = (VideoView)v.findViewById(R.id.video);
         videoWrapper = (FrameLayout)v.findViewById(R.id.video_wrapper);
+        videoPoster = (ImageView)v.findViewById(R.id.video_poster);
+        if(videoPoster != null)
+        {
+            videoPoster.setImageResource(posterId);
+        }
 
         return v;
     }

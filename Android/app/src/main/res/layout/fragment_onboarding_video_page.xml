@@ -5,6 +5,12 @@
     android:background="@color/radio_red"
     tools:context="com.molamil.radio24syv.PageFragment">
 
+    <ImageView
+        android:id="@+id/video_poster"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:scaleType="centerCrop" />
+
     <FrameLayout
         android:id="@+id/video_wrapper"
         android:layout_width="match_parent"
