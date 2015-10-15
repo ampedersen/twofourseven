@@ -98,14 +98,16 @@ public class OnboardingPageFragment extends Fragment
         if(videoView != null && videoPath != null)
         {
 
-            //ViewGroup.LayoutParams params = videoView.getLayoutParams();
+            ViewGroup.LayoutParams params = videoView.getLayoutParams();
             //Log.i("PS", "videoView.getWidth(): "+videoView.getWidth());
             //Log.i("PS", "videoView.getHeight(): "+videoView.getHeight());
-            //params.width = videoView.getWidth()*100;
-            //params.height = videoView.getHeight();
+            params.width = videoView.getWidth()*3;
+            params.height = videoView.getHeight();
 
 
-            //videoView.setAlpha(0);
+            videoView.setVisibility(View.VISIBLE);
+            videoView.setAlpha(0);
+
             videoView.setOnPreparedListener(new MediaPlayer.OnPreparedListener() {
                 @Override
                 public void onPrepared(MediaPlayer mp) {
@@ -140,8 +142,15 @@ public class OnboardingPageFragment extends Fragment
     {
         if(videoView != null)
         {
-            //TODO: Stop and unload video
-            //videoView.setVisibility(View.GONE);
+            Log.i("PS", "cleanup video (called from pager)");
+
+            ViewGroup.LayoutParams params = videoView.getLayoutParams();
+            params.width = 100;
+            params.height = 100;
+            
+            videoView.stopPlayback();
+
+            videoView.setVisibility(View.GONE);
             videoView.setAlpha(0);
         }
     }
