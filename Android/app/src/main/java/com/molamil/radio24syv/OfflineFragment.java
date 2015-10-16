@@ -48,6 +48,8 @@ public class OfflineFragment extends PageFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_offline, container, false);
 
+        //Dev buttons
+        /*
         v.findViewById(R.id.delete_all_button).setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -68,6 +70,7 @@ public class OfflineFragment extends PageFragment {
                 Storage.get().deleteImageCache();
             }
         });
+        */
 
         ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
         for (ProgramInfo program : Storage.get().getProgramsWithPodcastsInLibrary()) {

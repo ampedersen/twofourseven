@@ -17,6 +17,8 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:layout_margin="@dimen/app_margin_25"
+            android:paddingBottom="@dimen/tabbar_expanded_height"
             >
 
             <TextView
@@ -26,6 +28,8 @@
                 style="@style/SectionTitleText"
                 />
 
+            <!-- DEV STUFF -->
+            <!--
             <Button
                 android:id="@+id/delete_all_button"
                 android:layout_width="wrap_content"
@@ -46,6 +50,7 @@
                 android:layout_height="wrap_content"
                 android:text="Reset image cache"
                 />
+            -->
 
             <LinearLayout
                 android:id="@+id/content"

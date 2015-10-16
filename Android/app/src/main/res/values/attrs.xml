@@ -12,6 +12,11 @@
         <attr name="audioTitle" format="string" />
         <attr name="audioDescription" format="string" />
         <attr name="adaptActionAfterPlay" format="boolean" />
+
+        <attr name="playIcon" format="reference" />
+        <attr name="stopIcon" format="reference" />
+        <attr name="pauseIcon" format="reference" />
+
     </declare-styleable>
 
     <declare-styleable name="DateLineView">

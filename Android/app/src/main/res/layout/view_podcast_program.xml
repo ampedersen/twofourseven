@@ -3,6 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:layout_marginTop="@dimen/app_margin_25"
     android:animateLayoutChanges="true"
     >
 
@@ -16,10 +17,9 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
+            android:orientation="horizontal" >
 
-            <TextView
+            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
                 android:id="@+id/name_text"
                 android:layout_width="0dp"
                 android:layout_weight="1"
@@ -30,21 +30,28 @@
                 style="@style/PodcastProgramTitleText"
                 />
 
-            <TextView
-                android:id="@+id/size_button"
+            <FrameLayout
                 android:layout_width="40dp"
                 android:layout_height="40dp"
-                android:layout_weight="0"
-                />
+                android:layout_weight="0">
+                    <ImageView
+                        android:id="@+id/expand_button"
+                        android:src="@drawable/button_expand_big"
+                        android:layout_gravity="right|center_vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content" />
+                </FrameLayout>
+
 
         </LinearLayout>
 
-        <TextView
+        <View
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="-------------------------------------------------"
-            android:gravity="center"
-            />
+            android:layout_height="1dp"
+            android:layout_marginTop="@dimen/app_margin_half25"
+            android:layout_marginBottom="8dp"
+            android:background="@color/radio_gray_darker"/>
+
 
     </LinearLayout>
 
@@ -65,6 +72,7 @@
                 android:id="@+id/count_text"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:textColor="@color/radio_gray_dark"
                 android:text="XX episoder"
                 />
 

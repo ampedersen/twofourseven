@@ -5,6 +5,8 @@ import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -161,16 +163,12 @@ public class PodcastProgramView extends LinearLayout implements
             expandedLayout.setVisibility(View.VISIBLE);
         }
 
-        TextView sizeButton = (TextView) findViewById(R.id.size_button);
+        ImageView expandButton = (ImageView) findViewById(R.id.expand_button);
         if (size == Size.CONTRACTED) {
-            sizeButton.setText("[expand image]");
+            expandButton.setImageResource(R.drawable.button_expand_big);
         } else {
-            sizeButton.setText("[contract image]");
+            expandButton.setImageResource(R.drawable.button_collapse_big);
         }
-
-//        if (listener != null) {
-//            listener.onPodcastEpisodeViewSizeChanged(this, size);
-//        }
     }
 
     @Override

@@ -30,6 +30,10 @@ public class RadioPlayerButton extends Button implements
     private RadioPlayer player;
     private boolean isAvailable = true;
 
+    private int playIcon;
+    private int stopIcon;
+    private int pauseIcon;
+
     public RadioPlayerButton(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -45,6 +49,9 @@ public class RadioPlayerButton extends Button implements
             setTitle(a.getString(R.styleable.RadioPlayerButton_audioTitle));
             setDescription(a.getString(R.styleable.RadioPlayerButton_audioDescription));
             setAdaptActionAfterPlay(a.getBoolean(R.styleable.RadioPlayerButton_adaptActionAfterPlay, true));
+            setPlayIcon(a.getResourceId(R.styleable.RadioPlayerButton_playIcon, 0));
+            setStopIcon(a.getResourceId(R.styleable.RadioPlayerButton_stopIcon, 0));
+            setPauseIcon(a.getResourceId(R.styleable.RadioPlayerButton_pauseIcon, 0));
         } finally {
             a.recycle();
         }
@@ -96,6 +103,30 @@ public class RadioPlayerButton extends Button implements
         this.player = player;
         player.addListener(this);
     }
+
+    public int getStopIcon() {
+        return stopIcon;
+    }
+
+    public void setStopIcon(int stopIcon) {
+        this.stopIcon = stopIcon;
+    }
+
+    public int getPlayIcon() {
+        return playIcon;
+    }
+
+    public void setPlayIcon(int playIcon) {
+        this.playIcon = playIcon;
+    }
+    public int getPauseIcon() {
+        return pauseIcon;
+    }
+
+    public void setPauseIcon(int pauseIcon) {
+        this.pauseIcon = pauseIcon;
+    }
+
 
     @Override
     protected void onAttachedToWindow() {
@@ -171,6 +202,9 @@ public class RadioPlayerButton extends Button implements
         }
         drawCenter(canvas, p, RadioPlayer.getActionName(action));
 
+        //background image
+        //setBackground(action);
+
         super.onDraw(canvas);
     }
 
@@ -185,6 +219,39 @@ public class RadioPlayerButton extends Button implements
         //float y = cHeight / 2f + r.height() / 2f - r.bottom;
         float y = cHeight / 2f + 4; // Hack to use same y position no matter text height
         canvas.drawText(text, x, y, paint);
+    }
+
+    private void setBackground(int action)
+    {
+        Log.i("PS", "set background: "+action);
+        switch (action)
+        {
+            case 0://play
+                Log.i("PS", "try set play image");
+                if(playIcon != 0) {
+                    setBackgroundResource(playIcon);
+                    Log.i("PS", "set play image");
+                }
+                break;
+            case 1://stop
+                Log.i("PS", "try set stop image");
+                if(stopIcon != 0) {
+                    setBackgroundResource(stopIcon);
+                    Log.i("PS", "set stop image");
+                }
+                break;
+            case 2://pause
+                Log.i("PS", "try set pause image");
+                if(pauseIcon != 0) {
+                    setBackgroundResource(pauseIcon);
+                    Log.i("PS", "set pause image");
+                }
+                break;
+            case 3://next
+                break;
+            case 4://prev
+                break;
+        }
     }
 
     @Override
@@ -302,6 +369,7 @@ public class RadioPlayerButton extends Button implements
     private void setIsAvailable(boolean isAvailable) {
         this.isAvailable = isAvailable;
         postInvalidate(); // Redraw view next frame
+        setBackground(action);
     }
 
     private void setIsAvailableAndPlayAction(RadioPlayer player) {

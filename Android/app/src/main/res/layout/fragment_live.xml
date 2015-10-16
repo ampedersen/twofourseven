@@ -111,7 +111,7 @@
                 android:textSize="@dimen/schedule_time_text_size"
                 android:drawableRight="@drawable/button_arrow_white_small"
                 android:drawablePadding="@dimen/app_margin_half25"
-                style="@style/TextButton"
+                style="@style/BaseButton"
                 />
 
             <!--
@@ -142,7 +142,7 @@
                 android:textColor="@color/radio_gray_dark"
                 android:textSize="@dimen/schedule_time_text_size"
                 android:drawableRight="@drawable/button_expand"
-                style="@style/TextButton"
+                style="@style/BaseButton"
                 />
 
             <com.molamil.radio24syv.view.RadioPlayerButton
