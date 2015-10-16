@@ -152,6 +152,8 @@
                 android:layout_width="100dp"
                 android:layout_height="100dp"
                 android:background="@drawable/button_play_live"
+                app:playIcon="@drawable/button_play_live"
+                app:stopIcon="@drawable/button_stop_live"
                 app:action="play"
                 app:audioUrl="@string/url_live_radio"
                 />

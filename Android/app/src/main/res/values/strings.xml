@@ -34,8 +34,8 @@
     <string name="live_header">Radio24syv Live</string>
     <string name="live_schedule_button">Se sendeplan</string>
     <string name="playing_now">Lige nu</string>
-    <string name="expand_text">Se mere</string>
-    <string name="contract_text">Se mindre</string>
+    <string name="expand_text">Udvid</string>
+    <string name="contract_text">Fold sammen</string>
 
     <!-- Schedule -->
     <string name="schedule_header">Sendeplan</string>
@@ -72,8 +72,8 @@
     <string name="offline_header">Downloadede</string>
     <string name="download_podcast">Download</string>
     <string name="remove_podcast">Slet</string>
-    <string name="episode_count">%1$s podcast</string> <!-- %1$s is replaced with the number of episodes -->
-    <string name="episodes_count">%1$s podcasts</string> <!-- %1$s is replaced with the number of episodes -->
+    <string name="episode_count">%1$s  podcast</string> <!-- %1$s is replaced with the number of episodes -->
+    <string name="episodes_count">%1$s  podcasts</string> <!-- %1$s is replaced with the number of episodes -->
 
     <!-- URLs (no slash at the end please) -->
     <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>

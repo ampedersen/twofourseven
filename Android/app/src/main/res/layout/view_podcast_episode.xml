@@ -5,15 +5,17 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical"
     android:animateLayoutChanges="true"
+    android:layout_marginBottom="@dimen/app_margin_half25"
     >
 
     <LinearLayout
         android:id="@+id/top_layout"
+        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:id="@+id/name_text"
             android:layout_width="0dp"
             android:layout_weight="1"
@@ -39,6 +41,7 @@
     </LinearLayout>
 
     <LinearLayout
+        android:layout_marginTop="@dimen/app_margin_half25"
         android:id="@+id/contracted_layout"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -51,24 +54,25 @@
             android:orientation="horizontal"
             >
 
-            <TextView
+            <ImageView
                 android:id="@+id/downloaded_image"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="[downloaded image]"
-                />
+                android:src="@drawable/icon_download_checked_small"/>
 
-            <TextView
+            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
+                android:textSize="@dimen/expand_text_size"
+                android:textColor="@color/radio_gray_dark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/expand_text"
                 />
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="[expand image]"
-                />
+                android:layout_gravity="center"
+                android:src="@drawable/button_expand"/>
 
         </LinearLayout>
 
@@ -81,53 +85,63 @@
         android:orientation="vertical"
         >
 
-        <LinearLayout
-            android:id="@+id/download_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            >
-
-            <TextView
-                android:id="@+id/download_button_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="[download button image]"
-                />
-
-            <TextView
-                android:id="@+id/download_button_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/download_podcast"
-                />
-
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/description_text"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:text="Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbl"
-            />
 
         <LinearLayout
+            android:layout_marginTop="@dimen/app_margin_half25"
             android:id="@+id/contract_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:orientation="horizontal"
             >
 
-            <TextView
+            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
+                android:textSize="@dimen/expand_text_size"
+                android:textColor="@color/radio_gray_dark"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/contract_text"
                 />
 
-            <TextView
+            <ImageView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="[contract image]"
+                android:layout_gravity="center"
+                android:src="@drawable/button_collapse"/>
+
+        </LinearLayout>
+
+
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk56It
+            android:layout_marginTop="@dimen/app_margin_half25"
+            android:id="@+id/description_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/radio_white"
+            android:textSize="@dimen/body_text_size"
+            android:text="Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbl"
+            />
+
+
+        <LinearLayout
+            android:layout_marginTop="@dimen/app_margin_half25"
+            android:id="@+id/download_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            >
+
+            <ImageView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:src="@drawable/button_garbage_can"/>
+
+            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
+                android:textSize="@dimen/expand_text_size"
+                android:id="@+id/download_button_text"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textColor="@color/radio_gray_dark"
+                android:text="@string/remove_podcast"
                 />
 
         </LinearLayout>

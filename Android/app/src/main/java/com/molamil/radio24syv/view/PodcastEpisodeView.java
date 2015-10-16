@@ -4,6 +4,7 @@ import android.content.Context;
 import android.util.AttributeSet;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
@@ -167,57 +168,58 @@ public class PodcastEpisodeView extends LinearLayout implements
 
     @Override
     public void OnRadioLibraryStatusUpdated(int podcastId, RadioLibrary.Status status) {
-        TextView downloadedImage = (TextView) findViewById(R.id.downloaded_image);
+        ImageView downloadedImage = (ImageView) findViewById(R.id.downloaded_image);
+
         View downloadButton = findViewById(R.id.download_button);
-        TextView downloadButtonImage = (TextView) findViewById(R.id.download_button_image);
+        //TextView downloadButtonImage = (TextView) findViewById(R.id.download_button_image);
         TextView downloadButtonText = (TextView) findViewById(R.id.download_button_text);
         RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
 
         switch (status.getDownloadStatus()) {
 
             case RadioLibrary.DOWNLOAD_STATUS_UNKNOWN:
-                downloadedImage.setText("Ikke hentet");
-                downloadButtonImage.setText(downloadedImage.getText());
+                downloadedImage.setImageResource(R.drawable.icon_download_small);
+                //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.download_podcast);
                 downloadButton.setOnClickListener(downloadOnClick);
                 playButton.setUrl(podcastUrl);
                 break;
 
             case RadioLibrary.DOWNLOAD_STATUS_FAILED:
-                downloadedImage.setText("Kunne ikke hente");
-                downloadButtonImage.setText(downloadedImage.getText());
+                downloadedImage.setImageResource(R.drawable.icon_download_small);
+                //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.download_podcast);
                 downloadButton.setOnClickListener(downloadOnClick);
                 playButton.setUrl(podcastUrl);
                 break;
 
             case RadioLibrary.DOWNLOAD_STATUS_PAUSED:
-                downloadedImage.setText("Henter");
-                downloadButtonImage.setText(downloadedImage.getText());
+                downloadedImage.setImageResource(R.drawable.icon_download_small);
+                //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.remove_podcast);
                 downloadButton.setOnClickListener(removeOnClick);
                 playButton.setUrl(podcastUrl);
                 break;
 
             case RadioLibrary.DOWNLOAD_STATUS_PENDING:
-                downloadedImage.setText("Henter");
-                downloadButtonImage.setText(downloadedImage.getText());
+                downloadedImage.setImageResource(R.drawable.icon_download_small);
+                //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.remove_podcast);
                 downloadButton.setOnClickListener(removeOnClick);
                 playButton.setUrl(podcastUrl);
                 break;
 
             case RadioLibrary.DOWNLOAD_STATUS_RUNNING:
-                downloadedImage.setText("Henter");
-                downloadButtonImage.setText(downloadedImage.getText());
+                downloadedImage.setImageResource(R.drawable.icon_download_small);
+                //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.remove_podcast);
                 downloadButton.setOnClickListener(removeOnClick);
                 playButton.setUrl(podcastUrl);
                 break;
 
             case RadioLibrary.DOWNLOAD_STATUS_SUCCESSFUL:
-                downloadedImage.setText("Hentet");
-                downloadButtonImage.setText(downloadedImage.getText());
+                downloadedImage.setImageResource(R.drawable.icon_download_checked_small);
+                //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.remove_podcast);
                 downloadButton.setOnClickListener(removeOnClick);
                 playButton.setUrl(status.getLocalPodcastUrl()); // Play local file

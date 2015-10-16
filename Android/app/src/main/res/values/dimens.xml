@@ -16,6 +16,7 @@
     <dimen name="date_text_size">12sp</dimen>
 
     <dimen name="body_text_size">15sp</dimen>
+    <dimen name="expand_text_size">14sp</dimen>
 
     <dimen name="onboarding_bottom_margin_size">150dp</dimen>
 
