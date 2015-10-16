@@ -13,4 +13,9 @@
     <dimen name="date_text_size">12sp</dimen>
 
     <dimen name="onboarding_bottom_margin_size">150dp</dimen>
+
+    <dimen name="app_margin_25">25dp</dimen>
+    <dimen name="app_margin_50">50dp</dimen>
+    <dimen name="app_margin_75">75dp</dimen>
+
 </resources>

@@ -1,6 +1,9 @@
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools" android:layout_width="match_parent"
-    android:layout_height="match_parent" tools:context="com.molamil.radio24syv.PageFragment">
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.molamil.radio24syv.PageFragment">
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -13,23 +16,23 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:src="@drawable/audio_curve"
-            android:layout_marginBottom="25dp"/>
+            android:layout_marginBottom="@dimen/app_margin_25"/>
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:layout_marginBottom="25dp"
+            android:layout_marginLeft="@dimen/app_margin_25"
+            android:layout_marginRight="@dimen/app_margin_25"
+            android:layout_marginBottom="@dimen/app_margin_25"
             android:textSize="21sp"
             android:text="@string/onboarding_welcome" />
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="25dp"
-            android:layout_marginRight="25dp"
-            android:layout_marginBottom="50dp"
+            android:layout_marginLeft="@dimen/app_margin_25"
+            android:layout_marginRight="@dimen/app_margin_25"
+            android:layout_marginBottom="@dimen/app_margin_50"
             android:textSize="21sp"
             android:text="@string/onboarding_intro_message" />
 
@@ -38,10 +41,10 @@
         android:layout_height="wrap_content"
         android:orientation="horizontal">
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="25dp"
+            android:layout_marginLeft="@dimen/app_margin_25"
             android:textSize="13sp"
             android:text="@string/onboarding_intro_hint" />
 

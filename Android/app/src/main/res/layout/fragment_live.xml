@@ -73,8 +73,8 @@
                 android:text="Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla Bla bla "
                 />
 
-            <Button
-                android:id="@+id/text_expand"
+                                                                                            <Button
+                                                                                                android:id="@+id/text_expand"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/expand_text"
