@@ -6,9 +6,11 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="horizontal"
+    android:layout_marginTop="@dimen/app_margin_25"
+    android:layout_marginBottom="@dimen/app_margin_half25"
     >
 
-    <TextView
+    <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
         android:id="@+id/time_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -20,17 +22,17 @@
     <ImageView
         android:layout_width="22dp"
         android:layout_height="2dp"
-        android:src="@color/radio_gray"
+        android:src="@color/radio_gray_dark"
         android:layout_gravity="center"
         android:layout_marginLeft="12sp"
         android:layout_marginRight="12sp"
         />
 
-    <TextView
+    <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
         android:id="@+id/date_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textColor="@color/radio_gray"
+        android:textColor="@color/radio_gray_dark"
         android:text="5/10"
         style="@style/ProgramCategoryText"
         />

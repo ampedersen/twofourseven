@@ -3,10 +3,10 @@ package com.molamil.radio24syv;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Podcast;
@@ -35,6 +35,7 @@ public class NewsFragment extends Fragment {
 
     private OnFragmentInteractionListener listener;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
+    private ProgressBar progressBar;
 
     public NewsFragment() {
         // Required empty public constructor
@@ -50,7 +51,10 @@ public class NewsFragment extends Fragment {
         // Inflate the layout for this fragment
         final View v = inflater.inflate(R.layout.fragment_news, container, false);
 
-        showLoadingText(v, true);
+        progressBar = (ProgressBar)v.findViewById(R.id.activity_indicator);
+        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.MULTIPLY);
+
+        showActivityIndicator(v, true);
 
         RestClient.getApi().getLatestNewsPodcasts().enqueue(new Callback<List<Podcast>>() {
             @Override
@@ -58,7 +62,7 @@ public class NewsFragment extends Fragment {
                 if (listener != null) {
                     listener.onError(null);
                 }
-                showLoadingText(v, false);
+                showActivityIndicator(v, false);
                 List<Podcast> podcasts = response.body();
                 PodcastInfo p = null;
                 if ((podcasts != null) && (podcasts.size() > 0)) {
@@ -72,8 +76,8 @@ public class NewsFragment extends Fragment {
                 if (listener != null) {
                     listener.onError(t.getLocalizedMessage());
                 }
-                showLoadingText(v, false);
-                Log.d("JJJ", "fail " + t.getMessage());
+                showActivityIndicator(v, false);
+                //Log.d("JJJ", "fail " + t.getMessage());
                 t.printStackTrace();
             }
         });
@@ -81,15 +85,16 @@ public class NewsFragment extends Fragment {
         return v;
     }
 
-    private void showLoadingText(View v, boolean show) {
-        View loadingText = v.findViewById(R.id.loading_text);
+    private void showActivityIndicator(View v, boolean show)
+    {
+        //ProgressBar progressBar = (ProgressBar)v.findViewById(R.id.activity_indicator);
         int visibility;
         if (show) {
             visibility = View.VISIBLE;
         } else {
             visibility = View.GONE;
         }
-        loadingText.setVisibility(visibility);
+        progressBar.setVisibility(visibility);
     }
 
     private void showPodcast(PodcastInfo podcast) {

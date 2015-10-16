@@ -16,9 +16,11 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:layout_margin="@dimen/app_margin_25"
+            android:paddingBottom="@dimen/tabbar_expanded_height"
             >
 
-            <TextView
+            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/news_header"
@@ -33,15 +35,18 @@
                 android:animateLayoutChanges="true"
                 />
 
-            <TextView
-                android:id="@+id/loading_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/loading"
-                android:visibility="gone"
+            <com.molamil.radio24syv.view.RadioPlayerButton
+                android:id="@+id/play_button"
+                android:layout_marginTop="@dimen/app_margin_25"
                 android:layout_gravity="center"
+                android:layout_width="100dp"
+                android:layout_height="100dp"
+                android:background="@drawable/button_play_live"
+                app:action="play"
+                android:visibility="gone"
                 />
 
+            <!--
             <com.molamil.radio24syv.view.RadioPlayerButton
                 android:id="@+id/play_button"
                 android:layout_width="100dp"
@@ -50,9 +55,17 @@
                 app:action="play"
                 android:visibility="gone"
                 />
-
+            -->
         </LinearLayout>
 
     </ScrollView>
+
+    <ProgressBar
+        android:id="@+id/activity_indicator"
+        style="?android:attr/progressBarStyleLarge"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerInParent="true">
+    </ProgressBar>
 
 </RelativeLayout>
