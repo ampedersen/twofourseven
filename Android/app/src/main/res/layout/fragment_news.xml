@@ -22,7 +22,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/news_header"
-                style="@style/PageTitleText"
+                style="@style/SectionTitleText"
                 />
 
             <LinearLayout

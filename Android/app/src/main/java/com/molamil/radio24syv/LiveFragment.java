@@ -69,7 +69,7 @@ public class LiveFragment extends PageFragment {
                     ((TextView) v.findViewById(R.id.program_title)).setText(b.getProgramName());
                     ((TextView) v.findViewById(R.id.program_time_begin)).setText(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
                     ((TextView) v.findViewById(R.id.program_time_end)).setText(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
-                    ((TextView) v.findViewById(R.id.program_category)).setText(b.getTopic());
+                    //((TextView) v.findViewById(R.id.program_category)).setText(b.getTopic());
                     ((TextView) v.findViewById(R.id.program_description)).setText(b.getDescriptionText());
                     RadioPlayerButton playButton = (RadioPlayerButton) v.findViewById(R.id.play_button);
                     playButton.setTitle(b.getProgramName());
