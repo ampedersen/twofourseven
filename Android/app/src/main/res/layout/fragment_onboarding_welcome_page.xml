@@ -19,6 +19,7 @@
             android:layout_marginBottom="@dimen/app_margin_25"/>
 
         <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+            android:textColor="@color/radio_white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/app_margin_25"
@@ -28,6 +29,7 @@
             android:text="@string/onboarding_welcome" />
 
         <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+            android:textColor="@color/radio_white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/app_margin_25"
@@ -42,6 +44,7 @@
         android:orientation="horizontal">
 
         <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
+            android:textColor="@color/radio_white"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="@dimen/app_margin_25"

@@ -94,8 +94,7 @@ public class IntroActivity extends FragmentActivity {
 
         if (settings.getBoolean("returningUser", false))
         {
-            //Un-comment for correct flow
-            //startMainActivity();
+            startMainActivity();
         }
         else
         {
