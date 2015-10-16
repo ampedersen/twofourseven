@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
@@ -35,6 +36,8 @@ public class LiveFragment extends PageFragment {
     private PlayerFragment.OnFragmentInteractionListener playerListener;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
 
+    private ProgressBar timeline;
+
     public LiveFragment() {
         // Required empty public constructor
     }
@@ -43,6 +46,8 @@ public class LiveFragment extends PageFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_live, container, false);
 
+        timeline = (ProgressBar) v.findViewById(R.id.player_progress);
+
         Button scheduleButton = (Button)v.findViewById(R.id.schedule_button);
         scheduleButton.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -50,6 +55,14 @@ public class LiveFragment extends PageFragment {
                 if (listener != null) {
                     listener.onShowSidePage(OnFragmentInteractionListener.Side.SHOW_RIGHT);
                 }
+            }
+        });
+
+        Button expandButton = (Button)v.findViewById(R.id.text_expand);
+        expandButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.i("TODO", "Implement expand collapse text");
             }
         });
 
@@ -74,6 +87,8 @@ public class LiveFragment extends PageFragment {
                     RadioPlayerButton playButton = (RadioPlayerButton) v.findViewById(R.id.play_button);
                     playButton.setTitle(b.getProgramName());
                     playButton.setDescription(b.getDescriptionText());
+
+
                     //TODO get audio URL playButton.setUrl(b.get);
                 } else {
                     if (listener != null) {
