@@ -374,6 +374,11 @@ public class ProgramListFragment extends PageFragment {
     }
 
     private void addPrograms(final ViewGroup content, final List<ProgramInfo> programs) {
+        if(getActivity() == null)
+        {
+            return;
+        }
+
         ProgramListView list = new ProgramListView(getActivity(), programs, radioPlayerProvider.getRadioPlayer());
         list.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override

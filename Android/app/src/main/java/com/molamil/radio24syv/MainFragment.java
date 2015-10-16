@@ -46,10 +46,10 @@ public class MainFragment extends Fragment {
         tabHost = (FragmentTabHost)v.findViewById(android.R.id.tabhost);
         tabHost.setup(inflater.getContext(), getChildFragmentManager(), android.R.id.tabcontent);
 
-        addTab(inflater, TAG_TAB_LIVE, R.string.tab_live, android.R.drawable.btn_star, LiveFragment.class);
-        addTab(inflater, TAG_TAB_PROGRAMS, R.string.tab_programs, android.R.drawable.btn_star, ProgramsFragment.class);
-        addTab(inflater, TAG_TAB_NEWS, R.string.tab_news, android.R.drawable.btn_star, NewsFragment.class);
-        addTab(inflater, TAG_TAB_OFFLINE, R.string.tab_offline, android.R.drawable.btn_star, OfflineFragment.class);
+        addTab(inflater, TAG_TAB_LIVE, R.string.tab_live, R.drawable.tab_icon_live, LiveFragment.class);
+        addTab(inflater, TAG_TAB_PROGRAMS, R.string.tab_programs, R.drawable.tab_icon_podcasts, ProgramsFragment.class);
+        addTab(inflater, TAG_TAB_NEWS, R.string.tab_news, R.drawable.tab_icon_news, NewsFragment.class);
+        addTab(inflater, TAG_TAB_OFFLINE, R.string.tab_offline, R.drawable.tab_icon_offline, OfflineFragment.class);
 
         tabHost.setCurrentTabByTag(startupTabTag);
 
@@ -58,6 +58,7 @@ public class MainFragment extends Fragment {
             @Override
             public void onTabChanged(String tabId) {
                 if (listener != null) {
+                    //Do Manual alpha on images in tab bar
                     listener.onMainTabChanged(tabId);
                 }
             }
@@ -140,7 +141,7 @@ public class MainFragment extends Fragment {
 
     private void addTab(LayoutInflater inflater, String tag, int textId, int iconId, Class<?> fragment) {
         View indicator = inflater.inflate(R.layout.view_tab_indicator, tabHost.getTabWidget(), false);
-        ((ImageView) indicator.findViewById(R.id.tab_indicator_icon)).setImageResource(android.R.drawable.btn_star);
+        ((ImageView) indicator.findViewById(R.id.tab_indicator_icon)).setImageResource(iconId);
         ((TextView) indicator.findViewById(R.id.tab_indicator_text)).setText(getResources().getText(textId));
 
         tabHost.addTab(tabHost.newTabSpec(tag).setIndicator(indicator), fragment, null);

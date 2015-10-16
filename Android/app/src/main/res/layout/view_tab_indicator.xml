@@ -21,16 +21,18 @@
             android:id="@+id/tab_indicator_icon"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:src="@drawable/tab_icon"
+            android:layout_marginTop="8dp"
+            android:src="@drawable/tab_icon_live"
             />
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:id="@+id/tab_indicator_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:textColor="@drawable/tab_text"
-            android:textSize="12sp"
-            android:textStyle="bold"
+            android:layout_marginTop="8dp"
+            android:layout_marginBottom="8dp"
+            android:textSize="10sp"
             />
 
     </LinearLayout>

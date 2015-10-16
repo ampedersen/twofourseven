@@ -21,9 +21,9 @@
 
     <!-- Main -->
     <string name="tab_live">Live radio</string>
-    <string name="tab_programs">Programmer</string>
-    <string name="tab_news">Sidste nyt</string>
-    <string name="tab_offline">Lyt offline</string>
+    <string name="tab_programs">Podcasts</string>
+    <string name="tab_news">Seneste nyt</string>
+    <string name="tab_offline">Downloadede</string>
     <string name="error_generic">Kunne ikke få forbindelse, beklager.</string>
     <string name="loading">Indlæser...</string>
 
@@ -46,7 +46,7 @@
     <string name="program_alarm_failed">Kan ikke give besked før programmet starter, beklager</string>
 
     <!-- Programs -->
-    <string name="programs_header">Programmer</string>
+    <string name="programs_header">Podcasts</string>
     <string name="programs_recent">Du har for nyligt lyttet til</string>
     <string name="programs_recomended">Anbefalet til dig</string>
     <string name="programs_popular">Populære programmer</string>
@@ -65,13 +65,13 @@
     <string name="search_busy">Søger...</string>
 
     <!-- News -->
-    <string name="news_header">Sidste nyt</string>
+    <string name="news_header">Seneste nyt</string>
     <string name="news_empty">Hør seneste nyt fra Radio24syv</string>
 
     <!-- Offline -->
-    <string name="offline_header">Lyt offline</string>
-    <string name="download_podcast">Gem til offline</string>
-    <string name="remove_podcast">Fjern fra offline</string>
+    <string name="offline_header">Downloadede</string>
+    <string name="download_podcast">Download</string>
+    <string name="remove_podcast">Slet</string>
     <string name="episode_count">%1$s episode</string> <!-- %1$s is replaced with the number of episodes -->
     <string name="episodes_count">%1$s episoder</string> <!-- %1$s is replaced with the number of episodes -->
 
@@ -87,7 +87,7 @@
     <string name="onboarding_message_0">Lyt til live radio i appen og swipe for at se sendeplan</string>
     <string name="onboarding_message_1">Find podcasts og download til offline brug</string>
     <string name="onboarding_message_2">Få de seneste nyheder. Opdateres hver time</string>
-    <string name="onboarding_message_3">Se de podcasts du har downloadet og lyt uden internetforbindelse</string> //Se de podcasts du har downloadet og lyt uden internetforbindelse
+    <string name="onboarding_message_3">Se de podcasts du har downloadet og lyt uden internetforbindelse</string>
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_done">Færdig</string>
 

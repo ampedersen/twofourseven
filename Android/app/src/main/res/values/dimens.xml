@@ -3,6 +3,9 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="tabbar_expanded_height">68dp</dimen>
+    <dimen name="tabbar_collapsed_height">32dp</dimen>
+
     <dimen name="page_sub_back_button_width">40dp</dimen>
 
     <dimen name="page_title_text_size">22sp</dimen>
@@ -12,11 +15,15 @@
     <dimen name="schedule_time_text_size">14sp</dimen>
     <dimen name="date_text_size">12sp</dimen>
 
+    <dimen name="body_text_size">15sp</dimen>
+
     <dimen name="onboarding_bottom_margin_size">150dp</dimen>
 
     <dimen name="app_margin_15">15dp</dimen>
+    <dimen name="app_margin_half25">13dp</dimen>
     <dimen name="app_margin_25">25dp</dimen>
     <dimen name="app_margin_50">50dp</dimen>
     <dimen name="app_margin_75">75dp</dimen>
+    <dimen name="app_margin_half75">38dp</dimen>
 
 </resources>

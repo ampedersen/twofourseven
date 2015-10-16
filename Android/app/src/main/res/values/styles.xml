@@ -6,6 +6,7 @@
         <item name="android:windowBackground">@color/radio_black</item>
     </style>
 
+    <!-- TEXTS -->
     <style name="PageTitleText" >
         <item name="android:textColor">@color/radio_white</item>
         <item name="android:textSize">@dimen/program_category_text_size</item>
@@ -25,15 +26,6 @@
 
     <style name="SidePageTitleText" parent="PageTitleText">
         <item name="android:textColor">@color/radio_black</item>
-    </style>
-
-    <style name="PageBackButton" >
-        <item name="android:textColor">@color/radio_gray_light</item>
-        <!-- TODO use image instead of text for back symbol -->
-        <item name="android:textStyle">bold</item>
-        <item name="android:textSize">30sp</item>
-        <item name="android:gravity">center</item>
-        <item name="android:background">@color/transparent</item>
     </style>
 
     <style name="PodcastEpisodeTitleText" >
@@ -77,4 +69,22 @@
         <item name="android:textColor">@color/radio_white</item>
         <item name="android:textSize">@dimen/podcast_episode_title_text_size</item>
     </style>
+
+
+    <!-- BUTTONS -->
+    <style name="PageBackButton" >
+        <item name="android:textColor">@color/radio_gray_light</item>
+        <!-- TODO use image instead of text for back symbol -->
+        <item name="android:textStyle">bold</item>
+        <item name="android:textSize">30sp</item>
+        <item name="android:gravity">center</item>
+        <item name="android:background">@color/transparent</item>
+    </style>
+
+    <style name="TextButton" >
+        <item name="android:minWidth">0dp</item>
+        <item name="android:minHeight">0dp</item>
+        <item name="android:background">@color/transparent</item>
+    </style>
+
 </resources>
