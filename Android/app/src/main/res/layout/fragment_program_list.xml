@@ -16,30 +16,46 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:orientation="vertical"
+            android:layout_margin="@dimen/app_margin_25"
+            android:paddingBottom="@dimen/tabbar_expanded_height"
             >
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/programs_header"
-                style="@style/PageTitleText"
-                />
+            <FrameLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
 
-            <Button
-                android:id="@+id/categories_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Se kategorier"
-                />
+                <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/programs_header"
+                    style="@style/SectionTitleText"
+                    android:layout_gravity="center"
+                    />
 
-            <Button
-                android:id="@+id/search_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Søg"
-                />
+                <ImageButton
+                    android:id="@+id/categories_button"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@color/transparent"
+                    android:src="@drawable/icon_categories"
+                    android:layout_gravity="left|top"
+                    />
+
+                <ImageButton
+                    android:id="@+id/search_button"
+                    android:layout_width="32dp"
+                    android:layout_height="32dp"
+                    android:background="@color/transparent"
+                    android:src="@drawable/icon_search"
+                    android:layout_gravity="right|top"
+                    />
+
+            </FrameLayout>
+
 
             <com.molamil.radio24syv.view.ProgramCategoryButton
+                android:layout_marginTop="@dimen/app_margin_half25"
+                android:layout_marginBottom="@dimen/app_margin_half25"
                 android:id="@+id/category_button"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"

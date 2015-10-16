@@ -223,28 +223,21 @@ public class RadioPlayerButton extends Button implements
 
     private void setBackground(int action)
     {
-        Log.i("PS", "set background: "+action);
         switch (action)
         {
             case 0://play
-                Log.i("PS", "try set play image");
                 if(playIcon != 0) {
                     setBackgroundResource(playIcon);
-                    Log.i("PS", "set play image");
                 }
                 break;
             case 1://stop
-                Log.i("PS", "try set stop image");
                 if(stopIcon != 0) {
                     setBackgroundResource(stopIcon);
-                    Log.i("PS", "set stop image");
                 }
                 break;
             case 2://pause
-                Log.i("PS", "try set pause image");
                 if(pauseIcon != 0) {
                     setBackgroundResource(pauseIcon);
-                    Log.i("PS", "set pause image");
                 }
                 break;
             case 3://next

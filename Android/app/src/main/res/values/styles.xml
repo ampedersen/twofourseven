@@ -30,13 +30,11 @@
 
     <style name="PodcastEpisodeTitleText" >
         <item name="android:textColor">@color/radio_white</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/podcast_episode_title_text_size</item>
     </style>
 
     <style name="PodcastProgramTitleText" >
         <item name="android:textColor">@color/radio_white</item>
-        <item name="android:textStyle">bold</item>
         <item name="android:textSize">@dimen/podcast_program_title_text_size</item>
         <item name="android:singleLine">true</item>
     </style>

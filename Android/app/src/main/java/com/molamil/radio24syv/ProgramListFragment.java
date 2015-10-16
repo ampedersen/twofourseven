@@ -9,6 +9,8 @@ import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.Button;
+import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
@@ -21,6 +23,7 @@ import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.storage.model.TopicInfo;
+import com.molamil.radio24syv.util.DisplayUtil;
 import com.molamil.radio24syv.view.ProgramCategoryButton;
 import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.ProgramListView;
@@ -86,7 +89,7 @@ public class ProgramListFragment extends PageFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_program_list, container, false);
 
-        Button categoriesButton = (Button)v.findViewById(R.id.categories_button);
+        ImageButton categoriesButton = (ImageButton)v.findViewById(R.id.categories_button);
         categoriesButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -95,7 +98,7 @@ public class ProgramListFragment extends PageFragment {
                 }
             }
         });
-        Button searchButton = (Button) v.findViewById(R.id.search_button);
+        ImageButton searchButton = (ImageButton) v.findViewById(R.id.search_button);
         searchButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -243,7 +246,11 @@ public class ProgramListFragment extends PageFragment {
 
                 // Show programs (if we still have any left)
                 if (recentPrograms.size() > 0) {
-                    TextView t = new TextView(content.getContext());
+                    com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg t = new com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg(content.getContext());
+                    t.setTextColor(getResources().getColor(R.color.radio_white));
+                    int padding = DisplayUtil.dpToPx(getActivity().getApplicationContext(), 10);
+                    t.setPadding(0,0,0,padding);
+
                     t.setText(R.string.programs_recent);
                     content.addView(t);
                     addPrograms(content, recentPrograms);
@@ -301,7 +308,13 @@ public class ProgramListFragment extends PageFragment {
 
             // Show recommended programs
             if (recommendedPrograms.size() > 0) {
-                TextView t = new TextView(content.getContext());
+                com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg t = new com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg(content.getContext());
+                t.setTextColor(getResources().getColor(R.color.radio_white));
+                int paddingTop = DisplayUtil.dpToPx(getActivity().getApplicationContext(), (int)getResources().getDimension(R.dimen.app_margin_half25));
+                int padding = DisplayUtil.dpToPx(getActivity().getApplicationContext(), 10);
+                t.setPadding(0,paddingTop,0,padding);
+
+                //TextView t = new TextView(content.getContext());
                 t.setText(R.string.programs_recomended);
                 content.addView(t);
                 addPrograms(content, recommendedPrograms);
@@ -321,7 +334,14 @@ public class ProgramListFragment extends PageFragment {
                     for (Program program : response.body()) {
                         popularPrograms.add(new ProgramInfo(program));
                     }
-                    TextView t = new TextView(content.getContext());
+
+                    //TextView t = new TextView(content.getContext());
+                    com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg t = new com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg(content.getContext());
+                    t.setTextColor(getResources().getColor(R.color.radio_white));
+                    int paddingTop = DisplayUtil.dpToPx(getActivity().getApplicationContext(), (int)getResources().getDimension(R.dimen.app_margin_half25));
+                    int padding = DisplayUtil.dpToPx(getActivity().getApplicationContext(), 10);
+                    t.setPadding(0,paddingTop,0,padding);
+
                     t.setText(R.string.programs_popular);
                     content.addView(t);
                     addPrograms(content, popularPrograms);
@@ -458,4 +478,5 @@ public class ProgramListFragment extends PageFragment {
     public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {
         public void onProgramSelected(ProgramInfo program);
     }
+
 }

@@ -8,6 +8,7 @@
     android:background="@color/radio_gray_darker"
     android:focusable="false"
     android:clickable="false"
+    android:layout_marginBottom="@dimen/app_margin_half25"
     >
 
     <com.molamil.radio24syv.view.ProgramImageView
@@ -18,18 +19,24 @@
         android:clickable="false"
         />
 
-    <TextView
+    <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+        android:layout_margin="@dimen/app_margin_half25"
         android:id="@+id/name_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Program name that could be a long one with lots of text and interesting stuff blabla"
+        android:text="Title"
         android:singleLine="true"
         android:layout_alignParentTop="true"
         android:focusable="false"
         android:clickable="false"
+        style="@style/PodcastProgramTitleText"
         />
 
-    <TextView
+    <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
+        android:layout_marginLeft="@dimen/app_margin_half25"
+        android:layout_marginRight="@dimen/app_margin_half25"
+        android:layout_marginBottom="@dimen/app_margin_half25"
+        android:textColor="@color/radio_white"
         android:id="@+id/description_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -41,7 +48,7 @@
         android:clickable="false"
         />
 
-    <TextView
+    <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
         android:id="@+id/topic_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -50,17 +57,23 @@
         android:layout_alignParentBottom="true"
         android:focusable="false"
         android:clickable="false"
+        android:textColor="@color/radio_white"
+        android:layout_marginLeft="@dimen/app_margin_half25"
         />
 
     <com.molamil.radio24syv.view.RadioPlayerButton
         android:id="@+id/play_button"
-        android:layout_width="50dp"
-        android:layout_height="50dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         app:action="play"
-        android:layout_alignParentBottom="true"
         android:layout_alignParentRight="true"
+        android:layout_alignParentBottom="true"
         android:focusable="false"
         android:clickable="false"
+        android:layout_marginRight="@dimen/app_margin_half25"
+        android:background="@drawable/button_play_program"
+        app:playIcon="@drawable/button_play_program"
+        app:pauseIcon="@drawable/button_pause_program"
         />
 
 </RelativeLayout>

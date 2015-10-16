@@ -1,13 +1,16 @@
 package com.molamil.radio24syv.view;
 
 import android.app.Activity;
+import android.graphics.drawable.ColorDrawable;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 
+import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.util.DisplayUtil;
 
 import java.util.List;
 
@@ -19,6 +22,9 @@ public class ProgramListView extends ListView {
 
     public ProgramListView(Activity activity, List<ProgramInfo> programs, RadioPlayer radioPlayer) {
         super(activity);
+
+        setDivider(new ColorDrawable(getResources().getColor(R.color.transparent)));
+        setDividerHeight(DisplayUtil.dpToPx(activity.getApplicationContext(), (int)getResources().getDimension(R.dimen.app_margin_half25)));
 
         setLayoutParams(new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
         setAdapter(new ProgramListViewAdapter(activity, programs.toArray(new ProgramInfo[0]), radioPlayer));

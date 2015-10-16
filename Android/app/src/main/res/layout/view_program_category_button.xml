@@ -25,7 +25,7 @@
             android:layout_marginRight="10dp"
             />
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:id="@+id/topic_text"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
