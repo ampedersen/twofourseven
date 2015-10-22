@@ -179,6 +179,9 @@ public class ProgramDetailsFragment extends PageFragment implements
                 }
                 //for (Podcast p : response.body()) { // For some reason this does not work
                 //for (Podcast p : response.body().iterator) { // For some reason this does not work neither
+
+                PodcastEpisodeView prevView = null;
+
                 for (int i = 0; i < response.body().size(); i++) {
                     PodcastInfo p = new PodcastInfo(response.body().get(i));
                     podcastById.put(p.getPodcastId(), p);
@@ -186,6 +189,10 @@ public class ProgramDetailsFragment extends PageFragment implements
                     DateTime date = DateTime.parse(p.getDate());
                     boolean isNewMonth = (lastPodcastDate == null) || (!date.monthOfYear().equals(lastPodcastDate.monthOfYear())) || (!date.year().equals(lastPodcastDate.year()));
                     if (isNewMonth) {
+                        if(prevView != null)
+                        {
+                            prevView.findViewById(R.id.divider).setVisibility(View.GONE);
+                        }
                         lastPodcastDate = date;
                         DateLineView separator = new DateLineView(content.getContext());
                         separator.setDate(date.monthOfYear().getAsText(Locale.getDefault()), date.year().getAsText(Locale.getDefault()));
@@ -197,6 +204,16 @@ public class ProgramDetailsFragment extends PageFragment implements
                     v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
                     v.setOnPodcastEpisodeViewUpdatedListener(ProgramDetailsFragment.this);
                     content.addView(v);
+
+                    /*
+                    //TODO: Handle load more. This hidden divider might need to be shown when more results are loaded
+                    if(i == response.body().size()-1)
+                    {
+                        v.findViewById(R.id.divider).setVisibility(View.GONE);
+                    }
+                    */
+
+                    prevView = v;
 
                     Storage.get().addPodcast(p);
                 }

@@ -98,6 +98,7 @@ public class PodcastEpisodeView extends LinearLayout implements
             }
         });
 
+
         setSize(Size.CONTRACTED);
     }
 
@@ -174,10 +175,12 @@ public class PodcastEpisodeView extends LinearLayout implements
         //TextView downloadButtonImage = (TextView) findViewById(R.id.download_button_image);
         TextView downloadButtonText = (TextView) findViewById(R.id.download_button_text);
         RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
+        ImageView downloadButtonImage = (ImageView) findViewById(R.id.download_icon);
 
         switch (status.getDownloadStatus()) {
 
             case RadioLibrary.DOWNLOAD_STATUS_UNKNOWN:
+                downloadButtonImage.setImageResource(R.drawable.button_download);
                 downloadedImage.setImageResource(R.drawable.icon_download_small);
                 //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.download_podcast);
@@ -186,6 +189,7 @@ public class PodcastEpisodeView extends LinearLayout implements
                 break;
 
             case RadioLibrary.DOWNLOAD_STATUS_FAILED:
+                downloadButtonImage.setImageResource(R.drawable.button_download);
                 downloadedImage.setImageResource(R.drawable.icon_download_small);
                 //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.download_podcast);
@@ -194,6 +198,7 @@ public class PodcastEpisodeView extends LinearLayout implements
                 break;
 
             case RadioLibrary.DOWNLOAD_STATUS_PAUSED:
+                downloadButtonImage.setImageResource(R.drawable.button_garbage_can);
                 downloadedImage.setImageResource(R.drawable.icon_download_small);
                 //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.remove_podcast);
@@ -202,6 +207,7 @@ public class PodcastEpisodeView extends LinearLayout implements
                 break;
 
             case RadioLibrary.DOWNLOAD_STATUS_PENDING:
+                downloadButtonImage.setImageResource(R.drawable.button_garbage_can);
                 downloadedImage.setImageResource(R.drawable.icon_download_small);
                 //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.remove_podcast);
@@ -210,6 +216,7 @@ public class PodcastEpisodeView extends LinearLayout implements
                 break;
 
             case RadioLibrary.DOWNLOAD_STATUS_RUNNING:
+                downloadButtonImage.setImageResource(R.drawable.button_garbage_can);
                 downloadedImage.setImageResource(R.drawable.icon_download_small);
                 //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.remove_podcast);
@@ -218,6 +225,7 @@ public class PodcastEpisodeView extends LinearLayout implements
                 break;
 
             case RadioLibrary.DOWNLOAD_STATUS_SUCCESSFUL:
+                downloadButtonImage.setImageResource(R.drawable.button_garbage_can);
                 downloadedImage.setImageResource(R.drawable.icon_download_checked_small);
                 //downloadButtonImage.setText(downloadedImage.getText());
                 downloadButtonText.setText(R.string.remove_podcast);

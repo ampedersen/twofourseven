@@ -10,7 +10,6 @@
 
     <LinearLayout
         android:id="@+id/top_layout"
-        android:layout_marginTop="8dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal">
@@ -131,8 +130,10 @@
             >
 
             <ImageView
+                android:id="@+id/download_icon"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="left|center_vertical"
                 android:src="@drawable/button_garbage_can"/>
 
             <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
@@ -142,10 +143,20 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/radio_gray_dark"
                 android:text="@string/remove_podcast"
+                android:layout_gravity="left|center_vertical"
                 />
 
         </LinearLayout>
 
     </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/divider"
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:layout_marginTop="@dimen/app_margin_half25"
+        android:background="@color/radio_gray_darker">
+
+    </FrameLayout>
 
 </LinearLayout>
