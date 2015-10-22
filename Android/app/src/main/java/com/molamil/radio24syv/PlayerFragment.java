@@ -229,13 +229,21 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     }
 
     private void updateBigPlayer(View v, ProgramInfo p) {
-        ((ProgramImageView) v.findViewById(R.id.image)).setImageUrl(p.getImageUrl());
-        ((TextView) v.findViewById(R.id.name_text)).setText(p.getName());
+        ProgramImageView programImage = ((ProgramImageView) v.findViewById(R.id.image));
+        programImage.setImageUrl(p.getImageUrl());
+        programImage.setTintColor(0x000000);
+        TextView titleText =  ((TextView) v.findViewById(R.id.name_text));
+        titleText.setText(p.getName());
+
+        //TODO: Set podcast title when available, else program title
+        ((TextView) v.findViewById(R.id.podcast_name_text)).setText(p.getName());
+        //TODO: Set text color from topic
+        //titleText.setTextColor();
+
+        //self.headerTimeLabel.text = current.formattedStartTime() + " - " + current.formattedEndTime()
+        ((TextView) v.findViewById(R.id.time_text)).setText(p.getFormattedStartTime()+" - "+p.getFormattedEndTime());
+
         ((TextView) v.findViewById(R.id.description_text)).setText(p.getDescription());
-//        ((TextView) v.findViewById(R.id.time_text)).setText(); //TODO
-//        ((TextView) v.findViewById(R.id.podcast_name_text)).setText(); //TODO
-//        ((TextView) v.findViewById(R.id.time_start_text)).setText(); //TODO
-//        ((TextView) v.findViewById(R.id.time_end_text)).setText(); //TODO
 
     }
 

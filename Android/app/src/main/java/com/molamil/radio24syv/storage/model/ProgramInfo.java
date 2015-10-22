@@ -8,6 +8,7 @@ import com.molamil.radio24syv.storage.Storage;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -174,6 +175,33 @@ public class ProgramInfo implements Serializable {
         int resId = c.getResources().getIdentifier(frequency, "string", packageName);
 
         return broadcastInfo.getDay()+", "+broadcastInfo.getTime()+", "+c.getResources().getString(resId);
+    }
+
+    public String getFormattedStartTime()
+    {
+        return getFormattedTime(null);
+    }
+
+    public String getFormattedEndTime()
+    {
+        return getFormattedTime(null);
+    }
+
+    private String getFormattedTime(Date date)
+    {
+        return "00:00";
+
+        //TODO: Implement
+        /*
+        let calendar = NSCalendar.currentCalendar()
+        //calendar.timeZone = NSTimeZone(name: "GMT")! //Don't. Use whatever time zone the phone has here.
+        let components = calendar.components(.CalendarUnitHour | .CalendarUnitMinute, fromDate: date)
+
+        let hour = String(format: "%02d", components.hour)
+        let minute = String(format: "%02d", components.minute)
+
+        return "\(hour):\(minute)"
+        */
     }
 
 }

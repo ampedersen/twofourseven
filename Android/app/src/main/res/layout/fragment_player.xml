@@ -82,6 +82,7 @@
             android:layout_alignParentRight="true"
             />
 
+
         <com.molamil.radio24syv.view.ProgramImageView
             android:id="@+id/image"
             android:layout_width="match_parent"
@@ -90,7 +91,16 @@
             app:forceFullQuality="true"
             />
 
-        <TextView
+        <FrameLayout
+            android:id="@+id/image_cover"
+            android:layout_width="match_parent"
+            android:layout_height="140dp"
+            android:layout_below="@id/cast_button"
+            android:background="@color/radio_black"
+            android:alpha="0.2">
+        </FrameLayout>
+
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:id="@+id/name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -100,9 +110,11 @@
             android:layout_marginLeft="20dp"
             android:ellipsize="end"
             android:maxLines="1"
+            android:textSize="21sp"
+            android:textColor="@color/radio_white"
             />
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:id="@+id/description_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -112,9 +124,11 @@
             android:layout_marginLeft="20dp"
             android:ellipsize="end"
             android:maxLines="1"
+            android:textSize="15sp"
+            android:textColor="@color/radio_white"
             />
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:id="@+id/time_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -124,6 +138,8 @@
             android:layout_marginLeft="20dp"
             android:ellipsize="end"
             android:maxLines="1"
+            android:textSize="15sp"
+            android:textColor="@color/radio_white"
             />
 
         <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
