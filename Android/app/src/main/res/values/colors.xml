@@ -10,4 +10,7 @@
     <color name="radio_gray_darker">#333333</color>
     <color name="radio_white">#eeeeee</color>
     <color name="radio_yellow">#ffdd33</color>
+    <color name="player_background">#393939</color>
+    <!-- <color name="mini_player_background">#262626</color> -->
+
 </resources>

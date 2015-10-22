@@ -4,41 +4,53 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     tools:context="com.molamil.radio24syv.PlayerFragment"
-    android:background="@color/radio_gray_dark"
+    android:background="@color/radio_gray_darker"
     android:animateLayoutChanges="true"
     >
 
-    <Button
+    <ImageButton
         android:id="@+id/size_button"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="size"
+        android:layout_width="50dp"
+        android:paddingLeft="-20dp"
+        android:layout_height="30dp"
+        android:src="@drawable/expand_player_button"
         android:layout_alignParentLeft="true"
+        style="@style/BaseButton"
+
         />
 
     <RelativeLayout
         android:id="@+id/small_player"
         android:layout_width="match_parent"
-        android:layout_height="50dp"
+        android:layout_height="30dp"
         android:visibility="gone"
         >
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:id="@+id/small_name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="name"
             android:gravity="center"
+            android:paddingBottom="2dp"
             android:layout_centerInParent="true"
             android:ellipsize="end"
             android:maxLines="1"
+            android:textSize="10sp"
+            android:textColor="@color/radio_white"
             />
 
         <com.molamil.radio24syv.view.RadioPlayerButton
             android:id="@+id/small_play_button"
-            android:layout_width="50dp"
-            android:layout_height="50dp"
+            android:layout_width="20dp"
+            android:layout_height="20dp"
             android:layout_alignParentRight="true"
+            android:layout_centerVertical="true"
+            android:layout_marginRight="5dp"
+            android:background="@drawable/player_button_play_small"
+            app:playIcon="@drawable/player_button_play_small"
+            app:pauseIcon="@drawable/player_button_pause_small"
+            app:stopIcon="@drawable/player_button_stop_small"
             app:action="play"
             />
 
@@ -56,13 +68,17 @@
         android:id="@+id/big_player"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:visibility="visible"
         >
 
-        <Button
+        <ImageButton
             android:id="@+id/cast_button"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="cast"
+            android:src="@drawable/airplay_icon"
+            style="@style/BaseButton"
+            android:padding="10dp"
             android:layout_alignParentRight="true"
             />
 
@@ -110,45 +126,54 @@
             android:maxLines="1"
             />
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:id="@+id/podcast_name_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="podcast name"
             android:layout_below="@id/image"
-            android:layout_marginTop="10dp"
+            android:layout_marginTop="@dimen/app_margin_25"
+            android:layout_marginBottom="@dimen/app_margin_half25"
             android:layout_centerHorizontal="true"
             android:ellipsize="end"
             android:maxLines="1"
+            android:textColor="@color/radio_white"
             />
 
         <com.molamil.radio24syv.view.RadioPlayerButton
             android:id="@+id/play_button"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/player_play_button_size"
+            android:layout_height="@dimen/player_play_button_size"
             android:layout_below="@id/podcast_name_text"
-            android:layout_marginTop="5dp"
             android:layout_centerHorizontal="true"
             app:action="play"
+            android:background="@drawable/player_button_play"
+            app:playIcon="@drawable/player_button_play"
+            app:pauseIcon="@drawable/player_button_pause"
+            app:stopIcon="@drawable/player_button_stop"
             />
 
         <com.molamil.radio24syv.view.RadioPlayerButton
             android:id="@+id/previous_button"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/player_next_prev_button_size"
+            android:layout_height="@dimen/player_next_prev_button_size"
             android:layout_below="@id/podcast_name_text"
-            android:layout_marginTop="5dp"
+            android:layout_marginRight="@dimen/app_margin_25"
             android:layout_toLeftOf="@id/play_button"
+            android:layout_alignBaseline="@id/play_button"
+            android:background="@drawable/prev_button_disabled"
             app:action="previous"
             />
 
         <com.molamil.radio24syv.view.RadioPlayerButton
             android:id="@+id/next_button"
-            android:layout_width="100dp"
-            android:layout_height="100dp"
+            android:layout_width="@dimen/player_next_prev_button_size"
+            android:layout_height="@dimen/player_next_prev_button_size"
             android:layout_below="@id/podcast_name_text"
-            android:layout_marginTop="5dp"
+            android:layout_marginLeft="@dimen/app_margin_25"
             android:layout_toRightOf="@id/play_button"
+            android:layout_alignBaseline="@id/play_button"
+            android:background="@drawable/next_button_disabled"
             app:action="next"
             />
 
@@ -158,9 +183,11 @@
             android:orientation="horizontal"
             android:layout_below="@id/play_button"
             android:layout_marginBottom="10dp"
+            android:layout_marginLeft="@dimen/app_margin_25"
+            android:layout_marginRight="@dimen/app_margin_25"
             >
 
-            <TextView
+            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
                 android:id="@+id/time_start_text"
                 android:layout_weight="1"
                 android:layout_width="0dp"
@@ -168,6 +195,8 @@
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:text="00:00"
+                android:textSize="12dp"
+                android:textColor="@color/radio_gray_dark"
                 />
 
             <View
@@ -177,9 +206,11 @@
                 android:layout_height="2dp"
                 android:background="@color/radio_red"
                 android:layout_gravity="center"
+                android:layout_marginLeft="5dp"
+                android:layout_marginRight="5dp"
                 />
 
-            <TextView
+            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
                 android:id="@+id/time_end_text"
                 android:layout_weight="1"
                 android:layout_width="0dp"
@@ -187,6 +218,8 @@
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:text="12:34"
+                android:textSize="12dp"
+                android:textColor="@color/radio_gray_dark"
                 />
 
         </LinearLayout>

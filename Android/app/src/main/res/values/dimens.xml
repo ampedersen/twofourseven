@@ -27,4 +27,7 @@
     <dimen name="app_margin_75">75dp</dimen>
     <dimen name="app_margin_half75">38dp</dimen>
 
+    <dimen name="player_play_button_size">70dp</dimen>
+    <dimen name="player_next_prev_button_size">30dp</dimen>
+
 </resources>

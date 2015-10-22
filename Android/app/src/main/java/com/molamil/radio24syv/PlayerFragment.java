@@ -7,6 +7,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.player.RadioPlayer;
@@ -60,7 +61,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_player, container, false);
 
-        Button expandButton = (Button)v.findViewById(R.id.size_button);
+        ImageButton expandButton = (ImageButton)v.findViewById(R.id.size_button);
         expandButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -186,18 +187,18 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             parentView.setVisibility(View.VISIBLE);
             View bigPlayer = parentView.findViewById(R.id.big_player);
             View smallPlayer = parentView.findViewById(R.id.small_player);
-            Button expandButton = (Button) parentView.findViewById(R.id.size_button);
+            ImageButton expandButton = (ImageButton) parentView.findViewById(R.id.size_button);
             int targetColorId;
             if (size == PlayerSize.BIG) {
                 bigPlayer.setVisibility(View.VISIBLE);
                 smallPlayer.setVisibility(View.GONE);
-                expandButton.setText("Small");
-                targetColorId = R.color.radio_gray_dark;
+                expandButton.setImageResource(R.drawable.collapse_player_button);
+                targetColorId = R.color.player_background;
             } else {
                 bigPlayer.setVisibility(View.GONE);
                 smallPlayer.setVisibility(View.VISIBLE);
-                expandButton.setText("Big");
-                targetColorId = R.color.radio_gray_darker;
+                expandButton.setImageResource(R.drawable.expand_player_button);
+                targetColorId = R.color.radio_gray_darker;//R.color.mini_player_background;
             }
             parentView.setBackgroundColor(getResources().getColor(targetColorId));
             updatePlayer();
