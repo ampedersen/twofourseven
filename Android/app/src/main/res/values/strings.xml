@@ -56,7 +56,7 @@
     <string name="recommended">Anbefalet</string>
     <string name="alphabetically">Alfabetisk</string>
     <string name="genre">Genre</string>
-    <string name="old_programs">Gamle programmer</string>
+    <string name="old_programs">Bagkatalog</string>
 
     <!-- Program search -->
     <string name="search_hint">Indtast søgning</string>

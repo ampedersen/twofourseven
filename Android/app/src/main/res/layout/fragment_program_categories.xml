@@ -19,11 +19,13 @@
             android:orientation="vertical"
             >
 
-            <TextView
+            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/program_categories_header"
-                style="@style/SidePageTitleText"
+                android:textColor="@color/radio_black"
+                android:layout_margin="@dimen/app_margin_25"
+                style="@style/SectionTitleText"
                 />
 
             <LinearLayout
@@ -31,6 +33,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_marginLeft="@dimen/app_margin_50"
+                android:layout_marginRight="@dimen/app_margin_50"
                 android:layout_marginBottom="20dp"
                 />
 
@@ -39,6 +43,8 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="vertical"
+                android:layout_marginLeft="@dimen/app_margin_50"
+                android:layout_marginRight="@dimen/app_margin_50"
                 android:layout_marginBottom="20dp"
                 />
 
@@ -46,6 +52,8 @@
                 android:id="@+id/content_bottom"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_marginLeft="@dimen/app_margin_50"
+                android:layout_marginRight="@dimen/app_margin_50"
                 android:orientation="vertical"
                 />
 
