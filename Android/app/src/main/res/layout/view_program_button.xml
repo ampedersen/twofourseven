@@ -54,11 +54,12 @@
         android:layout_height="wrap_content"
         android:text="Topic"
         android:singleLine="true"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:focusable="false"
         android:clickable="false"
         android:textColor="@color/radio_white"
         android:layout_marginLeft="@dimen/app_margin_half25"
+        android:layout_marginTop="110dp"
         />
 
     <com.molamil.radio24syv.view.RadioPlayerButton
@@ -67,10 +68,11 @@
         android:layout_height="25dp"
         app:action="play"
         android:layout_alignParentRight="true"
-        android:layout_alignParentBottom="true"
+        android:layout_alignParentTop="true"
         android:focusable="false"
         android:clickable="false"
         android:layout_marginRight="@dimen/app_margin_half25"
+        android:layout_marginTop="105dp"
         android:background="@drawable/button_play_program"
         app:playIcon="@drawable/button_play_program"
         app:pauseIcon="@drawable/button_pause_program"
