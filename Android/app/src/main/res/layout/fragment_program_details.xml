@@ -19,70 +19,148 @@
             android:orientation="vertical"
             >
 
-            <com.molamil.radio24syv.view.ProgramImageView
-                android:id="@+id/image"
+            <FrameLayout
                 android:layout_width="match_parent"
-                android:layout_height="100dp"
-                />
+                android:layout_height="100dp">
 
-            <TextView
-                android:id="@+id/name_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                style="@style/PageTitleText"
-                />
+                <com.molamil.radio24syv.view.ProgramImageView
+                    android:id="@+id/image"
+                    android:layout_width="match_parent"
+                    android:layout_height="100dp"
+                    android:layout_marginLeft="30dp"
+                    />
 
-            <Button
-                android:id="@+id/back_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Back"
-                />
 
-            <TextView
-                android:id="@+id/program_id_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+                <ImageButton
+                    android:id="@+id/back_button"
+                    android:layout_width="30dp"
+                    android:src="@drawable/back_button_white"
+                    android:background="@color/radio_gray_darker"
+                    style="@style/BaseButton"
+                    android:layout_height="match_parent" />
+                <!--
+                <Button
+                    android:id="@+id/back_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Back"
+                    />
+                -->
 
-            <TextView
-                android:id="@+id/topic_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+                <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+                    android:id="@+id/title_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Title"
+                    android:layout_marginLeft="10dp"
+                    android:layout_gravity="center"
+                    style="@style/SectionTitleText"
+                    />
 
-            <TextView
-                android:id="@+id/description_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                />
+            </FrameLayout>
 
             <LinearLayout
-                android:id="@+id/content"
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical"
-                android:divider="@android:drawable/divider_horizontal_bright"
-                android:showDividers="middle"
-                />
+                android:padding="@dimen/app_margin_25">
 
-            <Button
-                android:id="@+id/load_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Indlæs flere"
-                android:visibility="gone"
-                android:layout_gravity="center"
-                />
+                <FrameLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="@dimen/app_margin_half25">
 
-            <TextView
-                android:id="@+id/loading_text"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/loading"
-                android:visibility="gone"
-                android:layout_gravity="center"
-                />
+
+                    <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+                        android:id="@+id/name_text"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Title"
+                        android:layout_gravity="left|center_vertical"
+                        style="@style/SectionTitleText"
+                        />
+
+                    <ImageButton
+                        android:id="@+id/notification_button"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        style="@style/BaseButton"
+                        android:layout_gravity="right|center_vertical"
+                        android:src="@drawable/icon_bell_white"/>
+
+                </FrameLayout>
+
+                <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
+                    android:id="@+id/info_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textColor="@color/radio_gray_dark"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="@dimen/app_margin_half25"
+                    android:text="Info"
+                    />
+
+
+                <!--
+                <TextView
+                    android:id="@+id/topic_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    />
+                -->
+
+                <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
+                    android:id="@+id/description_text"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:textSize="15sp"
+                    android:layout_marginBottom="@dimen/app_margin_half25"
+                    android:text="Description"
+                    android:textColor="@color/radio_white"
+                    />
+
+                <com.molamil.radio24syv.components.ButtonNeueHaasGrotesk55Rg
+                    android:id="@+id/text_expand"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/expand_text"
+                    android:textColor="@color/radio_gray_dark"
+                    android:textSize="@dimen/schedule_time_text_size"
+                    android:drawableRight="@drawable/button_expand"
+                    style="@style/BaseButton"
+                    android:layout_marginBottom="@dimen/app_margin_25"
+                    />
+
+                <LinearLayout
+                    android:id="@+id/content"
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:orientation="vertical"
+                    android:divider="@android:drawable/divider_horizontal_bright"
+                    android:showDividers="middle"
+                    />
+
+                <com.molamil.radio24syv.components.ButtonNeueHaasGrotesk55Rg
+                    android:id="@+id/load_button"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/load_more"
+                    android:visibility="gone"
+                    android:layout_gravity="center"
+                    style="@style/BaseButton"
+                    />
+
+                <ProgressBar
+                    android:id="@+id/activity_indicator"
+                    style="?android:attr/progressBarStyleLarge"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="@dimen/app_margin_half25"
+                    android:layout_gravity="center">
+                </ProgressBar>
+
+            </LinearLayout>
+
 
         </LinearLayout>
 

@@ -1,11 +1,14 @@
 package com.molamil.radio24syv.storage.model;
 
+import android.content.Context;
+
 import com.molamil.radio24syv.api.RestClient;
-import com.molamil.radio24syv.api.model.ConciseProgram;
-import com.molamil.radio24syv.api.model.Program;
+import com.molamil.radio24syv.api.model.*;
 import com.molamil.radio24syv.storage.Storage;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Information about a ConciseProgram or Program from the API containing only the stuff needed.
@@ -21,6 +24,8 @@ public class ProgramInfo implements Serializable {
     private String imageUrl;
     private boolean active;
 
+    private List<Host> hosts = new ArrayList<Host>();
+    private com.molamil.radio24syv.api.model.BroadcastInfo broadcastInfo;
     public ProgramInfo() {}
 
     public ProgramInfo(ConciseProgram conciseProgram) {
@@ -41,6 +46,8 @@ public class ProgramInfo implements Serializable {
         description = RestClient.getTextWithoutHtmlTags(program.getDescriptionHtml());
         imageUrl = program.getImageUrl();
         active = program.getActive();
+        hosts = program.getHosts();
+        broadcastInfo = program.getBroadcastInfo();
     }
 
     // TODO this is broken until the API returns an integer instead of null for relatedProgram.getVideoProgramId()
@@ -112,6 +119,61 @@ public class ProgramInfo implements Serializable {
 
     public void setActive(boolean active) {
         this.active = active;
+    }
+
+    public String getHostsAndTime(Context c)
+    {
+        if(!active)
+        {
+            String packageName = c.getPackageName();
+            int resId = c.getResources().getIdentifier("old_programs", "string", packageName);
+            return c.getResources().getString(resId);
+        }
+
+        String result = "";
+        String hostStr = getHostNames();
+        if(hostStr != "")
+        {
+            result = hostStr + "\n" + getBroadcastTime(c);
+        }
+        else
+        {
+            result = getBroadcastTime(c);
+        }
+
+        return result;
+    }
+
+    private String getHostNames()
+    {
+        if(hosts.size() == 0)
+        {
+            return "";
+        }
+        String result = "";
+        String delimiter = hosts.size() == 2 ? " og " : ", ";
+
+        //for host in hosts
+        for(int i = 0 ; i < hosts.size() ; i++)
+        {
+            result += hosts.get(i).getName();//hosts[i].name!
+
+            if(i < hosts.size()-1)
+            {
+                result += delimiter;
+            }
+        }
+
+        return result;
+    }
+
+    private String getBroadcastTime(Context c)
+    {
+        String frequency = broadcastInfo.getWeekly() ? "weekly" : "daily";
+        String packageName = c.getPackageName();
+        int resId = c.getResources().getIdentifier(frequency, "string", packageName);
+
+        return broadcastInfo.getDay()+", "+broadcastInfo.getTime()+", "+c.getResources().getString(resId);
     }
 
 }

@@ -1,12 +1,15 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageButton;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
@@ -45,6 +48,12 @@ public class ProgramDetailsFragment extends PageFragment implements
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
     private HashMap<Integer, PodcastInfo> podcastById = new HashMap<>();
 
+    private ProgressBar progressSpinner;
+
+    private Button expandButton;
+    private TextView desctiptionTv;
+    private boolean expanded = false;
+
     public static ProgramDetailsFragment newInstance(ProgramInfo program) {
         ProgramDetailsFragment fragment = new ProgramDetailsFragment();
         Bundle args = new Bundle();
@@ -71,10 +80,13 @@ public class ProgramDetailsFragment extends PageFragment implements
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_program_details, container, false);
 
-        ((TextView) v.findViewById(R.id.program_id_text)).setText(Integer.toString(program.getProgramId()));
+       // ((TextView) v.findViewById(R.id.info_text)).setText(Integer.toString(program.getProgramId()));
+        ((TextView) v.findViewById(R.id.info_text)).setText(program.getHostsAndTime(getActivity().getApplicationContext()));
         ((TextView) v.findViewById(R.id.name_text)).setText(program.getName());
-        ((TextView) v.findViewById(R.id.topic_text)).setText(program.getTopic());
-        ((TextView) v.findViewById(R.id.description_text)).setText(program.getDescription());
+        ((TextView) v.findViewById(R.id.title_text)).setText(program.getName());
+        //((TextView) v.findViewById(R.id.topic_text)).setText(program.getTopic());
+        desctiptionTv = ((TextView) v.findViewById(R.id.description_text));
+
         ProgramImageView image = ((ProgramImageView) v.findViewById(R.id.image));
         image.setImageUrl(program.getImageUrl());
         TopicInfo topic = Storage.get().getTopic(program.getTopicId());
@@ -82,7 +94,7 @@ public class ProgramDetailsFragment extends PageFragment implements
             image.setTintColor(topic.getColorValue());
         }
 
-        Button backButton = (Button) v.findViewById(R.id.back_button);
+        ImageButton backButton = (ImageButton) v.findViewById(R.id.back_button);
         backButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -92,17 +104,70 @@ public class ProgramDetailsFragment extends PageFragment implements
             }
         });
 
+        expandButton = (Button)v.findViewById(R.id.text_expand);
+        expandButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                toggleExpanded();
+            }
+        });
+
+
+        progressSpinner = (ProgressBar) v.findViewById(R.id.activity_indicator);
+        progressSpinner.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.MULTIPLY);
+
+        ImageButton notificationButton = (ImageButton) v.findViewById(R.id.notification_button);
+        notificationButton.setVisibility(program.getActive() ? View.VISIBLE : View.GONE);
+
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
         getPodcasts(content, BATCH_SIZE, 1);
 
+        updateExpandedState();
+
         return v;
+    }
+
+    private void toggleExpanded()
+    {
+        expanded = !expanded;
+        updateExpandedState();
+    }
+
+    private void updateExpandedState()
+    {
+        Drawable drawable = expanded ? getResources().getDrawable( R.drawable.button_collapse ) : getResources().getDrawable(R.drawable.button_expand);
+        expandButton.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+        expandButton.setText(expanded ? R.string.contract_text : R.string.expand_text);
+        desctiptionTv.setText(getDescription());
+    }
+
+    private String getDescription()
+    {
+        String full = program.getDescription();
+        if(expanded)
+        {
+            return full;
+        }
+
+        int stubCutoffLimit = 150;
+        int stubLength = 100;
+        if(full.length() < stubCutoffLimit)
+        {
+            expandButton.setVisibility(View.GONE);
+            return full;
+        }
+
+        return full.substring(0,stubLength)+"...";
+        //return program.getDescription();
     }
 
     private void getPodcasts(final ViewGroup content, final int amount, final int batch) {
         Log.d("JJJ", "getPodcasts id " + program.getProgramId() + " content " + content + " amount " + amount + " batch " + batch);
         final ViewGroup parent = (ViewGroup) content.getParent();
-        final TextView loadingText = (TextView) parent.findViewById(R.id.loading_text);
-        loadingText.setVisibility(View.VISIBLE);
+
+        //final TextView progressSpinner = (TextView) parent.findViewById(R.id.loading_text);
+        progressSpinner.setVisibility(View.VISIBLE);
+
         final Button loadButton = (Button) parent.findViewById(R.id.load_button);
         loadButton.setVisibility(View.GONE);
 
@@ -147,7 +212,7 @@ public class ProgramDetailsFragment extends PageFragment implements
                     });
                 }
 
-                loadingText.setVisibility(View.GONE);
+                progressSpinner.setVisibility(View.GONE);
             }
 
             @Override
@@ -155,7 +220,7 @@ public class ProgramDetailsFragment extends PageFragment implements
                 if (listener != null) {
                     listener.onError(t.getLocalizedMessage());
                 }
-                loadingText.setVisibility(View.GONE);
+                progressSpinner.setVisibility(View.GONE);
                 Log.d("JJJ", "fail " + t.getMessage());
                 t.printStackTrace();
             }

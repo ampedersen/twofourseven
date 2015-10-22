@@ -16,6 +16,11 @@
     <string name="title_fragment_schedule">ScheduleFragment</string>
     <string name="title_fragment_program_details">ProgramDetailsFragment</string>
 
+    <!-- Generic -->
+
+    <string name="weekly">Ugentlig</string>
+    <string name="daily">Daglig</string>
+
     <!-- Intro -->
     <string name="intro_next">Videre</string>
 
@@ -50,6 +55,7 @@
     <string name="programs_recent">Du har for nyligt lyttet til</string>
     <string name="programs_recomended">Anbefalet til dig</string>
     <string name="programs_popular">Populære programmer</string>
+    <string name="load_more">Hent flere</string>
 
     <!-- Program categories -->
     <string name="program_categories_header">Kategorier</string>
