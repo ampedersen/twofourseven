@@ -11,6 +11,8 @@
         <attr name="audioUrl" format="string" />
         <attr name="audioTitle" format="string" />
         <attr name="audioDescription" format="string" />
+        <attr name="audioTopic" format="string" />
+        <attr name="audioProgramTitle" format="string" />
         <attr name="adaptActionAfterPlay" format="boolean" />
 
         <attr name="playIcon" format="reference" />

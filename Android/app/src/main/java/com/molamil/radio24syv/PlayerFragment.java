@@ -3,6 +3,7 @@ package com.molamil.radio24syv;
 import android.app.Activity;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,7 +12,9 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.player.RadioPlayer;
+import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
+import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.RadioPlayerButton;
 
@@ -209,6 +212,11 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         RadioPlayer player = radioPlayerProvider.getRadioPlayer();
         programInfo.setName(player.getTitle());
         programInfo.setDescription(player.getDescription());
+        programInfo.setTopic(player.getTopic());
+        programInfo.setTopic(player.getTopic());
+
+        //TODO: Handle Program title vs podcast title too.
+        //programInfo.setName(player.getProgramTitle());
 
         View v = getView();
         if (v == null) {
@@ -237,11 +245,18 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
         //TODO: Set podcast title when available, else program title
         ((TextView) v.findViewById(R.id.podcast_name_text)).setText(p.getName());
-        //TODO: Set text color from topic
-        //titleText.setTextColor();
 
-        //self.headerTimeLabel.text = current.formattedStartTime() + " - " + current.formattedEndTime()
-        ((TextView) v.findViewById(R.id.time_text)).setText(p.getFormattedStartTime()+" - "+p.getFormattedEndTime());
+        if(p.getTopic() != null)
+        {
+            TopicInfo topic = Storage.get().getTopic(p.getTopicId());
+            titleText.setTextColor(topic.getColorValue());
+        }
+        else
+        {
+            titleText.setTextColor(0xffffff);
+        }
+
+         ((TextView) v.findViewById(R.id.time_text)).setText(p.getFormattedStartTime() + " - " + p.getFormattedEndTime());
 
         ((TextView) v.findViewById(R.id.description_text)).setText(p.getDescription());
 

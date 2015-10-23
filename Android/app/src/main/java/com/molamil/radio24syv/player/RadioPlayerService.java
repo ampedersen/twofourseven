@@ -59,6 +59,8 @@ public class RadioPlayerService extends Service implements
     private String url = RadioPlayer.URL_UNASSIGNED;
     private String title;
     private String description;
+    private String programTitle;
+    private String topic;
 
     private MediaPlayer player;
     private int action = RadioPlayer.ACTION_STOP;
@@ -125,13 +127,13 @@ public class RadioPlayerService extends Service implements
                 return true; // Return true, internet is happy
             } else {
                 Log.d("JJJ", "Unable to play " + url + " because internet connection is down");
-                setAction(url, title, description, RadioPlayer.ACTION_STOP);
+                setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_STOP);
                 return false; // Return false, internet is not happy
             }
         }
     }
 
-    public void setAction(final String url, String title, String description, int newAction) {
+    public void setAction(final String url, String title, String description, String programTitle, String topic, int newAction) {
         Log.d("JJJ", "service setAction " + RadioPlayer.getActionName(newAction) + " (was " + RadioPlayer.getActionName(action) + ") + audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
 
         if (!isActionAllowed(newAction)) {
@@ -147,6 +149,8 @@ public class RadioPlayerService extends Service implements
         this.url = url;
         this.title = title;
         this.description = description;
+        this.topic = topic;
+        this.programTitle = programTitle;
 
         switch (newAction) {
 
@@ -291,6 +295,14 @@ public class RadioPlayerService extends Service implements
         return description;
     }
 
+    public String getProgramTitle() {
+        return programTitle;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
     public int getState() {
         return state;
     }
@@ -319,7 +331,7 @@ public class RadioPlayerService extends Service implements
                 Log.d("JJJ", "Audio focus gained");
                 // Resume playback
                 if (action == RadioPlayer.ACTION_PAUSE) {
-                    setAction(url, title, description, RadioPlayer.ACTION_PLAY);
+                    setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_PLAY);
                 }
                 if (player != null) {
                     player.setVolume(1, 1);
@@ -330,16 +342,16 @@ public class RadioPlayerService extends Service implements
                 Log.d("JJJ", "Audio focus lost");
                 // Lost focus for an unbounded amount of time
                 if (action == RadioPlayer.ACTION_PLAY) {
-                    setAction(url, title, description, RadioPlayer.ACTION_PAUSE);
+                    setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_PAUSE);
                 } else {
-                    setAction(url, title, description, RadioPlayer.ACTION_STOP);
+                    setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_STOP);
                 }
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 Log.d("JJJ", "Audio focus lost temporarily");
                 // Lost focus for a short time, but we have to stop playback. Playback is likely to resume.
-                setAction(url, title, description, RadioPlayer.ACTION_PAUSE);
+                setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_PAUSE);
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
@@ -370,7 +382,7 @@ public class RadioPlayerService extends Service implements
         protected Void doInBackground(String... arguments) {
             if ((arguments == null) || (arguments.length != 3) || (arguments[ARGUMENT_URL] == null)) {
                 Log.e("JJJ", "Unable to play URL because it is empty " + url);
-                setAction(url, title, description, RadioPlayer.ACTION_STOP);
+                setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_STOP);
                 return null; // Return, no url to play
             }
             Log.d("JJJ", "url " + arguments[ARGUMENT_URL]);
@@ -389,7 +401,7 @@ public class RadioPlayerService extends Service implements
             } catch (MalformedURLException e) {
                 Log.d("JJJ", "Unable play URL because it is not valid " + url);
                 e.printStackTrace();
-                setAction(url, title, description, RadioPlayer.ACTION_STOP);
+                setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_STOP);
                 return null; // Return, bad URL
             }
 
@@ -402,7 +414,7 @@ public class RadioPlayerService extends Service implements
                     @Override
                     public void onCompletion(MediaPlayer mp) {
                         Log.d("JJJ", "Playback completed " + url);
-                        setAction(url, title, description, RadioPlayer.ACTION_STOP);
+                        setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_STOP);
                     }
                 });
             } else {
@@ -417,7 +429,7 @@ public class RadioPlayerService extends Service implements
             } catch (IOException e) {
                 Log.e("JJJ", "Unable to play URL because of data source error " + url);
                 e.printStackTrace();
-                setAction(url, title, description, RadioPlayer.ACTION_STOP);
+                setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_STOP);
                 return null; // Return, data source error
             }
 
@@ -430,12 +442,12 @@ public class RadioPlayerService extends Service implements
                 } catch (IOException e) {
                     Log.e("JJJ", "Unable to play URL because of some playback error " + url);
                     e.printStackTrace();
-                    setAction(url, title, description, RadioPlayer.ACTION_STOP);
+                    setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_STOP);
                     return null; // Return, playback error
                 } catch (IllegalStateException e) {
                     Log.e("JJJ", "Unable to play URL because player is in an unexpected state (maybe headphones got unplugged while buffering?) " + url);
                     e.printStackTrace();
-                    setAction(url, title, description, RadioPlayer.ACTION_STOP);
+                    setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_STOP);
                     return null; // Return, playback error
                 }
             }

@@ -24,6 +24,8 @@ public class RadioPlayerButton extends Button implements
     private int action;
     private String url;
     private String title;
+    private String topic;
+    private String programTitle;
     private String description;
     private boolean adaptActionAfterPlay = true; // This is really a terrible name I know. It means that if the action was PLAY, the button will change to PAUSE or STOP depending on the audio source (local or streamed).
 
@@ -48,6 +50,8 @@ public class RadioPlayerButton extends Button implements
             setUrl(a.getString(R.styleable.RadioPlayerButton_audioUrl));
             setTitle(a.getString(R.styleable.RadioPlayerButton_audioTitle));
             setDescription(a.getString(R.styleable.RadioPlayerButton_audioDescription));
+            setTopic(a.getString(R.styleable.RadioPlayerButton_audioTopic));
+            setProgramTitle(a.getString(R.styleable.RadioPlayerButton_audioProgramTitle));
             setAdaptActionAfterPlay(a.getBoolean(R.styleable.RadioPlayerButton_adaptActionAfterPlay, true));
             setPlayIcon(a.getResourceId(R.styleable.RadioPlayerButton_playIcon, 0));
             setStopIcon(a.getResourceId(R.styleable.RadioPlayerButton_stopIcon, 0));
@@ -127,6 +131,21 @@ public class RadioPlayerButton extends Button implements
         this.pauseIcon = pauseIcon;
     }
 
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
+
+    public String getProgramTitle() {
+        return programTitle;
+    }
+
+    public void setProgramTitle(String programTitle) {
+        this.programTitle = programTitle;
+    }
 
     @Override
     protected void onAttachedToWindow() {
@@ -146,19 +165,19 @@ public class RadioPlayerButton extends Button implements
 
     @Override
     public void onClick(View v) {
-        Log.d("JJJ", "action " + action + " player " + player + " url " + url + " title " + title);
+        //Log.d("PS", "action " + action + " player " + player + " url " + url + " title " + title + " topic " + topic);
         if (player == null) {
             return;
         }
 
         if (!isAvailable()) {
-            Log.d("JJJ", "Unable to click button (id " + getId() + ") because it is not available");
+            //Log.d("JJJ", "Unable to click button (id " + getId() + ") because it is not available");
             return; // Return, cannot click button
         }
 
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                player.play(getUrl(), getTitle(), getDescription());
+                player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic());
                 break;
             case RadioPlayer.ACTION_STOP:
                 player.stop();
@@ -179,6 +198,8 @@ public class RadioPlayerButton extends Button implements
     static Paint greenPaint = null;
     static Paint redPaint = null;
 
+    //Used for dev drawing. TODO: use isAvailable to modify the image shown so users know if it's enabled or not
+    /*
     @Override
     protected void onDraw(Canvas canvas) {
         //setEnabled(isAvailable()); // Disable if action is not available due to the current state of the player
@@ -220,6 +241,7 @@ public class RadioPlayerButton extends Button implements
         float y = cHeight / 2f + 4; // Hack to use same y position no matter text height
         canvas.drawText(text, x, y, paint);
     }
+    */
 
     private void setBackground(int action)
     {

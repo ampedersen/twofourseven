@@ -87,7 +87,8 @@ public class LiveFragment extends PageFragment {
                     RadioPlayerButton playButton = (RadioPlayerButton) v.findViewById(R.id.play_button);
                     playButton.setTitle(b.getProgramName());
                     playButton.setDescription(b.getDescriptionText());
-
+                    playButton.setProgramTitle(b.getProgramName());
+                    playButton.setTopic(b.getTopic());
 
                     //TODO get audio URL playButton.setUrl(b.get);
                 } else {
