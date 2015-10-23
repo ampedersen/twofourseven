@@ -385,9 +385,9 @@ public class RadioPlayerService extends Service implements
                 setAction(url, title, description, programTitle, topic, RadioPlayer.ACTION_STOP);
                 return null; // Return, no url to play
             }
-            Log.d("JJJ", "url " + arguments[ARGUMENT_URL]);
-            Log.d("JJJ", "title " + arguments[ARGUMENT_TITLE]);
-            Log.d("JJJ", "description " + arguments[ARGUMENT_DESCRIPTION]);
+            //Log.d("JJJ", "url " + arguments[ARGUMENT_URL]);
+            //Log.d("JJJ", "title " + arguments[ARGUMENT_TITLE]);
+            //Log.d("JJJ", "description " + arguments[ARGUMENT_DESCRIPTION]);
 
             setState(RadioPlayer.STATE_BUSY);
             url = arguments[ARGUMENT_URL];

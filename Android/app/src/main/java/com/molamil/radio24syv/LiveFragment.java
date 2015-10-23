@@ -1,6 +1,7 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.util.Log;
@@ -38,6 +39,11 @@ public class LiveFragment extends PageFragment {
 
     private ProgressBar timeline;
 
+    private Button expandButton;
+    private TextView desctiptionTv;
+    private boolean expanded = false;
+    private String fullDescription = "";
+
     public LiveFragment() {
         // Required empty public constructor
     }
@@ -47,6 +53,8 @@ public class LiveFragment extends PageFragment {
         View v = inflater.inflate(R.layout.fragment_live, container, false);
 
         timeline = (ProgressBar) v.findViewById(R.id.player_progress);
+
+        desctiptionTv = ((TextView) v.findViewById(R.id.program_description));
 
         Button scheduleButton = (Button)v.findViewById(R.id.schedule_button);
         scheduleButton.setOnClickListener(new View.OnClickListener() {
@@ -58,11 +66,11 @@ public class LiveFragment extends PageFragment {
             }
         });
 
-        Button expandButton = (Button)v.findViewById(R.id.text_expand);
+        expandButton = (Button)v.findViewById(R.id.text_expand);
         expandButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Log.i("TODO", "Implement expand collapse text");
+                toggleExpanded();
             }
         });
 
@@ -83,7 +91,10 @@ public class LiveFragment extends PageFragment {
                     ((TextView) v.findViewById(R.id.program_time_begin)).setText(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
                     ((TextView) v.findViewById(R.id.program_time_end)).setText(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
                     //((TextView) v.findViewById(R.id.program_category)).setText(b.getTopic());
-                    ((TextView) v.findViewById(R.id.program_description)).setText(b.getDescriptionText());
+                    expanded = false;
+                    fullDescription = b.getDescriptionText();
+                    updateExpandedState();
+
                     RadioPlayerButton playButton = (RadioPlayerButton) v.findViewById(R.id.play_button);
                     playButton.setTitle(b.getProgramName());
                     playButton.setDescription(b.getDescriptionText());
@@ -150,5 +161,37 @@ public class LiveFragment extends PageFragment {
         radioPlayerProvider = null;
     }
 
+    //Description expand
+    private void toggleExpanded()
+    {
+        expanded = !expanded;
+        updateExpandedState();
+    }
+
+    private void updateExpandedState()
+    {
+        Drawable drawable = expanded ? getResources().getDrawable( R.drawable.button_collapse ) : getResources().getDrawable(R.drawable.button_expand);
+        expandButton.setCompoundDrawablesWithIntrinsicBounds(null, null, drawable, null);
+        expandButton.setText(expanded ? R.string.contract_text : R.string.expand_text);
+        desctiptionTv.setText(getDescription());
+    }
+
+    private String getDescription()
+    {
+        if(expanded)
+        {
+            return fullDescription;
+        }
+
+        int stubCutoffLimit = 150;
+        int stubLength = 100;
+        if(fullDescription.length() < stubCutoffLimit)
+        {
+            expandButton.setVisibility(View.GONE);
+            return fullDescription;
+        }
+
+        return fullDescription.substring(0,stubLength)+"...";
+    }
 
 }

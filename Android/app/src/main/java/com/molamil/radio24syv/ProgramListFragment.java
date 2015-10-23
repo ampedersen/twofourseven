@@ -148,7 +148,6 @@ public class ProgramListFragment extends PageFragment {
             loadingText.setVisibility(View.VISIBLE);
         }
 
-        Log.d("JJJ", "Updating program list");
         RestClient.getApi().getPrograms().enqueue(new Callback<List<ConciseProgram>>() {
             @Override
             public void onResponse(Response<List<ConciseProgram>> response) {
@@ -184,13 +183,13 @@ public class ProgramListFragment extends PageFragment {
 
         // Show cached program list while waiting for response.
         if (isCached) {
-            Log.d("JJJ", "Showing cached program list");
+            //Log.d("JJJ", "Showing cached program list");
             showPrograms(content, programs);
         }
     }
 
     private void showPrograms(final ViewGroup content, List<ProgramInfo> programs) {
-        Log.d("JJJ", "showPrograms category " + category + " topic " + (topic == null ? "null" : topic.getTopicId()));
+        //Log.d("JJJ", "showPrograms category " + category + " topic " + (topic == null ? "null" : topic.getTopicId()));
 
         boolean matchActive = true;
         String matchTopicId = null;
