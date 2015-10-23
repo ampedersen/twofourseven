@@ -78,6 +78,7 @@ public class ProgramScheduleButton extends LinearLayout {
         TextView topicText = (TextView) findViewById(R.id.topic_text);
         topicText.setText(broadcast.getTopic());
 
+        /*
         View programButton = findViewById(R.id.program_button);
         programButton.setOnClickListener(new OnClickListener() {
             @Override
@@ -87,6 +88,7 @@ public class ProgramScheduleButton extends LinearLayout {
                 }
             }
         });
+        */
 
         CheckBox notificationButton = (CheckBox) findViewById(R.id.notification_button);
         if (broadcast.isPlayingNow()) {

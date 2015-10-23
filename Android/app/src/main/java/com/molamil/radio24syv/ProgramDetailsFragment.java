@@ -8,6 +8,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -116,7 +117,7 @@ public class ProgramDetailsFragment extends PageFragment implements
         progressSpinner = (ProgressBar) v.findViewById(R.id.activity_indicator);
         progressSpinner.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.MULTIPLY);
 
-        ImageButton notificationButton = (ImageButton) v.findViewById(R.id.notification_button);
+        CheckBox notificationButton = (CheckBox) v.findViewById(R.id.notification_button);
         notificationButton.setVisibility(program.getActive() ? View.VISIBLE : View.GONE);
 
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);

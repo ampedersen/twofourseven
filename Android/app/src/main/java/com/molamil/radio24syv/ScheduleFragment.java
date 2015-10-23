@@ -7,6 +7,7 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ProgressBar;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Broadcast;
@@ -36,6 +37,8 @@ public class ScheduleFragment extends PageFragment {
     private PageFragment.OnFragmentInteractionListener listener;
     private ProgramScheduleButton.OnProgramScheduleButtonViewListener buttonListener;
 
+    private ProgressBar progressSpinner;
+
     public ScheduleFragment() {
         // Required empty public constructor
     }
@@ -49,12 +52,17 @@ public class ScheduleFragment extends PageFragment {
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         final View v = inflater.inflate(R.layout.fragment_schedule, container, false);
 
+        progressSpinner = (ProgressBar) v.findViewById(R.id.activity_indicator);
+        progressSpinner.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.MULTIPLY);
+
         RestClient.getApi().getNextBroadcasts(20, 0).enqueue(new Callback<List<Broadcast>>() {
             @Override
             public void onResponse(Response<List<Broadcast>> response) {
                 if (listener != null) {
                     listener.onError(null);
                 }
+
+
                 showLoadingText(v, false);
 
                 ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
@@ -109,14 +117,14 @@ public class ScheduleFragment extends PageFragment {
     }
 
     private void showLoadingText(View v, boolean show) {
-        View loadingText = v.findViewById(R.id.loading_text);
+
         int visibility;
         if (show) {
             visibility = View.VISIBLE;
         } else {
             visibility = View.GONE;
         }
-        loadingText.setVisibility(visibility);
+        progressSpinner.setVisibility(visibility);
     }
 
     @Override

@@ -70,6 +70,7 @@
                         style="@style/SectionTitleText"
                         />
 
+                    <!--
                     <ImageButton
                         android:id="@+id/notification_button"
                         android:layout_width="wrap_content"
@@ -77,6 +78,14 @@
                         style="@style/BaseButton"
                         android:layout_gravity="right|center_vertical"
                         android:src="@drawable/icon_bell_white"/>
+                    -->
+                    <CheckBox
+                        android:id="@+id/notification_button"
+                        android:layout_gravity="right|center_vertical"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:button="@drawable/button_notification_white"
+                        />
 
                 </FrameLayout>
 

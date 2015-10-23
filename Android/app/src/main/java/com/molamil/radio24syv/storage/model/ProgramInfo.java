@@ -170,6 +170,10 @@ public class ProgramInfo implements Serializable {
 
     private String getBroadcastTime(Context c)
     {
+        if(broadcastInfo == null)
+        {
+            return "";
+        }
         String frequency = broadcastInfo.getWeekly() ? "weekly" : "daily";
         String packageName = c.getPackageName();
         int resId = c.getResources().getIdentifier(frequency, "string", packageName);

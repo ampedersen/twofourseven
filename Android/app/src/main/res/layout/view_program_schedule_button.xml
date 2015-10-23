@@ -5,6 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:orientation="vertical"
+    android:layout_marginBottom="@dimen/app_margin_half25"
     android:background="@drawable/button_white_background"
     >
 
@@ -16,7 +17,7 @@
         android:orientation="vertical"
         >
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
             android:id="@+id/time_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -33,7 +34,7 @@
         android:layout_marginLeft="15dp"
         >
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
             android:id="@+id/name_text"
             android:layout_weight="1"
             android:layout_width="match_parent"
@@ -49,7 +50,7 @@
             android:layout_weight="0"
             android:layout_width="40dp"
             android:layout_height="40dp"
-            android:button="@android:drawable/btn_star"
+            android:button="@drawable/button_notification"
             />
 
     </LinearLayout>
@@ -61,12 +62,13 @@
         android:layout_marginLeft="15dp"
         >
 
-        <TextView
+        <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
             android:id="@+id/topic_text"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Topic"
-            android:textColor="@color/radio_gray"
+            android:paddingTop="-5dp"
+            android:textColor="@color/radio_gray_dark"
             />
 
     </LinearLayout>

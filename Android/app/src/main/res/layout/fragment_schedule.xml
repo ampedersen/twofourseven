@@ -16,14 +16,18 @@
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="match_parent"
+            android:layout_margin="@dimen/app_margin_25"
+            android:paddingBottom="@dimen/app_margin_25"
             android:orientation="vertical"
             >
 
-            <TextView
+            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="@string/schedule_header"
-                style="@style/SidePageTitleText"
+                android:textColor="@color/radio_black"
+                android:layout_marginBottom="@dimen/app_margin_half75"
+                style="@style/SectionTitleText"
                 />
 
             <LinearLayout
@@ -33,6 +37,7 @@
                 android:orientation="vertical"
                 />
 
+            <!--
             <TextView
                 android:id="@+id/loading_text"
                 android:layout_width="wrap_content"
@@ -41,6 +46,16 @@
                 android:visibility="gone"
                 android:layout_gravity="center"
                 />
+            -->
+
+            <ProgressBar
+                android:id="@+id/activity_indicator"
+                style="?android:attr/progressBarStyleLarge"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_margin="@dimen/app_margin_half25"
+                android:layout_gravity="center">
+            </ProgressBar>
 
         </LinearLayout>
 
