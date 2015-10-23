@@ -100,6 +100,8 @@ public class LiveFragment extends PageFragment {
                     playButton.setDescription(b.getDescriptionText());
                     playButton.setProgramTitle(b.getProgramName());
                     playButton.setTopic(b.getTopic());
+                    playButton.setStartTime(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
+                    playButton.setEndTime(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
 
                     //TODO get audio URL playButton.setUrl(b.get);
                 } else {

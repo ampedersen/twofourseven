@@ -27,6 +27,8 @@ public class RadioPlayerButton extends Button implements
     private String topic;
     private String programTitle;
     private String description;
+    private String startTime;
+    private String endTime;
     private boolean adaptActionAfterPlay = true; // This is really a terrible name I know. It means that if the action was PLAY, the button will change to PAUSE or STOP depending on the audio source (local or streamed).
 
     private RadioPlayer player;
@@ -52,6 +54,8 @@ public class RadioPlayerButton extends Button implements
             setDescription(a.getString(R.styleable.RadioPlayerButton_audioDescription));
             setTopic(a.getString(R.styleable.RadioPlayerButton_audioTopic));
             setProgramTitle(a.getString(R.styleable.RadioPlayerButton_audioProgramTitle));
+            setStartTime(a.getString(R.styleable.RadioPlayerButton_audioStartTime));
+            setEndTime(a.getString(R.styleable.RadioPlayerButton_audioEndTime));
             setAdaptActionAfterPlay(a.getBoolean(R.styleable.RadioPlayerButton_adaptActionAfterPlay, true));
             setPlayIcon(a.getResourceId(R.styleable.RadioPlayerButton_playIcon, 0));
             setStopIcon(a.getResourceId(R.styleable.RadioPlayerButton_stopIcon, 0));
@@ -147,6 +151,22 @@ public class RadioPlayerButton extends Button implements
         this.programTitle = programTitle;
     }
 
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -177,7 +197,7 @@ public class RadioPlayerButton extends Button implements
 
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic());
+                player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic(), getStartTime(), getEndTime());
                 break;
             case RadioPlayer.ACTION_STOP:
                 player.stop();

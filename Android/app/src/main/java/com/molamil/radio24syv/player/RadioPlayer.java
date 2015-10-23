@@ -63,6 +63,8 @@ public class RadioPlayer {
     private String description = DESCRIPTION_UNASSIGNED;
     private String topic = null;
     private String programTitle = null;
+    private String startTime = null;
+    private String endTime = null;
     private Context context;
     private RadioPlayerService service = null;
     private boolean isBoundToService;
@@ -73,6 +75,8 @@ public class RadioPlayer {
     private String pendingDescription = DESCRIPTION_UNASSIGNED;
     private String pendingTopic = null;
     private String pendingProgramTitle = null;
+    private String pendingStartTime = null;
+    private String pendingEndTime = null;
 
 
     public RadioPlayer(Context context) {
@@ -158,6 +162,24 @@ public class RadioPlayer {
         }
     }
 
+    public String getStartTime() {
+        if (isBoundToService) {
+            return service.getStartTime();
+        } else {
+            return null;
+        }
+        //return startTime;
+    }
+
+    public String getEndTime() {
+        if (isBoundToService) {
+            return service.getEndTime();
+        } else {
+            return null;
+        }
+        //return endTime;
+    }
+
     public int getState() {
         if (isBoundToService) {
             return service.getState();
@@ -221,28 +243,30 @@ public class RadioPlayer {
     }
     */
 
-    public void play(String url, String title, String description, String programTitle, String topic) {
+    public void play(String url, String title, String description, String programTitle, String topic, String startTime, String endTime) {
         this.url = url;
         this.title = title;
         this.description = description;
         this.programTitle = programTitle;
         this.topic = topic;
-        setAction(url, title, description, programTitle, topic, ACTION_PLAY);
+        this.startTime = startTime;
+        this.endTime = endTime;
+        setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_PLAY);
     }
 
     public void stop() {
-        setAction(url, title, description, programTitle, topic, ACTION_STOP);
+        setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_STOP);
     }
 
     public void pause() {
-        setAction(url, title, description, programTitle, topic, ACTION_PAUSE);
+        setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_PAUSE);
     }
 
-    public void next() { setAction(url, title, description, programTitle, topic, ACTION_NEXT); }
+    public void next() { setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_NEXT); }
 
-    public void previous() { setAction(url, title, description, programTitle, topic, ACTION_PREVIOUS); }
+    public void previous() { setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_PREVIOUS); }
 
-    private void setAction(final String url, String title, String description, String programTitle, String topic, int action) {
+    private void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int action) {
         //Log.d("JJJ", "setAction " + action + " isBound " + isBoundToService + " " + service + " url " + url + " title " + title + " description " + description);
         if (isBoundToService) {
 
@@ -268,23 +292,23 @@ public class RadioPlayer {
                 audioTitle = audioDescription; // TODO download program info
             }
             */
-            service.setAction(url, title, description, programTitle, topic, action);
+            service.setAction(url, title, description, programTitle, topic, startTime, endTime, action);
             clearPendingAction(); // We got hole through to the service, clear pending action
         } else {
             Log.d("JJJ", "Unable to set action for service because service is not bound - will set the action when it getInstance bound");
-            setPendingAction(url, title, description, programTitle, topic, action);
+            setPendingAction(url, title, description, programTitle, topic, startTime, endTime, action);
         }
     }
 
     private void clearPendingAction() {
-        setPendingAction(URL_UNASSIGNED, TITLE_UNASSIGNED, DESCRIPTION_UNASSIGNED, null, null, ACTION_UNASSIGNED);
+        setPendingAction(URL_UNASSIGNED, TITLE_UNASSIGNED, DESCRIPTION_UNASSIGNED, null, null, null, null, ACTION_UNASSIGNED);
     }
 
     private boolean isPendingAction() {
         return (pendingUrl != null) && (!pendingUrl.equals(URL_UNASSIGNED)) && (pendingAction != ACTION_UNASSIGNED);
     }
 
-    private void setPendingAction(String url, String title, String description, String programTitle, String topic, int action) {
+    private void setPendingAction(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int action) {
         //Log.d("JJJ", "set pending action " + getActionName(action) + " url " + url + " title " + title);
         pendingUrl = url;
         pendingAction = action;
@@ -292,6 +316,8 @@ public class RadioPlayer {
         pendingDescription = description;
         pendingProgramTitle = programTitle;
         pendingTopic = topic;
+        pendingStartTime = startTime;
+        pendingEndTime = endTime;
     }
 
     // Defines callbacks for service binding, passed to bindService()
@@ -307,7 +333,7 @@ public class RadioPlayer {
 
             if (isPendingAction()) {
                 Log.d("JJJ", "Executing pending action " + getActionName(pendingAction) + " url " + pendingUrl);
-                setAction(pendingUrl, pendingTitle, pendingDescription, pendingProgramTitle, pendingTopic, pendingAction);
+                setAction(pendingUrl, pendingTitle, pendingDescription, pendingProgramTitle, pendingTopic, pendingStartTime, pendingEndTime, pendingAction);
             } else {
                 callback(); // Make a callback to all listeners about the state of the player service
             }
