@@ -660,6 +660,23 @@ public class StorageDatabase extends SQLiteOpenHelper {
         return alarmId;
     }
 
+    public List<Integer> getAlarmIdsForSlug(String programSlug) {
+        String query = "SELECT " + KEY_ALARM_ID + " FROM " + TABLE_ALARM + " WHERE " + KEY_PROGRAM_SLUG + " = '" + programSlug + "'";
+        //Log.i("PS", "QUERY: "+query);
+        List<Integer> alarmIds = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                int alarmId = c.getInt(c.getColumnIndex(KEY_ALARM_ID));
+                alarmIds.add(alarmId);
+            } while (c.moveToNext());
+            c.close();
+        } else {
+            //Log.d("PS", "no program notifications");
+        }
+        return alarmIds;
+    }
+
     public void removeAlarm(int alarmId) {
         deleteRow(TABLE_ALARM, KEY_ALARM_ID + " = " + alarmId);
     }

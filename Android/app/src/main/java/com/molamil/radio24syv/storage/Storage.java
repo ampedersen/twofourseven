@@ -188,6 +188,10 @@ public class Storage {
         return database.getAlarmId(programSlug, programTime);
     }
 
+    public List<Integer> getAlarmIdsForSlug(String programSlug) {
+        return database.getAlarmIdsForSlug(programSlug);
+    }
+
     public void removeAlarm(int alarmId) {
         database.removeAlarm(alarmId);
     }

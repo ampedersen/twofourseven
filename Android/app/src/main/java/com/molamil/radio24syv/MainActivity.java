@@ -324,9 +324,16 @@ public class MainActivity extends FragmentActivity implements
             //Log.i("PS", "Remove notifications for " + slug);
             int alarmId = Storage.get().getProgramAlarmId(slug);
             if ((alarmId != Storage.ALARM_ID_UNKNOWN) && removeAlarmNotification(alarmId)) {
+
+                //Log.i("PS", "Remove notifications success");
                 // Success
                 Storage.get().removeProgramAlarm(alarmId);
-                //Log.i("PS", "Remove notifications success");
+                List<Integer> idsToRemove = Storage.get().getAlarmIdsForSlug(slug);
+                for(int alarmIdToRemove : idsToRemove )
+                {
+                    //Log.i("PS", "Remove individual alarm: "+alarmIdToRemove);
+                    Storage.get().removeAlarm(alarmIdToRemove);
+                }
             } else {
                 //Log.i("PS", "Remove notifications fail");
             }
@@ -335,78 +342,52 @@ public class MainActivity extends FragmentActivity implements
 
     private void UpdateProgramNotifications()
     {
-        Log.i("PS", "Update program notifications");
         List<String> slugs = Storage.get().getAllProgramsWithAlarm();
+        //Log.i("PS", "Update program notifications for " + slugs.size() + " programs");
         for (String slug : slugs) {
             UpdateProgramNotificationsForProgram(slug);
         }
     }
 
-    private void UpdateProgramNotificationsForProgram(String programSlug)
+    private void UpdateProgramNotificationsForProgram(final String slug)
     {
-        Log.i("PS", "Update notifications for "+programSlug);
-        RestClient.getApi().getNextBroadcasts(programSlug).enqueue(new Callback<List<Broadcast>>() {
+        //Log.i("PS", "Update notifications for "+slug);
+        RestClient.getApi().getNextBroadcasts(slug).enqueue(new Callback<List<Broadcast>>() {
             @Override
             public void onResponse(Response<List<Broadcast>> response) {
 
                 List<Broadcast> broadcasts = response.body();
                 for (int i = 0; i < broadcasts.size(); i++) {
+                    Broadcast broadcast = broadcasts.get(i);
+                    String programName = broadcast.getProgramName();
+                    String broadcastTime = broadcast.getBroadcastTime().getStart();
+                    int alarmId = Storage.get().getAlarmId(slug, broadcastTime); // Check if there is an alarm for this program and time
+                    if(alarmId == Storage.ALARM_ID_UNKNOWN)
+                    {
+                        //Log.i("PS", "ADD: Add alarm for "+slug+" @ "+broadcastTime);
+                        String message;
+                        alarmId = Storage.get().addAlarm(slug, broadcastTime); // Store alarm in database and get unique alarm ID that can be used to distinguish alarm notifications
+                        if (addAlarmNotification(alarmId, programName, broadcastTime)) {
+                            //Log.i("PS", "ADD: Added alarm for "+slug+" @ "+broadcastTime);
 
-                }
-                /*
-                if (listener != null) {
-                    listener.onError(null);
-                }
 
-
-                showLoadingText(v, false);
-
-                ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
-                content.removeAllViews();
-
-                List<Broadcast> broadcasts = response.body();
-
-                DateTime previousDate = null;
-                for (int i = 0; i < broadcasts.size(); i++) {
-                    BroadcastInfo b = new BroadcastInfo(broadcasts.get(i));
-
-                    // Date line separator between days
-                    if (previousDate == null) {
-                        previousDate = new DateTime(b.getTimeBegin());
-                    } else {
-                        DateTime nextDate = new DateTime(b.getTimeBegin());
-                        boolean isDifferentDay = (nextDate.getDayOfYear() != previousDate.getDayOfYear()) || (nextDate.getYear() != previousDate.getYear());
-                        if (isDifferentDay) {
-                            DateLineView dateLine = new DateLineView(v.getContext());
-                            dateLine.setDate(DateTime.now(), nextDate);
-                            dateLine.setWhiteBackground(true);
-                            content.addView(dateLine);
+                        } else {
+                            //Log.i("PS", "ADD: Failed to add alarm for " + slug + " @ " + broadcastTime);
+                            Storage.get().removeAlarm(alarmId);
                         }
-                        previousDate = nextDate;
                     }
-
-                    // Scheduled program button
-                    ProgramScheduleButton programButton = new ProgramScheduleButton(v.getContext());
-                    programButton.setBroadcast(b);
-                    programButton.setOnProgramScheduleButtonViewListener(buttonListener);
-                    int alarmId = Storage.get().getAlarmId(b.getProgramSlug(), b.getTimeBegin()); // Check if there is an alarm for this program and time
-                    boolean isNotificationEnabled = (alarmId != Storage.ALARM_ID_UNKNOWN);
-                    programButton.setNotificationEnabled(isNotificationEnabled);
-                    content.addView(programButton);
+                    else
+                    {
+                        //Log.i("PS", "Alarm already exists for "+slug+" @ "+broadcastTime);
+                    }
                 }
-                */
+
             }
 
             @Override
             public void onFailure(Throwable t) {
-                /*
-                if (listener != null) {
-                    listener.onError(t.getLocalizedMessage());
-                }
-                showLoadingText(v, false);
-                Log.d("JJJ", "fail " + t.getMessage());
-                */
-                t.printStackTrace();
+                Log.d("PS", "failed to get broadcasts for program to create notifications " + t.getMessage());
+                //t.printStackTrace();
             }
         });
     }
