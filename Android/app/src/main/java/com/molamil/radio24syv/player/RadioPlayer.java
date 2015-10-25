@@ -422,7 +422,17 @@ public class RadioPlayer {
     //playlist stuff
     //TODO: Sorted? Cached?
     public List<PodcastInfo> getPlayList() {
-        return Storage.get().getPodcasts(programId);
+        if(playlistType == PLAYLIST_PODCAST)
+        {
+            return Storage.get().getPodcasts(programId);
+        }
+        else if(playlistType == PLAYLIST_OFFLINE)
+        {
+            //Never used. Offline items are also set to PLAYLIST_PODCAST for now.
+            return Storage.get().getPodcastsInLibrary(programId);
+        }
+
+        return null;
     }
 
     /*
@@ -469,6 +479,11 @@ public class RadioPlayer {
     private PodcastInfo getNext()
     {
         List<PodcastInfo> playlist = getPlayList();
+        if(playlist == null)
+        {
+            return null;
+        }
+
         int i=0;
         for(PodcastInfo p: playlist)
         {
@@ -484,6 +499,11 @@ public class RadioPlayer {
     private PodcastInfo getPrevious()
     {
         List<PodcastInfo> playlist = getPlayList();
+        if(playlist == null)
+        {
+            return null;
+        }
+
         int i=0;
         for(PodcastInfo p: playlist)
         {
