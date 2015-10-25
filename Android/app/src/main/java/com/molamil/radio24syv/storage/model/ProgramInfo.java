@@ -22,11 +22,15 @@ public class ProgramInfo implements Serializable {
     private String name;
     private String topic;
     private String description;
+    private String startTime;
+    private String endTime;
     private String imageUrl;
     private boolean active;
 
     private List<Host> hosts = new ArrayList<Host>();
     private com.molamil.radio24syv.api.model.BroadcastInfo broadcastInfo;
+
+
     public ProgramInfo() {}
 
     public ProgramInfo(ConciseProgram conciseProgram) {
@@ -37,6 +41,7 @@ public class ProgramInfo implements Serializable {
         description = conciseProgram.getDescriptionText();
         imageUrl = conciseProgram.getImageUrl();
         active = conciseProgram.getActive();
+
     }
 
     public ProgramInfo(Program program) {
@@ -104,6 +109,22 @@ public class ProgramInfo implements Serializable {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public String getStartTime() {
+        return startTime;
+    }
+
+    public void setStartTime(String startTime) {
+        this.startTime = startTime;
+    }
+
+    public String getEndTime() {
+        return endTime;
+    }
+
+    public void setEndTime(String endTime) {
+        this.endTime = endTime;
     }
 
     public String getImageUrl() {
@@ -183,19 +204,22 @@ public class ProgramInfo implements Serializable {
 
     public String getFormattedStartTime()
     {
-        return getFormattedTime(null);
+        return getFormattedTime(startTime);
     }
 
     public String getFormattedEndTime()
     {
-        return getFormattedTime(null);
+        return getFormattedTime(endTime);
     }
 
-    private String getFormattedTime(Date date)
+    private String getFormattedTime(String time)
     {
-        return "00:00";
+        if(time == null)
+        {
+            return "";
+        }
+        return time;
 
-        //TODO: Implement
         /*
         let calendar = NSCalendar.currentCalendar()
         //calendar.timeZone = NSTimeZone(name: "GMT")! //Don't. Use whatever time zone the phone has here.

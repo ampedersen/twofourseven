@@ -162,6 +162,20 @@ public class Storage {
         return database.getRelatedPrograms(programId, limit);
     }
 
+    //Program alarms
+    public int addProgramAlarm(String programSlug) {
+        return database.addProgramAlarm(programSlug);
+    }
+
+    public int getProgramAlarmId(String programSlug) {
+        return database.getProgramAlarmId(programSlug);
+    }
+
+    public void removeProgramAlarm(int alarmId) {
+        database.removeProgramAlarm(alarmId);
+    }
+
+    //Schedule alarms
     public int addAlarm(String programSlug, String programTime) {
         return database.addAlarm(programSlug, programTime);
     }

@@ -53,7 +53,7 @@ public class LiveFragment extends PageFragment {
         View v = inflater.inflate(R.layout.fragment_live, container, false);
 
         timeline = (ProgressBar) v.findViewById(R.id.player_progress);
-
+        timeline.setProgress(0);
         desctiptionTv = ((TextView) v.findViewById(R.id.program_description));
 
         Button scheduleButton = (Button)v.findViewById(R.id.schedule_button);
@@ -102,6 +102,8 @@ public class LiveFragment extends PageFragment {
                     playButton.setTopic(b.getTopic());
                     playButton.setStartTime(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
                     playButton.setEndTime(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
+
+                    //Update timeline
 
                     //TODO get audio URL playButton.setUrl(b.get);
                 } else {

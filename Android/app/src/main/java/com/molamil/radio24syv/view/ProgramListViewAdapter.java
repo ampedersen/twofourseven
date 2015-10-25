@@ -10,6 +10,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
+import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
@@ -72,10 +73,18 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
             holder.image.setTintColor(topic.getColorValue());
         }
         holder.image.setImageUrl(program.getImageUrl());
+
+        //Setup play button
+        //This url comes from loading the program model and then loading the first podcast from that model, so we can't pass the final url here. Need to load stuff after button is clicked.
+
         //holder.playButton.setUrl(); // TODO set url for program button
         holder.playButton.setTitle(program.getName());
         holder.playButton.setDescription(program.getDescription());
         holder.playButton.setRadioPlayer(radioPlayer);
+
+        holder.playButton.setTopic(program.getTopic());
+        holder.playButton.setStartTime(program.getStartTime());
+        holder.playButton.setEndTime(program.getEndTime());
 
         return v;
     }

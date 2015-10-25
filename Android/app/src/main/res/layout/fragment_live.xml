@@ -74,7 +74,7 @@
                         android:layout_alignParentRight="true"
                         />
 
-                    <ProgressBar
+                    <com.molamil.radio24syv.components.TimeLine
                         android:id="@+id/player_progress"
                         android:progress="50"
                         android:max="100"

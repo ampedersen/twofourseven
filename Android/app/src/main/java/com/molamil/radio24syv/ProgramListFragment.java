@@ -6,13 +6,8 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
-import android.widget.Button;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
-import android.widget.ListAdapter;
-import android.widget.ListView;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
@@ -25,7 +20,6 @@ import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.util.DisplayUtil;
 import com.molamil.radio24syv.view.ProgramCategoryButton;
-import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.ProgramListView;
 
 import java.util.ArrayList;

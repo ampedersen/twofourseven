@@ -214,6 +214,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         programInfo.setDescription(player.getDescription());
         programInfo.setTopic(player.getTopic());
         programInfo.setTopic(player.getTopic());
+        programInfo.setStartTime(player.getStartTime());
+        programInfo.setEndTime(player.getEndTime());
 
         //TODO: Handle Program title vs podcast title too.
         //programInfo.setName(player.getProgramTitle());
@@ -256,7 +258,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             titleText.setTextColor(0xffffff);
         }
 
-         ((TextView) v.findViewById(R.id.time_text)).setText(p.getFormattedStartTime() + " - " + p.getFormattedEndTime());
+        ((TextView) v.findViewById(R.id.time_text)).setText(p.getFormattedStartTime() + " - " + p.getFormattedEndTime());
 
         ((TextView) v.findViewById(R.id.description_text)).setText(p.getDescription());
 

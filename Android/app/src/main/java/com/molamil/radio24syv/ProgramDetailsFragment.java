@@ -55,6 +55,8 @@ public class ProgramDetailsFragment extends PageFragment implements
     private TextView desctiptionTv;
     private boolean expanded = false;
 
+    CheckBox notificationButton;
+
     public static ProgramDetailsFragment newInstance(ProgramInfo program) {
         ProgramDetailsFragment fragment = new ProgramDetailsFragment();
         Bundle args = new Bundle();
@@ -117,9 +119,14 @@ public class ProgramDetailsFragment extends PageFragment implements
         progressSpinner = (ProgressBar) v.findViewById(R.id.activity_indicator);
         progressSpinner.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.MULTIPLY);
 
-        CheckBox notificationButton = (CheckBox) v.findViewById(R.id.notification_button);
+        notificationButton = (CheckBox) v.findViewById(R.id.notification_button);
         notificationButton.setVisibility(program.getActive() ? View.VISIBLE : View.GONE);
-
+        notificationButton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                OnNotificationButtonClick();
+            }
+        });
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
         getPodcasts(content, BATCH_SIZE, 1);
 
@@ -296,5 +303,32 @@ public class ProgramDetailsFragment extends PageFragment implements
 
     public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {
         public void onBackButtonPressed();
+    }
+
+    /*
+     Notifications
+     */
+
+    /*
+    public void setNotificationEnabled(boolean enabled) {
+        notificationButton.setChecked(enabled);
+    }
+
+    public boolean getNotificationEnabled() {
+        return notificationButton.isChecked();
+    }
+    */
+
+    private void OnNotificationButtonClick()
+    {
+        Log.i("PS", "Toggle notifications");
+        if(notificationButton.isChecked())
+        {
+            Log.i("PS", "ON");
+        }
+        else
+        {
+            Log.i("PS", "OFF");
+        }
     }
 }

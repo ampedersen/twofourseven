@@ -23,6 +23,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static final String TABLE_PROGRAM = "program";
     private static final String TABLE_PODCAST = "podcast";
     private static final String TABLE_ALARM = "alarm";
+    private static final String TABLE_PROGRAM_ALARM = "program_alarm";
     private static final String TABLE_TOPIC = "topic";
     private static final String TABLE_PLAYER_HISTORY = "player_history";
     private static final String TABLE_RELATED_PROGRAM = "related_program";
@@ -88,10 +89,15 @@ public class StorageDatabase extends SQLiteOpenHelper {
             + KEY_PROGRAM_SLUG + " TEXT"
             + ")";
 
+    private static final String SQL_CREATE_TABLE_PROGRAM_ALARM = "CREATE TABLE " + TABLE_PROGRAM_ALARM + "("
+            + KEY_ALARM_ID + " INTEGER PRIMARY KEY, "
+            + KEY_PROGRAM_SLUG + " TEXT"
+            + ")";
+
     private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 4;
+    private static final int DATABASE_VERSION = 5;
     private static final String DATABASE_NAME = "Storage.db";
 
     public StorageDatabase(Context context) {
@@ -123,6 +129,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
             execSQL(db, SQL_CREATE_TABLE_PLAYER_HISTORY);
             execSQL(db, SQL_CREATE_TABLE_RELATED_PROGRAM);
             execSQL(db, SQL_CREATE_TABLE_ALARM);
+            execSQL(db, SQL_CREATE_TABLE_PROGRAM_ALARM);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -140,6 +147,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
             execSQL(db, SQL_DROP_TABLE + TABLE_PLAYER_HISTORY);
             execSQL(db, SQL_DROP_TABLE + TABLE_RELATED_PROGRAM);
             execSQL(db, SQL_DROP_TABLE + TABLE_ALARM);
+            execSQL(db, SQL_DROP_TABLE + TABLE_PROGRAM_ALARM);
             db.setTransactionSuccessful();
         } finally {
             db.endTransaction();
@@ -555,6 +563,66 @@ public class StorageDatabase extends SQLiteOpenHelper {
         return getProgramsInQuery("SELECT DISTINCT " + KEY_PROGRAM_ID_RELATED + " FROM " + TABLE_RELATED_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " LIMIT " + limit);
     }
 
+    //Program alarms. Store program slug refs in one table and then store the alarms in the normal alarms db.
+    public int addProgramAlarm(String programSlug) {
+        int alarmId = Storage.ALARM_ID_UNKNOWN;
+
+        SQLiteDatabase db = getWritableDatabase();
+        db.beginTransaction();
+        try {
+            // First write the new entry
+            ContentValues values = new ContentValues();
+            values.put(KEY_PROGRAM_SLUG, programSlug);
+            db.insert(TABLE_PROGRAM_ALARM, null, values); // Alarm ID is automatically set by the database because it is the primary key. Same as if the column was AUTOINCREMENT.
+            // Then read the alarm ID it got assigned
+            alarmId = getProgramAlarmId(programSlug);
+            db.setTransactionSuccessful();
+        } finally {
+            db.endTransaction();
+        }
+
+        return alarmId;
+    }
+
+    public int getProgramAlarmId(String programSlug) {
+        //return getAlarmId(getReadableDatabase(), programSlug);
+        SQLiteDatabase db = getReadableDatabase();
+        String query = "SELECT " + KEY_ALARM_ID + " FROM " + TABLE_PROGRAM_ALARM + " WHERE " + KEY_PROGRAM_SLUG + " = '" + programSlug + "' LIMIT 1";
+        Log.d("PS", query);
+        int alarmId = Storage.ALARM_ID_UNKNOWN;
+        Cursor c = db.rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            alarmId = c.getInt(c.getColumnIndex(KEY_ALARM_ID));
+            c.close();
+        }
+        return alarmId;
+    }
+
+    public void removeProgramAlarm(int alarmId) {
+        deleteRow(TABLE_PROGRAM_ALARM, KEY_ALARM_ID + " = " + alarmId);
+    }
+
+    public List<String> getAllProgramsWithAlarm() {
+        String query = "SELECT " + KEY_PROGRAM_SLUG + " FROM " + TABLE_PROGRAM_ALARM;
+        //String query = "SELECT * FROM " + TABLE_PROGRAM_ALARM;
+        //c.getString(c.getColumnIndex(KEY_TOPIC_ID))
+
+        ArrayList<String> slugs = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                String slug = c.getString(c.getColumnIndex(KEY_PROGRAM_SLUG));
+                slugs.add(slug);
+            } while (c.moveToNext());
+            c.close();
+        } else {
+            Log.d("PS", "no program notifications");
+        }
+
+        return slugs;
+    }
+
+    //Schedule alarms
     public int addAlarm(String programSlug, String programTime) {
         int alarmId = Storage.ALARM_ID_UNKNOWN;
 
