@@ -11,8 +11,11 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.PodcastInfo;
 
 import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Plays audio and manages the RadioPlayerService. Supports playback of URL, standard play/pause/etc actions, multiple listener callbacks for player states.
@@ -65,6 +68,7 @@ public class RadioPlayer {
     private String programTitle = null;
     private String startTime = null;
     private String endTime = null;
+    private boolean usePodcastPlaylist = false;
     private Context context;
     private RadioPlayerService service = null;
     private boolean isBoundToService;
@@ -77,7 +81,10 @@ public class RadioPlayer {
     private String pendingProgramTitle = null;
     private String pendingStartTime = null;
     private String pendingEndTime = null;
+    private boolean pendingUsePodcastPlaylist = false;
 
+    //PS. Quick and dirty playlist for next / prev buttons.
+    //private List<PodcastInfo> playList;
 
     public RadioPlayer(Context context) {
         Log.d("JJJ", "Create RadioPlayer - starting radio service");
@@ -243,7 +250,7 @@ public class RadioPlayer {
     }
     */
 
-    public void play(String url, String title, String description, String programTitle, String topic, String startTime, String endTime) {
+    public void play(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, boolean usePodcastPlaylist) {
         this.url = url;
         this.title = title;
         this.description = description;
@@ -251,26 +258,29 @@ public class RadioPlayer {
         this.topic = topic;
         this.startTime = startTime;
         this.endTime = endTime;
-        setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_PLAY);
+        this.usePodcastPlaylist = usePodcastPlaylist;
+        setAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, ACTION_PLAY);
     }
 
     public void stop() {
-        setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_STOP);
+        setAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, ACTION_STOP);
     }
 
     public void pause() {
-        setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_PAUSE);
+        setAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, ACTION_PAUSE);
     }
 
     public void next() {
-        setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_NEXT);
+        Log.i("PS", "NEXT");
+        setAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, ACTION_NEXT);
     }
 
     public void previous() {
-        setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_PREVIOUS);
+        Log.i("PS", "PREV");
+        setAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, ACTION_PREVIOUS);
     }
 
-    private void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int action) {
+    private void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, boolean usePodcastPlaylist, int action) {
         //Log.d("JJJ", "setAction " + action + " isBound " + isBoundToService + " " + service + " url " + url + " title " + title + " description " + description);
         if (isBoundToService) {
 
@@ -300,19 +310,19 @@ public class RadioPlayer {
             clearPendingAction(); // We got hole through to the service, clear pending action
         } else {
             Log.d("JJJ", "Unable to set action for service because service is not bound - will set the action when it getInstance bound");
-            setPendingAction(url, title, description, programTitle, topic, startTime, endTime, action);
+            setPendingAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, action);
         }
     }
 
     private void clearPendingAction() {
-        setPendingAction(URL_UNASSIGNED, TITLE_UNASSIGNED, DESCRIPTION_UNASSIGNED, null, null, null, null, ACTION_UNASSIGNED);
+        setPendingAction(URL_UNASSIGNED, TITLE_UNASSIGNED, DESCRIPTION_UNASSIGNED, null, null, null, null, false, ACTION_UNASSIGNED);
     }
 
     private boolean isPendingAction() {
         return (pendingUrl != null) && (!pendingUrl.equals(URL_UNASSIGNED)) && (pendingAction != ACTION_UNASSIGNED);
     }
 
-    private void setPendingAction(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int action) {
+    private void setPendingAction(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, boolean usePodcastPlaylist, int action) {
         //Log.d("JJJ", "set pending action " + getActionName(action) + " url " + url + " title " + title);
         pendingUrl = url;
         pendingAction = action;
@@ -322,6 +332,7 @@ public class RadioPlayer {
         pendingTopic = topic;
         pendingStartTime = startTime;
         pendingEndTime = endTime;
+        pendingUsePodcastPlaylist = usePodcastPlaylist;
     }
 
     // Defines callbacks for service binding, passed to bindService()
@@ -337,7 +348,7 @@ public class RadioPlayer {
 
             if (isPendingAction()) {
                 Log.d("JJJ", "Executing pending action " + getActionName(pendingAction) + " url " + pendingUrl);
-                setAction(pendingUrl, pendingTitle, pendingDescription, pendingProgramTitle, pendingTopic, pendingStartTime, pendingEndTime, pendingAction);
+                setAction(pendingUrl, pendingTitle, pendingDescription, pendingProgramTitle, pendingTopic, pendingStartTime, pendingEndTime, pendingUsePodcastPlaylist, pendingAction);
             } else {
                 callback(); // Make a callback to all listeners about the state of the player service
             }
@@ -376,5 +387,50 @@ public class RadioPlayer {
 
     public interface RadioPlayerProvider {
         RadioPlayer getRadioPlayer();
+    }
+
+    //playlist stuff
+
+    public List<PodcastInfo> getPlayList() {
+        //return Storage.get().getPodcasts();
+        return null;
+    }
+
+    public boolean hasPrevious()
+    {
+        List<PodcastInfo> playlist = getPlayList();
+        if(playlist == null || usePodcastPlaylist == false)
+        {
+            return false;
+        }
+
+        int i = 0;
+        for(PodcastInfo p : playlist){
+            if(i>0 && p.getAudioUrl() == getUrl())
+            {
+                return true;
+            }
+            i++;
+        }
+        return false;
+    }
+
+    public boolean hasNext()
+    {
+        List<PodcastInfo> playlist = getPlayList();
+        if(playlist == null || usePodcastPlaylist == false)
+        {
+            return false;
+        }
+
+        int i = 0;
+        for(PodcastInfo p : playlist){
+            if(i<playlist.size()-2 && p.getAudioUrl() == getUrl())
+            {
+                return true;
+            }
+            i++;
+        }
+        return false;
     }
 }

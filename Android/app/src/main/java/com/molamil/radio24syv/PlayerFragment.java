@@ -40,6 +40,9 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     private PlayerSize size = PlayerSize.NONE;
 
+    private RadioPlayerButton prevButton;
+    private RadioPlayerButton nextButton;
+
     public static PlayerFragment newInstance(String title) {
         PlayerFragment fragment = new PlayerFragment();
         Bundle args = new Bundle();
@@ -75,6 +78,9 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
                 }
             }
         });
+
+        prevButton = (RadioPlayerButton) v.findViewById(R.id.previous_button);
+        nextButton = (RadioPlayerButton) v.findViewById(R.id.next_button);
 
         updateSize(v);
 
@@ -259,9 +265,26 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         }
 
         ((TextView) v.findViewById(R.id.time_text)).setText(p.getFormattedStartTime() + " - " + p.getFormattedEndTime());
-
         ((TextView) v.findViewById(R.id.description_text)).setText(p.getDescription());
 
+        //Next prev buttons activation
+
+        RadioPlayer player = radioPlayerProvider.getRadioPlayer();
+        enableNextPrevButton(prevButton, player.hasPrevious());
+        enableNextPrevButton(nextButton, player.hasNext());
+    }
+
+    private void enableNextPrevButton(RadioPlayerButton button, boolean enabled)
+    {
+        button.setEnabled(enabled);
+        if(button.getAction() == RadioPlayer.ACTION_PREVIOUS)
+        {
+            button.setBackgroundResource(enabled ? R.drawable.prev_button : R.drawable.prev_button_disabled);
+        }
+        else if(button.getAction() == RadioPlayer.ACTION_NEXT)
+        {
+            button.setBackgroundResource(enabled ? R.drawable.next_button : R.drawable.next_button_disabled);
+        }
     }
 
     private void updateSmallPlayer(View v, ProgramInfo p) {

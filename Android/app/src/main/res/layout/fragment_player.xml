@@ -179,6 +179,7 @@
             android:layout_toLeftOf="@id/play_button"
             android:layout_alignBaseline="@id/play_button"
             android:background="@drawable/prev_button_disabled"
+            android:enabled="false"
             app:action="previous"
             />
 
@@ -191,6 +192,7 @@
             android:layout_toRightOf="@id/play_button"
             android:layout_alignBaseline="@id/play_button"
             android:background="@drawable/next_button_disabled"
+            android:enabled="false"
             app:action="next"
             />
 

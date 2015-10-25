@@ -29,6 +29,7 @@ public class RadioPlayerButton extends Button implements
     private String description;
     private String startTime;
     private String endTime;
+    private boolean usePodcastPlaylist = false;
     private boolean adaptActionAfterPlay = true; // This is really a terrible name I know. It means that if the action was PLAY, the button will change to PAUSE or STOP depending on the audio source (local or streamed).
 
     private RadioPlayer player;
@@ -60,6 +61,7 @@ public class RadioPlayerButton extends Button implements
             setPlayIcon(a.getResourceId(R.styleable.RadioPlayerButton_playIcon, 0));
             setStopIcon(a.getResourceId(R.styleable.RadioPlayerButton_stopIcon, 0));
             setPauseIcon(a.getResourceId(R.styleable.RadioPlayerButton_pauseIcon, 0));
+            setUsePodcastPlaylist(a.getBoolean(R.styleable.RadioPlayerButton_usePodcastPlaylist, false));
         } finally {
             a.recycle();
         }
@@ -167,6 +169,14 @@ public class RadioPlayerButton extends Button implements
         this.endTime = endTime;
     }
 
+    public boolean getUsePodcastPlaylist() {
+        return usePodcastPlaylist;
+    }
+
+    public void setUsePodcastPlaylist(boolean usePodcastPlaylist) {
+        this.usePodcastPlaylist = usePodcastPlaylist;
+    }
+
     @Override
     protected void onAttachedToWindow() {
         super.onAttachedToWindow();
@@ -197,7 +207,7 @@ public class RadioPlayerButton extends Button implements
 
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic(), getStartTime(), getEndTime());
+                player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic(), getStartTime(), getEndTime(), getUsePodcastPlaylist());
                 break;
             case RadioPlayer.ACTION_STOP:
                 player.stop();

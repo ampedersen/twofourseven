@@ -16,6 +16,7 @@
         <attr name="audioEndTime" format="string" />
         <attr name="audioProgramTitle" format="string" />
         <attr name="adaptActionAfterPlay" format="boolean" />
+        <attr name="usePodcastPlaylist" format="boolean" />
 
         <attr name="playIcon" format="reference" />
         <attr name="stopIcon" format="reference" />
