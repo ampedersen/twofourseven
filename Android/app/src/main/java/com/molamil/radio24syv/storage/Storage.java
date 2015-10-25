@@ -175,6 +175,10 @@ public class Storage {
         database.removeProgramAlarm(alarmId);
     }
 
+    public List<String> getAllProgramsWithAlarm() {
+        return database.getAllProgramsWithAlarm();
+    }
+
     //Schedule alarms
     public int addAlarm(String programSlug, String programTime) {
         return database.addAlarm(programSlug, programTime);

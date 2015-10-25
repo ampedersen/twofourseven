@@ -62,7 +62,8 @@ public class MainActivity extends FragmentActivity implements
         OfflineFragment.OnFragmentInteractionListener,
         PlayerFragment.OnFragmentInteractionListener,
         ProgramSearchFragment.OnFragmentInteractionListener,
-        ProgramScheduleButton.OnProgramScheduleButtonViewListener {
+        ProgramScheduleButton.OnProgramScheduleButtonViewListener,
+        ProgramDetailsFragment.OnProgramNotificationToggleListener {
 
     public static final int NOTIFICATION_ALARM_MINUTES = 5; // How many minutes before program start the notification should be shown
     private static final int NOTIFICATION_ALARM_MILLISECONDS = 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
@@ -135,6 +136,10 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onResume() {
         super.onResume();
+
+        //Update Program notifications
+        UpdateProgramNotifications();
+
         // Hockeyapp
         checkForCrashes();
     }
@@ -295,6 +300,48 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
+
+    //Program Notifications
+    @Override
+    public void OnProgramNotificationButtonClicked(CheckBox view, String slug)
+    {
+        boolean checked = view.isChecked();
+        Log.i("PS", "Button is checked: "+checked);
+
+        if (checked) {
+            Log.i("PS", "Add notifications for "+slug);
+            int alarmId = Storage.get().addProgramAlarm(slug); // Store alarm in database and get unique alarm ID that can be used to distinguish alarm notifications
+            if(alarmId != Storage.ALARM_ID_UNKNOWN)
+            {
+                Log.i("PS", "Add notifications success, TODO: Load next boradcasts for this program and add alarms...");
+            }
+            else
+            {
+                Log.i("PS", "Add notifications fail");
+            }
+        } else {
+            Log.i("PS", "Remove notifications for " + slug);
+            int alarmId = Storage.get().getProgramAlarmId(slug);
+            if ((alarmId != Storage.ALARM_ID_UNKNOWN) && removeAlarmNotification(alarmId)) {
+                // Success
+                Storage.get().removeProgramAlarm(alarmId);
+                Log.i("PS", "Remove notifications success");
+            } else {
+                Log.i("PS", "Remove notifications fail");
+            }
+        }
+    }
+
+    private void UpdateProgramNotifications()
+    {
+        Log.i("PS", "Update program notifications");
+        List<String> slugs = Storage.get().getAllProgramsWithAlarm();
+        for (String slug : slugs) {
+            Log.i("PS", "Update notifications for "+slug);
+        }
+    }
+
+    //Schedule Notifications
     @Override
     public void OnProgramScheduleNotificationButtonClicked(ProgramScheduleButton view, CheckBox clickedView) {
         BroadcastInfo broadcast = view.getBroadcast();
@@ -352,6 +399,7 @@ public class MainActivity extends FragmentActivity implements
         }
     }
 
+    //Schedule notifications
     private boolean addAlarmNotification(int alarmId, String programName, String programTime) {
         PendingIntent alarmIntent = getAlarmNotificationIntent(alarmId, programName);
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);

@@ -27,9 +27,9 @@ public class ProgramInfo implements Serializable {
     private String imageUrl;
     private boolean active;
 
-    private List<Host> hosts = new ArrayList<Host>();
-    private com.molamil.radio24syv.api.model.BroadcastInfo broadcastInfo;
-
+    //NOT SERIALIZABLE. TODO: Store broadcast info as Basic data type
+    //private List<Host> hosts = new ArrayList<Host>();
+    //private com.molamil.radio24syv.api.model.BroadcastInfo broadcastInfo;
 
     public ProgramInfo() {}
 
@@ -52,8 +52,9 @@ public class ProgramInfo implements Serializable {
         description = RestClient.getTextWithoutHtmlTags(program.getDescriptionHtml());
         imageUrl = program.getImageUrl();
         active = program.getActive();
-        hosts = program.getHosts();
-        broadcastInfo = program.getBroadcastInfo();
+
+        //hosts = program.getHosts();
+        //broadcastInfo = program.getBroadcastInfo();
     }
 
     // TODO this is broken until the API returns an integer instead of null for relatedProgram.getVideoProgramId()
@@ -168,6 +169,9 @@ public class ProgramInfo implements Serializable {
 
     private String getHostNames()
     {
+        //TODO: Implement using basic data types instead of using Host
+        return "";
+        /*
         if(hosts.size() == 0)
         {
             return "";
@@ -187,10 +191,14 @@ public class ProgramInfo implements Serializable {
         }
 
         return result;
+        */
     }
 
     private String getBroadcastTime(Context c)
     {
+        //TODO: Implement using basic data types instead of using BroadcastInfo
+        return "";
+        /*
         if(broadcastInfo == null)
         {
             return "";
@@ -200,6 +208,7 @@ public class ProgramInfo implements Serializable {
         int resId = c.getResources().getIdentifier(frequency, "string", packageName);
 
         return broadcastInfo.getDay()+", "+broadcastInfo.getTime()+", "+c.getResources().getString(resId);
+        */
     }
 
     public String getFormattedStartTime()

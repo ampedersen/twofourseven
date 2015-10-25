@@ -56,6 +56,7 @@ public class ProgramDetailsFragment extends PageFragment implements
     private boolean expanded = false;
 
     CheckBox notificationButton;
+    private OnProgramNotificationToggleListener notificationListener;
 
     public static ProgramDetailsFragment newInstance(ProgramInfo program) {
         ProgramDetailsFragment fragment = new ProgramDetailsFragment();
@@ -121,10 +122,18 @@ public class ProgramDetailsFragment extends PageFragment implements
 
         notificationButton = (CheckBox) v.findViewById(R.id.notification_button);
         notificationButton.setVisibility(program.getActive() ? View.VISIBLE : View.GONE);
+
+        //TODO: Async?
+        boolean checked = (Storage.get().getProgramAlarmId(program.getProgramSlug()) != Storage.ALARM_ID_UNKNOWN);
+        notificationButton.setChecked(checked);
+
         notificationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                OnNotificationButtonClick();
+                if (notificationListener != null) {
+                    notificationListener.OnProgramNotificationButtonClicked((CheckBox) v, program.getProgramSlug());
+                }
+                //OnNotificationButtonClick();
             }
         });
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
@@ -267,12 +276,20 @@ public class ProgramDetailsFragment extends PageFragment implements
             throw new ClassCastException(activity.toString()
                     + " must implement PlayerFragment.RadioPlayerProvider");
         }
+        try {
+            notificationListener = (OnProgramNotificationToggleListener) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement OnProgramNotificationToggleListener");
+        }
+
     }
 
     @Override
     public void onDetach() {
         super.onDetach();
         listener = null;
+        notificationListener = null;
     }
 
     @Override
@@ -305,30 +322,7 @@ public class ProgramDetailsFragment extends PageFragment implements
         public void onBackButtonPressed();
     }
 
-    /*
-     Notifications
-     */
-
-    /*
-    public void setNotificationEnabled(boolean enabled) {
-        notificationButton.setChecked(enabled);
-    }
-
-    public boolean getNotificationEnabled() {
-        return notificationButton.isChecked();
-    }
-    */
-
-    private void OnNotificationButtonClick()
-    {
-        Log.i("PS", "Toggle notifications");
-        if(notificationButton.isChecked())
-        {
-            Log.i("PS", "ON");
-        }
-        else
-        {
-            Log.i("PS", "OFF");
-        }
+    public interface OnProgramNotificationToggleListener {
+        void OnProgramNotificationButtonClicked(CheckBox clickedView, String slug);
     }
 }
