@@ -26,10 +26,12 @@ public class RadioPlayerButton extends Button implements
     private String title;
     private String topic;
     private String programTitle;
+    private int programId;
     private String description;
     private String startTime;
     private String endTime;
-    private boolean usePodcastPlaylist = false;
+    //private boolean usePodcastPlaylist = false;
+    private int playListType = RadioPlayer.PLAYLIST_NONE;
     private boolean adaptActionAfterPlay = true; // This is really a terrible name I know. It means that if the action was PLAY, the button will change to PAUSE or STOP depending on the audio source (local or streamed).
 
     private RadioPlayer player;
@@ -61,7 +63,8 @@ public class RadioPlayerButton extends Button implements
             setPlayIcon(a.getResourceId(R.styleable.RadioPlayerButton_playIcon, 0));
             setStopIcon(a.getResourceId(R.styleable.RadioPlayerButton_stopIcon, 0));
             setPauseIcon(a.getResourceId(R.styleable.RadioPlayerButton_pauseIcon, 0));
-            setUsePodcastPlaylist(a.getBoolean(R.styleable.RadioPlayerButton_usePodcastPlaylist, false));
+            setPlayListType(a.getInt(R.styleable.RadioPlayerButton_playlistType, RadioPlayer.PLAYLIST_NONE));
+            setProgramId(a.getInt(R.styleable.RadioPlayerButton_audioProgramId, -1));
         } finally {
             a.recycle();
         }
@@ -153,6 +156,14 @@ public class RadioPlayerButton extends Button implements
         this.programTitle = programTitle;
     }
 
+    public int getProgramId() {
+        return programId;
+    }
+
+    public void setProgramId(int programId) {
+        this.programId = programId;
+    }
+
     public String getStartTime() {
         return startTime;
     }
@@ -169,6 +180,15 @@ public class RadioPlayerButton extends Button implements
         this.endTime = endTime;
     }
 
+    public int getPlayListType() {
+        return playListType;
+    }
+
+    public void setPlayListType(int playListType) {
+        this.playListType = playListType;
+    }
+
+    /*
     public boolean getUsePodcastPlaylist() {
         return usePodcastPlaylist;
     }
@@ -176,6 +196,7 @@ public class RadioPlayerButton extends Button implements
     public void setUsePodcastPlaylist(boolean usePodcastPlaylist) {
         this.usePodcastPlaylist = usePodcastPlaylist;
     }
+    */
 
     @Override
     protected void onAttachedToWindow() {
@@ -207,7 +228,7 @@ public class RadioPlayerButton extends Button implements
 
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic(), getStartTime(), getEndTime(), getUsePodcastPlaylist());
+                player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic(), getStartTime(), getEndTime(), getPlayListType(), getProgramId());
                 break;
             case RadioPlayer.ACTION_STOP:
                 player.stop();

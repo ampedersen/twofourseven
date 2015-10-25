@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.molamil.radio24syv.api.model.Podcast;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 
@@ -30,6 +31,10 @@ public class RadioPlayer {
     public final static int ACTION_PAUSE = 2;
     public final static int ACTION_NEXT = 3;
     public final static int ACTION_PREVIOUS = 4;
+
+    public final static int PLAYLIST_NONE = -1;
+    public final static int PLAYLIST_PODCAST = 0;
+    public final static int PLAYLIST_OFFLINE = 1;
 
     public static String getActionName(int action) {
         final String[] names = new String[] { "play", "stop", "pause", "next", "previous" };
@@ -68,7 +73,8 @@ public class RadioPlayer {
     private String programTitle = null;
     private String startTime = null;
     private String endTime = null;
-    private boolean usePodcastPlaylist = false;
+    private int playlistType = PLAYLIST_NONE;
+    private int programId = -1;
     private Context context;
     private RadioPlayerService service = null;
     private boolean isBoundToService;
@@ -81,10 +87,11 @@ public class RadioPlayer {
     private String pendingProgramTitle = null;
     private String pendingStartTime = null;
     private String pendingEndTime = null;
-    private boolean pendingUsePodcastPlaylist = false;
+    private int pendingPlaylistType = PLAYLIST_NONE;
+    private int pendingProgramId = -1;
 
     //PS. Quick and dirty playlist for next / prev buttons.
-    //private List<PodcastInfo> playList;
+    //private List<PodcastInfo> playList = null;
 
     public RadioPlayer(Context context) {
         Log.d("JJJ", "Create RadioPlayer - starting radio service");
@@ -250,7 +257,7 @@ public class RadioPlayer {
     }
     */
 
-    public void play(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, boolean usePodcastPlaylist) {
+    public void play(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId) {
         this.url = url;
         this.title = title;
         this.description = description;
@@ -258,29 +265,51 @@ public class RadioPlayer {
         this.topic = topic;
         this.startTime = startTime;
         this.endTime = endTime;
-        this.usePodcastPlaylist = usePodcastPlaylist;
-        setAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, ACTION_PLAY);
+        this.playlistType = playlistType;
+        this.programId = programId;
+
+        setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_PLAY);
     }
 
     public void stop() {
-        setAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, ACTION_STOP);
+        setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_STOP);
     }
 
     public void pause() {
-        setAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, ACTION_PAUSE);
+        setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_PAUSE);
     }
 
     public void next() {
-        Log.i("PS", "NEXT");
-        setAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, ACTION_NEXT);
+        //Hacked. Implement in service?
+        PodcastInfo next = getNext();
+        if(next == null)
+        {
+            return;
+        }
+
+        //TODO: Update times
+        play(next.getAudioUrl(), next.getTitle(), next.getDescription(), programTitle, topic, startTime, endTime, playlistType, programId);
+
+        //OBSOLETE
+        //setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_NEXT);
     }
 
     public void previous() {
-        Log.i("PS", "PREV");
-        setAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, ACTION_PREVIOUS);
+        //Hacked. Implement in service?
+        PodcastInfo previous = getPrevious();
+        if(previous == null)
+        {
+            return;
+        }
+
+        //TODO: Update times
+        play(previous.getAudioUrl(), previous.getTitle(), previous.getDescription(), programTitle, topic, startTime, endTime, playlistType, programId);
+
+        //OBSOLETE
+        //setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_PREVIOUS);
     }
 
-    private void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, boolean usePodcastPlaylist, int action) {
+    private void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId, int action) {
         //Log.d("JJJ", "setAction " + action + " isBound " + isBoundToService + " " + service + " url " + url + " title " + title + " description " + description);
         if (isBoundToService) {
 
@@ -310,19 +339,19 @@ public class RadioPlayer {
             clearPendingAction(); // We got hole through to the service, clear pending action
         } else {
             Log.d("JJJ", "Unable to set action for service because service is not bound - will set the action when it getInstance bound");
-            setPendingAction(url, title, description, programTitle, topic, startTime, endTime, usePodcastPlaylist, action);
+            setPendingAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, action);
         }
     }
 
     private void clearPendingAction() {
-        setPendingAction(URL_UNASSIGNED, TITLE_UNASSIGNED, DESCRIPTION_UNASSIGNED, null, null, null, null, false, ACTION_UNASSIGNED);
+        setPendingAction(URL_UNASSIGNED, TITLE_UNASSIGNED, DESCRIPTION_UNASSIGNED, null, null, null, null, PLAYLIST_NONE, -1, ACTION_UNASSIGNED);
     }
 
     private boolean isPendingAction() {
         return (pendingUrl != null) && (!pendingUrl.equals(URL_UNASSIGNED)) && (pendingAction != ACTION_UNASSIGNED);
     }
 
-    private void setPendingAction(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, boolean usePodcastPlaylist, int action) {
+    private void setPendingAction(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId, int action) {
         //Log.d("JJJ", "set pending action " + getActionName(action) + " url " + url + " title " + title);
         pendingUrl = url;
         pendingAction = action;
@@ -332,7 +361,8 @@ public class RadioPlayer {
         pendingTopic = topic;
         pendingStartTime = startTime;
         pendingEndTime = endTime;
-        pendingUsePodcastPlaylist = usePodcastPlaylist;
+        pendingPlaylistType = playlistType;
+        pendingProgramId = programId;
     }
 
     // Defines callbacks for service binding, passed to bindService()
@@ -348,7 +378,7 @@ public class RadioPlayer {
 
             if (isPendingAction()) {
                 Log.d("JJJ", "Executing pending action " + getActionName(pendingAction) + " url " + pendingUrl);
-                setAction(pendingUrl, pendingTitle, pendingDescription, pendingProgramTitle, pendingTopic, pendingStartTime, pendingEndTime, pendingUsePodcastPlaylist, pendingAction);
+                setAction(pendingUrl, pendingTitle, pendingDescription, pendingProgramTitle, pendingTopic, pendingStartTime, pendingEndTime, playlistType, pendingProgramId, pendingAction);
             } else {
                 callback(); // Make a callback to all listeners about the state of the player service
             }
@@ -390,47 +420,80 @@ public class RadioPlayer {
     }
 
     //playlist stuff
-
+    //TODO: Sorted? Cached?
     public List<PodcastInfo> getPlayList() {
-        //return Storage.get().getPodcasts();
-        return null;
+        return Storage.get().getPodcasts(programId);
     }
+
+    /*
+    public void setPlayList(List<PodcastInfo> playlist) {
+        //Cached playlist
+    }
+    */
 
     public boolean hasPrevious()
     {
-        List<PodcastInfo> playlist = getPlayList();
-        if(playlist == null || usePodcastPlaylist == false)
+        //Log.i("PS", "hasPrevious: program id: "+programId);
+        switch (playlistType)
         {
-            return false;
+            case PLAYLIST_NONE:
+                return false;
+            case PLAYLIST_OFFLINE:
+                return false;//TODO: Activate
+            case PLAYLIST_PODCAST:
+
+                //TODO: check if there is a next one or if this is the last in the list.
+                return true;
         }
 
-        int i = 0;
-        for(PodcastInfo p : playlist){
-            if(i>0 && p.getAudioUrl() == getUrl())
-            {
-                return true;
-            }
-            i++;
-        }
         return false;
     }
 
     public boolean hasNext()
     {
-        List<PodcastInfo> playlist = getPlayList();
-        if(playlist == null || usePodcastPlaylist == false)
+        //Log.i("PS", "hasNext: program id: "+programId);
+        switch (playlistType)
         {
-            return false;
+            case PLAYLIST_NONE:
+                return false;
+            case PLAYLIST_OFFLINE:
+                return false;//TODO: Activate
+            case PLAYLIST_PODCAST:
+                //TODO: check if there is a next one or if this is the last in the list.
+                return true;
         }
 
-        int i = 0;
-        for(PodcastInfo p : playlist){
-            if(i<playlist.size()-2 && p.getAudioUrl() == getUrl())
+        return false;
+    }
+
+    private PodcastInfo getNext()
+    {
+        List<PodcastInfo> playlist = getPlayList();
+        int i=0;
+        for(PodcastInfo p: playlist)
+        {
+            if(i<playlist.size()-2 && getUrl().toLowerCase().contains(p.getAudioUrl().toLowerCase()))
             {
-                return true;
+                return playlist.get(i+1);
             }
             i++;
         }
-        return false;
+        return null;
+    }
+
+    private PodcastInfo getPrevious()
+    {
+        List<PodcastInfo> playlist = getPlayList();
+        int i=0;
+        for(PodcastInfo p: playlist)
+        {
+            //if(p.getAudioUrl() == getUrl() && i>0)
+            if(i>0 && getUrl().toLowerCase().contains(p.getAudioUrl().toLowerCase()))
+            {
+                return playlist.get(i-1);
+            }
+            i++;
+        }
+        return null;
     }
 }

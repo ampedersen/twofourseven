@@ -15,8 +15,9 @@
         <attr name="audioStartTime" format="string" />
         <attr name="audioEndTime" format="string" />
         <attr name="audioProgramTitle" format="string" />
+        <attr name="audioProgramId" format="integer" />
         <attr name="adaptActionAfterPlay" format="boolean" />
-        <attr name="usePodcastPlaylist" format="boolean" />
+        <attr name="playlistType" format="integer" />
 
         <attr name="playIcon" format="reference" />
         <attr name="stopIcon" format="reference" />

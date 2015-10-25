@@ -357,6 +357,26 @@ public class StorageDatabase extends SQLiteOpenHelper {
         return podcasts;
     }
 
+    public List<PodcastInfo> getPodcasts(int programId) {
+        String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId;
+        //Log.d("PS", query);
+
+        ArrayList<PodcastInfo> podcasts = new ArrayList<>();
+        Cursor c = getReadableDatabase().rawQuery(query, null);
+        if ((c != null) && c.moveToFirst()) {
+            do {
+                PodcastInfo podcast = readPodcastInfo(c);
+                podcasts.add(podcast);
+                //Log.d("PS", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
+            } while (c.moveToNext());
+            c.close();
+        }
+        if (podcasts.size() == 0) {
+            //Log.d("PS", "no podcasts found");
+        }
+        return podcasts;
+    }
+
     public List<PodcastInfo> getPodcastsInLibrary(int programId) {
         String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " AND " + KEY_PODCAST_ID + " IN (SELECT " + KEY_PODCAST_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_DOWNLOAD_ID + " != " + Storage.DOWNLOAD_ID_UNKNOWN + ") ORDER BY " + KEY_DATE + " DESC";
         Log.d("JJJ", query);

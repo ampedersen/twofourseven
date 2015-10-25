@@ -136,7 +136,8 @@ public class PodcastEpisodeView extends LinearLayout implements
         playButton.setUrl(podcast.getAudioUrl());
         playButton.setTitle(podcast.getTitle());
         playButton.setDescription(podcast.getDescription());
-        playButton.setUsePodcastPlaylist(true);
+        playButton.setPlayListType(RadioPlayer.PLAYLIST_PODCAST);
+        playButton.setProgramId(podcast.getProgramId());
 
         RadioLibrary.getInstance().addListener(getContext(), podcast.getPodcastId(), this); // Listen for updates for this podcast ID
     }

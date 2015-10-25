@@ -107,11 +107,9 @@ public class Storage {
         return database.getPodcastsInLibrary(programId);
     }
 
-    /*
-    public List<PodcastInfo> getPodcasts() {
-        return database.getPodcasts();
+    public List<PodcastInfo> getPodcasts(int programId) {
+        return database.getPodcasts(programId);
     }
-    */
 
     public int getPodcastsInLibraryCount(int programId) {
         return database.getPodcastsInLibraryCount(programId);
