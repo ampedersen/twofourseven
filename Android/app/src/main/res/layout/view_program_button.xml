@@ -76,6 +76,7 @@
         android:background="@drawable/button_play_program"
         app:playIcon="@drawable/button_play_program"
         app:pauseIcon="@drawable/button_pause_program"
+        android:visibility="gone"
         />
 
 </RelativeLayout>

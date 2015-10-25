@@ -262,9 +262,13 @@ public class RadioPlayer {
         setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_PAUSE);
     }
 
-    public void next() { setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_NEXT); }
+    public void next() {
+        setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_NEXT);
+    }
 
-    public void previous() { setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_PREVIOUS); }
+    public void previous() {
+        setAction(url, title, description, programTitle, topic, startTime, endTime, ACTION_PREVIOUS);
+    }
 
     private void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int action) {
         //Log.d("JJJ", "setAction " + action + " isBound " + isBoundToService + " " + service + " url " + url + " title " + title + " description " + description);
