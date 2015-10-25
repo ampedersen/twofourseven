@@ -32,6 +32,10 @@ public interface RestApi {
     @GET("/broadcasts/next/1/0")
     Call<List<Broadcast>> getCurrentBroadcast();
 
+    //Ps.
+    @GET("/broadcasts/next/{slug}")
+    Call<List<Broadcast>> getNextBroadcasts(@Path("slug") String slug);
+
     // Hosts
 
     @GET("/hosts")

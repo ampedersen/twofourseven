@@ -123,7 +123,6 @@ public class ProgramDetailsFragment extends PageFragment implements
         notificationButton = (CheckBox) v.findViewById(R.id.notification_button);
         notificationButton.setVisibility(program.getActive() ? View.VISIBLE : View.GONE);
 
-        //TODO: Async?
         boolean checked = (Storage.get().getProgramAlarmId(program.getProgramSlug()) != Storage.ALARM_ID_UNKNOWN);
         notificationButton.setChecked(checked);
 

@@ -306,28 +306,29 @@ public class MainActivity extends FragmentActivity implements
     public void OnProgramNotificationButtonClicked(CheckBox view, String slug)
     {
         boolean checked = view.isChecked();
-        Log.i("PS", "Button is checked: "+checked);
+        //Log.i("PS", "Button is checked: "+checked);
 
         if (checked) {
-            Log.i("PS", "Add notifications for "+slug);
+            //Log.i("PS", "Add notifications for "+slug);
             int alarmId = Storage.get().addProgramAlarm(slug); // Store alarm in database and get unique alarm ID that can be used to distinguish alarm notifications
             if(alarmId != Storage.ALARM_ID_UNKNOWN)
             {
-                Log.i("PS", "Add notifications success, TODO: Load next boradcasts for this program and add alarms...");
+                //Log.i("PS", "Add notifications success, TODO: Load next broadcasts for this program and add alarms...");
+                UpdateProgramNotificationsForProgram(slug);
             }
             else
             {
-                Log.i("PS", "Add notifications fail");
+                //Log.i("PS", "Add notifications fail");
             }
         } else {
-            Log.i("PS", "Remove notifications for " + slug);
+            //Log.i("PS", "Remove notifications for " + slug);
             int alarmId = Storage.get().getProgramAlarmId(slug);
             if ((alarmId != Storage.ALARM_ID_UNKNOWN) && removeAlarmNotification(alarmId)) {
                 // Success
                 Storage.get().removeProgramAlarm(alarmId);
-                Log.i("PS", "Remove notifications success");
+                //Log.i("PS", "Remove notifications success");
             } else {
-                Log.i("PS", "Remove notifications fail");
+                //Log.i("PS", "Remove notifications fail");
             }
         }
     }
@@ -337,8 +338,77 @@ public class MainActivity extends FragmentActivity implements
         Log.i("PS", "Update program notifications");
         List<String> slugs = Storage.get().getAllProgramsWithAlarm();
         for (String slug : slugs) {
-            Log.i("PS", "Update notifications for "+slug);
+            UpdateProgramNotificationsForProgram(slug);
         }
+    }
+
+    private void UpdateProgramNotificationsForProgram(String programSlug)
+    {
+        Log.i("PS", "Update notifications for "+programSlug);
+        RestClient.getApi().getNextBroadcasts(programSlug).enqueue(new Callback<List<Broadcast>>() {
+            @Override
+            public void onResponse(Response<List<Broadcast>> response) {
+
+                List<Broadcast> broadcasts = response.body();
+                for (int i = 0; i < broadcasts.size(); i++) {
+
+                }
+                /*
+                if (listener != null) {
+                    listener.onError(null);
+                }
+
+
+                showLoadingText(v, false);
+
+                ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
+                content.removeAllViews();
+
+                List<Broadcast> broadcasts = response.body();
+
+                DateTime previousDate = null;
+                for (int i = 0; i < broadcasts.size(); i++) {
+                    BroadcastInfo b = new BroadcastInfo(broadcasts.get(i));
+
+                    // Date line separator between days
+                    if (previousDate == null) {
+                        previousDate = new DateTime(b.getTimeBegin());
+                    } else {
+                        DateTime nextDate = new DateTime(b.getTimeBegin());
+                        boolean isDifferentDay = (nextDate.getDayOfYear() != previousDate.getDayOfYear()) || (nextDate.getYear() != previousDate.getYear());
+                        if (isDifferentDay) {
+                            DateLineView dateLine = new DateLineView(v.getContext());
+                            dateLine.setDate(DateTime.now(), nextDate);
+                            dateLine.setWhiteBackground(true);
+                            content.addView(dateLine);
+                        }
+                        previousDate = nextDate;
+                    }
+
+                    // Scheduled program button
+                    ProgramScheduleButton programButton = new ProgramScheduleButton(v.getContext());
+                    programButton.setBroadcast(b);
+                    programButton.setOnProgramScheduleButtonViewListener(buttonListener);
+                    int alarmId = Storage.get().getAlarmId(b.getProgramSlug(), b.getTimeBegin()); // Check if there is an alarm for this program and time
+                    boolean isNotificationEnabled = (alarmId != Storage.ALARM_ID_UNKNOWN);
+                    programButton.setNotificationEnabled(isNotificationEnabled);
+                    content.addView(programButton);
+                }
+                */
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                /*
+                if (listener != null) {
+                    listener.onError(t.getLocalizedMessage());
+                }
+                showLoadingText(v, false);
+                Log.d("JJJ", "fail " + t.getMessage());
+                */
+                t.printStackTrace();
+            }
+        });
     }
 
     //Schedule Notifications
