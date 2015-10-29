@@ -4,6 +4,7 @@ import android.content.Context;
 import android.graphics.PorterDuff;
 import android.graphics.drawable.ColorDrawable;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -43,7 +44,6 @@ public class ProgramButtonView extends LinearLayout {
     private void initializeViews(final Context context) {
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.view_program_button, this);
-
     }
 
     @Override
@@ -90,7 +90,7 @@ public class ProgramButtonView extends LinearLayout {
         image.setImageUrl(program.getImageUrl());
         image.setTintColor(topic.getColorValue());
 
-        RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
+        //RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
         // TODO get url for program button's latest podcast
     }
 

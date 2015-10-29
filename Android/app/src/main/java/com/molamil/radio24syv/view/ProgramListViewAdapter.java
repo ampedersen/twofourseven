@@ -1,23 +1,36 @@
 package com.molamil.radio24syv.view;
 
 import android.app.Activity;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.api.model.Podcast;
+import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
+import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.ProgramButtonView;
 import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.RadioPlayerButton;
+
+import org.joda.time.DateTime;
+
+import java.util.List;
+import java.util.Locale;
+
+import retrofit.Callback;
+import retrofit.Response;
 
 /**
  * Created by jens on 08/10/15.
@@ -45,7 +58,7 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
     @Override
     public View getView(int position, View convertView, ViewGroup parent) {
         View v = convertView;
-        ViewHolder holder;
+        final ViewHolder holder;
 
         // Reuse views
         if (v == null) {
@@ -64,7 +77,7 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
         }
 
         // Fill data
-        ProgramInfo program = programs[position];
+        final ProgramInfo program = programs[position];
         holder.name.setText(program.getName());
         holder.description.setText(program.getDescription());
         holder.topic.setText(program.getTopic());
@@ -74,10 +87,6 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
         }
         holder.image.setImageUrl(program.getImageUrl());
 
-        //Setup play button
-        //This url comes from loading the program model and then loading the first podcast from that model, so we can't pass the final url here. Need to load stuff after button is clicked.
-
-        //holder.playButton.setUrl(); // TODO set url for program button
         holder.playButton.setTitle(program.getName());
         holder.playButton.setDescription(program.getDescription());
         holder.playButton.setRadioPlayer(radioPlayer);
@@ -86,7 +95,40 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
         holder.playButton.setStartTime(program.getStartTime());
         holder.playButton.setEndTime(program.getEndTime());
 
+        holder.playButton.setRadioPlayButtonListener(new RadioPlayerButton.OnRadioPlayerButtonListener()
+        {
+            @Override
+            public void onClick(int action)
+            {
+                playLatestPodcastForListItem(program, holder.playButton);
+            }
+        });
         return v;
+    }
+
+    //TODO: CAncel previous calls
+    private void playLatestPodcastForListItem(ProgramInfo program, final RadioPlayerButton button)
+    {
+        RestClient.getApi().getPodcasts(program.getProgramId(), 1).enqueue(new Callback<List<Podcast>>() {
+            @Override
+            public void onResponse(Response<List<Podcast>> response) {
+
+                if(response.body().size() > 0)
+                {
+
+                    PodcastInfo podcast = new PodcastInfo(response.body().get(0));
+                    button.setUrl(context.getString(R.string.url_offline_radio) + podcast.getAudioUrl());
+                    button.clickAction();
+                }
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                //Log.d("PS", "fail " + t.getMessage());
+                //t.printStackTrace();
+            }
+        });
+
     }
 
 }

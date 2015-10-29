@@ -41,6 +41,8 @@ public class RadioPlayerButton extends Button implements
     private int stopIcon;
     private int pauseIcon;
 
+    private OnRadioPlayerButtonListener radioPlayButtonListener;
+
     public RadioPlayerButton(Context context, AttributeSet attrs) {
         super(context, attrs);
 
@@ -188,6 +190,10 @@ public class RadioPlayerButton extends Button implements
         this.playListType = playListType;
     }
 
+    public void setRadioPlayButtonListener(OnRadioPlayerButtonListener radioPlayButtonListener) {
+        this.radioPlayButtonListener = radioPlayButtonListener;
+    }
+
     /*
     public boolean getUsePodcastPlaylist() {
         return usePodcastPlaylist;
@@ -216,16 +222,25 @@ public class RadioPlayerButton extends Button implements
 
     @Override
     public void onClick(View v) {
-        //Log.d("PS", "action " + action + " player " + player + " url " + url + " title " + title + " topic " + topic);
         if (player == null) {
             return;
         }
 
+        if(radioPlayButtonListener != null)
+        {
+            radioPlayButtonListener.onClick(action);
+        }
+
         if (!isAvailable()) {
-            //Log.d("JJJ", "Unable to click button (id " + getId() + ") because it is not available");
             return; // Return, cannot click button
         }
 
+        clickAction();
+
+    }
+
+    public void clickAction()
+    {
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
                 player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic(), getStartTime(), getEndTime(), getPlayListType(), getProgramId());
@@ -461,5 +476,8 @@ public class RadioPlayerButton extends Button implements
         return (playerUrl != null) && (playerUrl.equals(url));
     }
 
-
+    public interface OnRadioPlayerButtonListener {
+        void onClick(int action);
+    }
 }
+
