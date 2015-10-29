@@ -14,8 +14,12 @@ import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Broadcast;
+import com.molamil.radio24syv.components.TimeLine;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.view.RadioPlayerButton;
+
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
 
 import java.util.List;
 
@@ -37,7 +41,7 @@ public class LiveFragment extends PageFragment {
     private PlayerFragment.OnFragmentInteractionListener playerListener;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
 
-    private ProgressBar timeline;
+    private TimeLine timeline;
 
     private Button expandButton;
     private TextView desctiptionTv;
@@ -52,7 +56,7 @@ public class LiveFragment extends PageFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_live, container, false);
 
-        timeline = (ProgressBar) v.findViewById(R.id.player_progress);
+        timeline = (TimeLine) v.findViewById(R.id.player_progress);
         timeline.setProgress(0);
         desctiptionTv = ((TextView) v.findViewById(R.id.program_description));
 
@@ -95,6 +99,7 @@ public class LiveFragment extends PageFragment {
                     fullDescription = b.getDescriptionText();
                     updateExpandedState();
 
+
                     RadioPlayerButton playButton = (RadioPlayerButton) v.findViewById(R.id.play_button);
                     playButton.setTitle(b.getProgramName());
                     playButton.setDescription(b.getDescriptionText());
@@ -104,6 +109,9 @@ public class LiveFragment extends PageFragment {
                     playButton.setEndTime(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
 
                     //Update timeline
+                    DateTime start =  new DateTime(b.getBroadcastTime().getStart());
+                    DateTime end =  new DateTime(b.getBroadcastTime().getEnd());
+                    timeline.setProgress(start, end);
 
                     //TODO get audio URL playButton.setUrl(b.get);
                 } else {

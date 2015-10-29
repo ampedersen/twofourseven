@@ -6,6 +6,8 @@ import android.util.Log;
 import android.widget.ProgressBar;
 
 import org.joda.time.DateTime;
+import org.joda.time.DateTimeZone;
+import org.joda.time.LocalDateTime;
 
 /**
  * Created by patriksvensson on 23/10/15.
@@ -28,13 +30,28 @@ public class TimeLine extends ProgressBar
         super(context, attrs, defStyleAttr);
     }
 
-    public void updateProgress(DateTime start, DateTime end)
+    public void setProgress(DateTime start, DateTime end)
     {
         long t0 = start.getMillis();
         long t1 = end.getMillis();
         long t = DateTime.now().getMillis();
 
-        float pct = t / (t1 - t0);
-        Log.i("PS", "Progress: " + pct);
+        float duration = t1 - t0;
+        float time = t - t0;
+        if(duration == 0)
+        {
+            setProgress(0);
+        }
+
+        float pct = time / duration;
+        setProgress(pct);
+
+
+    }
+
+    public void setProgress(float pct)
+    {
+        int progress =  Math.max(0, Math.min(getMax(), (int)(pct * 100)));
+        setProgress(progress);
     }
 }

@@ -10,6 +10,7 @@ import android.os.IBinder;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.api.model.Podcast;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
@@ -194,12 +195,30 @@ public class RadioPlayer {
         //return endTime;
     }
 
+    public float getProgress() {
+        if (isBoundToService) {
+            return service.getProgress();
+        } else {
+            return 0;
+        }
+    }
+
+
     public int getState() {
         if (isBoundToService) {
             return service.getState();
         } else {
             Log.d("JJJ", "Unable to getInstance state from service because it is not connected");
             return STATE_UNASSIGNED;
+        }
+    }
+    public int getAction()
+    {
+        if (isBoundToService) {
+            return service.getAction();
+        } else {
+            Log.d("JJJ", "Unable to getInstance state from service because it is not connected");
+            return ACTION_UNASSIGNED;
         }
     }
 

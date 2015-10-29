@@ -2,6 +2,7 @@ package com.molamil.radio24syv;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -11,12 +12,21 @@ import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.molamil.radio24syv.components.TimeLine;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.RadioPlayerButton;
+
+import org.joda.time.DateTime;
+import org.joda.time.format.DateTimeFormat;
+import org.joda.time.format.DateTimeFormatter;
+
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 
 
 /**
@@ -43,6 +53,21 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     private RadioPlayerButton prevButton;
     private RadioPlayerButton nextButton;
 
+    private TimeLine timeline;
+    private TimeLine smallTimeLine;
+
+    private long timelineUpdateInterval = 5000;
+    private Handler timelineHandler = new Handler(); //Refactor to player service and let it update all necesary timelines
+    private Runnable timelineRunnable = new Runnable() {
+        @Override
+        public void run()
+        {
+            RadioPlayer player = radioPlayerProvider.getRadioPlayer();
+            UpdateTimeLines(player);
+
+            timelineHandler.postDelayed(timelineRunnable, timelineUpdateInterval);
+        }
+    };
     public static PlayerFragment newInstance(String title) {
         PlayerFragment fragment = new PlayerFragment();
         Bundle args = new Bundle();
@@ -61,6 +86,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         if (getArguments() != null) {
             title = getArguments().getString(ARG_TITLE);
         }
+
     }
 
     @Override
@@ -81,6 +107,9 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
         prevButton = (RadioPlayerButton) v.findViewById(R.id.previous_button);
         nextButton = (RadioPlayerButton) v.findViewById(R.id.next_button);
+
+        timeline = (TimeLine) v.findViewById(R.id.player_progress);
+        smallTimeLine = (TimeLine) v.findViewById(R.id.small_player_progress);
 
         updateSize(v);
 
@@ -114,9 +143,26 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     }
 
     @Override
+    public void onPause() {
+        super.onPause();  // Always call the superclass method first
+        timelineHandler.removeCallbacks(timelineRunnable);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();  // Always call the superclass method first
+        RadioPlayer player = radioPlayerProvider.getRadioPlayer();
+        if(player.getAction() == RadioPlayer.ACTION_PLAY) {
+            timelineHandler.post(timelineRunnable);
+        }
+    }
+
+    @Override
     public void onDetach() {
         super.onDetach();
         mListener = null;
+
+        timelineHandler.removeCallbacks(timelineRunnable);
     }
 
     @Override
@@ -135,16 +181,22 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         }
         setupPlaybackButtons(player, getView());
         updatePlayer();
+
+        timelineHandler.post(timelineRunnable);
     }
 
     @Override
     public void OnStopped(RadioPlayer player) {
         updatePlayer();
+
+        timelineHandler.removeCallbacks(timelineRunnable);
     }
 
     @Override
     public void OnPaused(RadioPlayer player) {
         updatePlayer();
+
+        timelineHandler.removeCallbacks(timelineRunnable);
     }
 
     private void setupPlaybackButtons(RadioPlayer player, View parentView) {
@@ -237,6 +289,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         } else {
             updateSmallPlayer(smallPlayer, programInfo);
         }
+
+        UpdateTimeLines(player);
     }
 
     public void setImageUrl(String imageUrl) {
@@ -309,5 +363,72 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         public void onPlayerSizeChanged(PlayerSize newSize, PlayerSize oldSize);
     }
 
+    //Timeline control
+    //HACK. Using formatted time strings HH:mm to calculate progress. Should use dates
+    private void UpdateTimeLines(RadioPlayer player)
+    {
+
+        String start = player.getStartTime();
+        String end = player.getEndTime();
+
+        //Not live, playing mp3 file. Calc progress from file progress instead
+        if(player.getUrl() != getString(R.string.url_live_radio))
+        {
+            float pct = player.getProgress();
+            timeline.setProgress(pct);
+            smallTimeLine.setProgress(pct);
+            return;
+        }
+
+        Date now = new Date();
+        SimpleDateFormat sdfr = new SimpleDateFormat("HH:mm");
+        Date curr = timeStringToDate(sdfr.format( now ));
+
+        Date startDate = timeStringToDate(start);
+        Date endDate = timeStringToDate(end);
+        if(startDate != null && endDate != null && curr != null)
+        {
+            long t0 = startDate.getTime();
+            long t1 = endDate.getTime();
+            long t = curr.getTime();
+
+            float duration = t1 - t0;
+            float time = t - t0;
+
+            //if(duration == 0)
+            if(Math.signum(duration) == 0)
+            {
+                timeline.setProgress(0);
+                smallTimeLine.setProgress(0);
+            }
+            float pct = time/duration;
+
+            timeline.setProgress(pct);
+            smallTimeLine.setProgress(pct);
+        }
+    }
+
+    //HACK. Use date objects instead of just the time strings?
+    private Date timeStringToDate(String timeStr)
+    {
+        if(timeStr == null)
+        {
+            return null;
+        }
+
+        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
+        Date date = null;
+        try {
+
+            date = formatter.parse(timeStr);
+            System.out.println(date);
+            System.out.println(formatter.format(date));
+
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        return date;
+    }
 
 }

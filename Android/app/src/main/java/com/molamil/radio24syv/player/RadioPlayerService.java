@@ -135,6 +135,10 @@ public class RadioPlayerService extends Service implements
         }
     }
 
+    public int getAction()
+    {
+        return action;
+    }
     public void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int newAction) {
         Log.d("JJJ", "service setAction " + RadioPlayer.getActionName(newAction) + " (was " + RadioPlayer.getActionName(action) + ") + audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
 
@@ -313,6 +317,16 @@ public class RadioPlayerService extends Service implements
 
     public String getEndTime() {
         return endTime;
+    }
+
+    public float getProgress()
+    {
+        if(player == null)
+        {
+            return 0;
+        }
+
+        return (float)player.getCurrentPosition() / player.getDuration();
     }
 
     public int getState() {
