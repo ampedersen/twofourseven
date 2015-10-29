@@ -3,31 +3,28 @@ package com.molamil.radio24syv.components;
 import android.content.Context;
 import android.util.AttributeSet;
 import android.util.Log;
-import android.widget.ProgressBar;
+import android.widget.SeekBar;
 
 import org.joda.time.DateTime;
-import org.joda.time.DateTimeZone;
-import org.joda.time.LocalDateTime;
 
 /**
- * Created by patriksvensson on 23/10/15.
+ * Created by patriksvensson on 29/10/15.
  */
-public class TimeLine extends ProgressBar
+public class TimeLineSeekBar extends SeekBar
 {
-    public TimeLine(Context context)
-    {
+
+    public TimeLineSeekBar(Context context) {
         super(context);
     }
 
-    public TimeLine(Context context, AttributeSet attrs)
-    {
+    public TimeLineSeekBar(Context context, AttributeSet attrs) {
         super(context, attrs);
     }
 
-    public TimeLine(Context context, AttributeSet attrs, int defStyleAttr)
-    {
+    public TimeLineSeekBar(Context context, AttributeSet attrs, int defStyleAttr) {
         super(context, attrs, defStyleAttr);
     }
+
 
     public void setProgress(DateTime start, DateTime end)
     {
@@ -49,6 +46,11 @@ public class TimeLine extends ProgressBar
     public void setProgress(float pct)
     {
         int progress =  Math.max(0, Math.min(getMax(), (int)(pct * 100)));
+
+        int max = getMax();
+        setMax(0);
+        setMax(max);
+
         setProgress(progress);
     }
 }

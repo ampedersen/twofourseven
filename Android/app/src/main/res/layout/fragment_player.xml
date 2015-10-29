@@ -68,6 +68,15 @@
             style="?android:attr/progressBarStyleHorizontal"
             />
 
+        <!--
+        <View
+            android:id="@+id/small_player_progress"
+            android:layout_width="match_parent"
+            android:layout_height="2dp"
+            android:background="@color/radio_red"
+            android:layout_alignParentBottom="true"
+            />
+    -->
     </RelativeLayout>
 
     <RelativeLayout
@@ -235,6 +244,24 @@
                 android:progressDrawable="@drawable/timeline"
                 android:indeterminate="false"
                 style="?android:attr/progressBarStyleHorizontal"
+                />
+
+            <com.molamil.radio24syv.components.TimeLineSeekBar
+                android:id="@+id/player_progress_seekbar"
+                android:layout_gravity="center"
+                android:progress="50"
+                android:max="100"
+                android:layout_weight="5"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_centerInParent="true"
+                android:minHeight="2dp"
+                android:maxHeight="2dp"
+                android:progressDrawable="@drawable/timeline"
+                android:thumb="@drawable/timeline_slider"
+                android:indeterminate="false"
+                android:visibility="gone"
                 />
 
             <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg

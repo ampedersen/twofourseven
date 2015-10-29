@@ -326,7 +326,16 @@ public class RadioPlayerService extends Service implements
             return 0;
         }
 
+        if (state == RadioPlayer.STATE_STARTED)
+        {
+            return (float)player.getCurrentPosition() / player.getDuration();
+        }
+
+        return 0;
+        /*
+
         return (float)player.getCurrentPosition() / player.getDuration();
+        */
     }
 
     public int getState() {

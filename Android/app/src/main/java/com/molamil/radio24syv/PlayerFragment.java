@@ -13,6 +13,7 @@ import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.components.TimeLine;
+import com.molamil.radio24syv.components.TimeLineSeekBar;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
@@ -55,6 +56,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     private TimeLine timeline;
     private TimeLine smallTimeLine;
+    private TimeLineSeekBar timeLineSeekBar;
+
 
     private long timelineUpdateInterval = 5000;
     private Handler timelineHandler = new Handler(); //Refactor to player service and let it update all necesary timelines
@@ -109,6 +112,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         nextButton = (RadioPlayerButton) v.findViewById(R.id.next_button);
 
         timeline = (TimeLine) v.findViewById(R.id.player_progress);
+        timeLineSeekBar = (TimeLineSeekBar) v.findViewById(R.id.player_progress_seekbar);
         smallTimeLine = (TimeLine) v.findViewById(R.id.small_player_progress);
 
         updateSize(v);
@@ -326,6 +330,17 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         RadioPlayer player = radioPlayerProvider.getRadioPlayer();
         enableNextPrevButton(prevButton, player.hasPrevious());
         enableNextPrevButton(nextButton, player.hasNext());
+
+        if(player.getUrl() != getString(R.string.url_live_radio))
+        {
+            timeline.setVisibility(View.GONE);
+            timeLineSeekBar.setVisibility(View.VISIBLE);
+        }
+        else
+        {
+            timeline.setVisibility(View.VISIBLE);
+            timeLineSeekBar.setVisibility(View.GONE);
+        }
     }
 
     private void enableNextPrevButton(RadioPlayerButton button, boolean enabled)
@@ -377,6 +392,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             float pct = player.getProgress();
             timeline.setProgress(pct);
             smallTimeLine.setProgress(pct);
+            timeLineSeekBar.setProgress(pct);
             return;
         }
 
@@ -400,11 +416,13 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             {
                 timeline.setProgress(0);
                 smallTimeLine.setProgress(0);
+                timeLineSeekBar.setProgress(0);
             }
             float pct = time/duration;
 
             timeline.setProgress(pct);
             smallTimeLine.setProgress(pct);
+            timeLineSeekBar.setProgress(pct);
         }
     }
 
