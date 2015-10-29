@@ -338,6 +338,15 @@ public class RadioPlayerService extends Service implements
         */
     }
 
+    public void seekTo(float pct)
+    {
+        if (state != RadioPlayer.STATE_UNASSIGNED && state != RadioPlayer.STATE_BUSY)
+        {
+            int millis = (int)(pct*player.getDuration());
+            player.seekTo(millis);
+        }
+    }
+
     public int getState() {
         return state;
     }

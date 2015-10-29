@@ -10,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
+import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.components.TimeLine;
@@ -112,9 +113,29 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         nextButton = (RadioPlayerButton) v.findViewById(R.id.next_button);
 
         timeline = (TimeLine) v.findViewById(R.id.player_progress);
-        timeLineSeekBar = (TimeLineSeekBar) v.findViewById(R.id.player_progress_seekbar);
         smallTimeLine = (TimeLine) v.findViewById(R.id.small_player_progress);
+        timeLineSeekBar = (TimeLineSeekBar) v.findViewById(R.id.player_progress_seekbar);
+        timeLineSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
+            @Override
+            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
+                //Log.i("PS", progress+", "+fromUser);
+                if(fromUser)
+                {
+                    RadioPlayer player = radioPlayerProvider.getRadioPlayer();
+                    player.seekTo(progress / 100.0f);
+                }
+            }
 
+            @Override
+            public void onStartTrackingTouch(SeekBar seekBar) {
+
+            }
+
+            @Override
+            public void onStopTrackingTouch(SeekBar seekBar) {
+
+            }
+        });
         updateSize(v);
 
         return v;

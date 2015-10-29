@@ -203,6 +203,12 @@ public class RadioPlayer {
         }
     }
 
+    public void seekTo(float pct)
+    {
+        if (isBoundToService) {
+            service.seekTo(pct);
+        }
+    }
 
     public int getState() {
         if (isBoundToService) {
