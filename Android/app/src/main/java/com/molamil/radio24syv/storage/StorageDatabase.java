@@ -113,13 +113,13 @@ public class StorageDatabase extends SQLiteOpenHelper {
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
         // Upgrade existing table to new format if table version is upgraded in a later app version.
         // For now, discard the data and start over.
-        Log.d("JJJ", "Upgrading database to version " + newVersion + " (was version " + oldVersion + ")");
+        //Log.d("JJJ", "Upgrading database to version " + newVersion + " (was version " + oldVersion + ")");
         dropTables(db);
         createTables(db);
     }
 
     private void createTables(SQLiteDatabase db) {
-        Log.d("JJJ", "Creating all database tables");
+        //Log.d("JJJ", "Creating all database tables");
         db.beginTransaction();
         try {
             execSQL(db, SQL_CREATE_TABLE_LIBRAY);
@@ -137,7 +137,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     }
 
     private void dropTables(SQLiteDatabase db) {
-        Log.d("JJJ", "Dropping all database tables");
+        //Log.d("JJJ", "Dropping all database tables");
         db.beginTransaction();
         try {
             execSQL(db, SQL_DROP_TABLE + TABLE_LIBRARY);
@@ -155,7 +155,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     }
 
     private static void execSQL(SQLiteDatabase db, String query) {
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
         db.execSQL(query);
     }
 
@@ -178,32 +178,32 @@ public class StorageDatabase extends SQLiteOpenHelper {
         // Better performance but unreadable:
         //String query = String.format(Locale.US, "SELECT %s FROM %s WHERE %s = %d", KEY_DOWNLOAD_ID, TABLE_LIBRARY,KEY_PODCAST_ID, podcastId );
         String query = "SELECT " + KEY_DOWNLOAD_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_PODCAST_ID + " = " + podcastId + " LIMIT 1";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             long downloadId = c.getLong(c.getColumnIndex(KEY_DOWNLOAD_ID));
             c.close();
-            Log.d("JJJ", "downloadId " + downloadId);
+            //Log.d("JJJ", "downloadId " + downloadId);
             return downloadId;
         } else {
-            Log.d("JJJ", "downloadId unknown");
+            //Log.d("JJJ", "downloadId unknown");
             return Storage.DOWNLOAD_ID_UNKNOWN;
         }
     }
 
     public int getLibraryPodcastId(long downloadId) {
         String query = "SELECT " + KEY_PODCAST_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_DOWNLOAD_ID + " = " + downloadId + " LIMIT 1";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             int podcastId = c.getInt(c.getColumnIndex(KEY_PODCAST_ID));
             c.close();
-            Log.d("JJJ", "podcastId " + podcastId);
+            //Log.d("JJJ", "podcastId " + podcastId);
             return podcastId;
         }
-        Log.d("JJJ", "podcastId unknown");
+        //Log.d("JJJ", "podcastId unknown");
         return Storage.PODCAST_ID_UNKNOWN;
     }
 
@@ -216,7 +216,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     }
 
     public void addPrograms(List<ProgramInfo> programs) {
-        Log.d("JJJ", "Writing " + programs.size() + " programs to database");
+        //Log.d("JJJ", "Writing " + programs.size() + " programs to database");
         SQLiteDatabase db = getWritableDatabase();
         db.beginTransaction(); // Use transaction because we will be adding lots of items (saves a lot of database operations)
         try {
@@ -231,37 +231,37 @@ public class StorageDatabase extends SQLiteOpenHelper {
 
     public ProgramInfo getProgram(int programId) {
         String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " LIMIT 1";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             ProgramInfo program = readProgramInfo(c);
             c.close();
-            Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId() + " slug " + program.getProgramSlug());
+            //Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId() + " slug " + program.getProgramSlug());
             return program;
         }
-        Log.d("JJJ", "programId not found " + programId);
+        //Log.d("JJJ", "programId not found " + programId);
         return null;
     }
 
     public ProgramInfo getProgram(String programSlug) {
         String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_SLUG + " = '" + programSlug + "' LIMIT 1";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             ProgramInfo program = readProgramInfo(c);
             c.close();
-            Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId() + " slug " + program.getProgramSlug());
+            //Log.d("JJJ", "program " + program.getName() + " id " + program.getProgramId() + " slug " + program.getProgramSlug());
             return program;
         }
-        Log.d("JJJ", "programSlug not found " + programSlug);
+        //Log.d("JJJ", "programSlug not found " + programSlug);
         return null;
     }
 
     public List<ProgramInfo> getPrograms() {
         String query = "SELECT * FROM " + TABLE_PROGRAM + " ORDER BY " + KEY_NAME;
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         ArrayList<ProgramInfo> programs = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(query, null);
@@ -274,14 +274,14 @@ public class StorageDatabase extends SQLiteOpenHelper {
             c.close();
         }
         if (programs.size() == 0) {
-            Log.d("JJJ", "no programs found");
+            //Log.d("JJJ", "no programs found");
         }
         return programs;
     }
 
     public List<ProgramInfo> getProgramsWithPodcastsInLibrary() {
         String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " IN (SELECT " + KEY_PROGRAM_ID + " FROM " + TABLE_PODCAST + " WHERE " + KEY_PODCAST_ID + " IN (SELECT " + KEY_PODCAST_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_DOWNLOAD_ID + " != " + Storage.DOWNLOAD_ID_UNKNOWN + "))";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         ArrayList<ProgramInfo> programs = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(query, null);
@@ -294,7 +294,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
             c.close();
         }
         if (programs.size() == 0) {
-            Log.d("JJJ", "no programs found");
+            //Log.d("JJJ", "no programs found");
         }
         return programs;
     }
@@ -309,37 +309,37 @@ public class StorageDatabase extends SQLiteOpenHelper {
 
     public PodcastInfo getPodcast(int podcastId) {
         String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_PODCAST_ID + " = " + podcastId + " LIMIT 1";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             PodcastInfo podcast = readPodcastInfo(c);
             c.close();
-            Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
+            //Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
             return podcast;
         }
-        Log.d("JJJ", "podcastId not found " + podcastId);
+        //Log.d("JJJ", "podcastId not found " + podcastId);
         return null;
     }
 
     public PodcastInfo getPodcast(String audioUrl) {
         String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_AUDIO_URL + " = '" + audioUrl + "' LIMIT 1";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             PodcastInfo podcast = readPodcastInfo(c);
             c.close();
-            Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
+            //Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
             return podcast;
         }
-        Log.d("JJJ", "podcast with audioUrl not found " + audioUrl);
+        //Log.d("JJJ", "podcast with audioUrl not found " + audioUrl);
         return null;
     }
 
     public List<PodcastInfo> getPodcasts() {
         String query = "SELECT * FROM " + TABLE_PODCAST;
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         ArrayList<PodcastInfo> podcasts = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(query, null);
@@ -347,12 +347,12 @@ public class StorageDatabase extends SQLiteOpenHelper {
             do {
                 PodcastInfo podcast = readPodcastInfo(c);
                 podcasts.add(podcast);
-                Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
+                //Log.d("JJJ", "podcast " + podcast.getTitle() + " id " + podcast.getPodcastId());
             } while (c.moveToNext());
             c.close();
         }
         if (podcasts.size() == 0) {
-            Log.d("JJJ", "no podcasts found");
+            //Log.d("JJJ", "no podcasts found");
         }
         return podcasts;
     }
@@ -379,7 +379,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
 
     public List<PodcastInfo> getPodcastsInLibrary(int programId) {
         String query = "SELECT * FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " AND " + KEY_PODCAST_ID + " IN (SELECT " + KEY_PODCAST_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_DOWNLOAD_ID + " != " + Storage.DOWNLOAD_ID_UNKNOWN + ") ORDER BY " + KEY_DATE + " DESC";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         ArrayList<PodcastInfo> podcasts = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(query, null);
@@ -387,27 +387,27 @@ public class StorageDatabase extends SQLiteOpenHelper {
             do {
                 PodcastInfo podcast = readPodcastInfo(c);
                 podcasts.add(podcast);
-                Log.d("JJJ", "podcast in library " + podcast.getTitle() + " id " + podcast.getPodcastId() + " date " + podcast.getDate());
+                //Log.d("JJJ", "podcast in library " + podcast.getTitle() + " id " + podcast.getPodcastId() + " date " + podcast.getDate());
             } while (c.moveToNext());
             c.close();
         }
         if (podcasts.size() == 0) {
-            Log.d("JJJ", "no podcasts in library found");
+            //Log.d("JJJ", "no podcasts in library found");
         }
         return podcasts;
     }
 
     public int getPodcastsInLibraryCount(int programId) {
         String query = "SELECT COUNT(*) FROM " + TABLE_PODCAST + " WHERE " + KEY_PROGRAM_ID + " = " + programId + " AND " + KEY_PODCAST_ID + " IN (SELECT " + KEY_PODCAST_ID + " FROM " + TABLE_LIBRARY + " WHERE " + KEY_DOWNLOAD_ID + " != " + Storage.DOWNLOAD_ID_UNKNOWN + ")";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             int count = c.getInt(0);
             c.close();
-            Log.d("JJJ", "podcasts in library count " + count + " for programId " + programId);
+            //Log.d("JJJ", "podcasts in library count " + count + " for programId " + programId);
             return count;
         }
-        Log.d("JJJ", "programId not found " + programId);
+        //Log.d("JJJ", "programId not found " + programId);
         return 0;
     }
 
@@ -480,23 +480,23 @@ public class StorageDatabase extends SQLiteOpenHelper {
 
     public TopicInfo getTopic(String topicId) {
         String query = "SELECT * FROM " + TABLE_TOPIC + " WHERE " + KEY_TOPIC_ID + " = '" + topicId + "' LIMIT 1";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         Cursor c = getReadableDatabase().rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
             TopicInfo topic = readTopicInfo(c);
             c.close();
-            Log.d("JJJ", "topic " + topic.getTopicId() + " color " + topic.getColor());
+            //Log.d("JJJ", "topic " + topic.getTopicId() + " color " + topic.getColor());
             return topic;
         } else {
-            Log.d("JJJ", "topic unknown " + topicId);
+            //Log.d("JJJ", "topic unknown " + topicId);
             return null;
         }
     }
 
     public List<TopicInfo> getTopics() {
         String query = "SELECT * FROM " + TABLE_TOPIC + " ORDER BY " + KEY_TOPIC_ID;
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         ArrayList<TopicInfo> topics = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(query, null);
@@ -504,11 +504,11 @@ public class StorageDatabase extends SQLiteOpenHelper {
             do {
                 TopicInfo t = readTopicInfo(c);
                 topics.add(t);
-                Log.d("JJJ", "topic " + t.getTopicId() + " color " + t.getColor());
+                //Log.d("JJJ", "topic " + t.getTopicId() + " color " + t.getColor());
             } while (c.moveToNext());
             c.close();
         } else {
-            Log.d("JJJ", "no topics");
+            //Log.d("JJJ", "no topics");
         }
         return topics;
     }
@@ -523,7 +523,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     public List<ProgramInfo> getPlayerHistory(int limit) {
         //cool but has duplicates
         String query = "SELECT * FROM " + TABLE_PROGRAM + " JOIN " + TABLE_PLAYER_HISTORY + " ON " + TABLE_PROGRAM + "." + KEY_PROGRAM_ID + " = " + TABLE_PLAYER_HISTORY + "." + KEY_PROGRAM_ID + " ORDER BY " + KEY_DATE + " DESC";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
 //        String s = "---------------------";
         List<ProgramInfo> programs = new ArrayList<>();
@@ -544,7 +544,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
 //            Log.d("JJJ", s);
             return programs;
         } else {
-            Log.d("JJJ", "no programs");
+            //Log.d("JJJ", "no programs");
             return programs;
         }
     }
@@ -608,7 +608,6 @@ public class StorageDatabase extends SQLiteOpenHelper {
         //return getAlarmId(getReadableDatabase(), programSlug);
         SQLiteDatabase db = getReadableDatabase();
         String query = "SELECT " + KEY_ALARM_ID + " FROM " + TABLE_PROGRAM_ALARM + " WHERE " + KEY_PROGRAM_SLUG + " = '" + programSlug + "' LIMIT 1";
-        Log.d("PS", query);
         int alarmId = Storage.ALARM_ID_UNKNOWN;
         Cursor c = db.rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
@@ -670,7 +669,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
 
     private int getAlarmId(SQLiteDatabase db, String programSlug, String programTime) {
         String query = "SELECT " + KEY_ALARM_ID + " FROM " + TABLE_ALARM + " WHERE " + KEY_PROGRAM_SLUG + " = '" + programSlug + "' AND " + KEY_DATE + " = '" + programTime + "' LIMIT 1";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
         int alarmId = Storage.ALARM_ID_UNKNOWN;
         Cursor c = db.rawQuery(query, null);
         if ((c != null) && c.moveToFirst()) {
@@ -703,7 +702,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
 
     private List<ProgramInfo> getProgramsInQuery(String queryWithProgramIds) {
         String query = "SELECT * FROM " + TABLE_PROGRAM + " WHERE " + KEY_PROGRAM_ID + " IN (" + queryWithProgramIds + ")";
-        Log.d("JJJ", query);
+        //Log.d("JJJ", query);
 
         List<ProgramInfo> programs = new ArrayList<>();
         Cursor c = getReadableDatabase().rawQuery(query, null);
@@ -711,19 +710,19 @@ public class StorageDatabase extends SQLiteOpenHelper {
             do {
                 ProgramInfo program = readProgramInfo(c);
                 programs.add(program);
-                Log.d("JJJ", "program " + program.getName());
+                //Log.d("JJJ", "program " + program.getName());
             } while (c.moveToNext());
             c.close();
             return programs;
         } else {
-            Log.d("JJJ", "no programs");
+            //Log.d("JJJ", "no programs");
             return programs;
         }
     }
 
     private void deleteRow(String table, String whereSelector) {
         int rows = getWritableDatabase().delete(table, whereSelector, null);
-        Log.d("JJJ", "DELETE FROM " + table + " WHERE " + whereSelector + " (" + rows + " row(s) deleted)");
+        //Log.d("JJJ", "DELETE FROM " + table + " WHERE " + whereSelector + " (" + rows + " row(s) deleted)");
     }
 
     private static void writeProgramInfo(SQLiteDatabase db, ProgramInfo program) {

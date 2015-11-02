@@ -110,6 +110,8 @@ public class MainActivity extends FragmentActivity implements
             Log.d("JJJ", "MainActivity got started with " + downloadIds.length + " downloadIds as a parameter");
             mainFragment.setStartupTab(MainFragment.TAG_TAB_OFFLINE);
         }
+
+
     }
 
     @Override

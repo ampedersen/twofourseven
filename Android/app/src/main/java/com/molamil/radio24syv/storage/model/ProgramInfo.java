@@ -1,6 +1,7 @@
 package com.molamil.radio24syv.storage.model;
 
 import android.content.Context;
+import android.text.TextUtils;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.*;
@@ -27,9 +28,15 @@ public class ProgramInfo implements Serializable {
     private String imageUrl;
     private boolean active;
 
-    //NOT SERIALIZABLE. TODO: Store broadcast info as Basic data type
-    //private List<Host> hosts = new ArrayList<Host>();
+    /*
+    //TODO: Make BroadcastInfo Serializable
     //private com.molamil.radio24syv.api.model.BroadcastInfo broadcastInfo;
+    private boolean broadcastWeekly;
+    private String broadcastDay;
+    private String broadcastTime;
+
+    private List<String> hosts = new ArrayList<String>();
+    */
 
     public ProgramInfo() {}
 
@@ -53,8 +60,20 @@ public class ProgramInfo implements Serializable {
         imageUrl = program.getImageUrl();
         active = program.getActive();
 
+        /*
         //hosts = program.getHosts();
+        hosts = new ArrayList<String>();
+        for(int i = 0 ; i < program.getHosts().size() ; i++)
+        {
+            hosts.add(program.getHosts().get(i).getName());
+        }
+
+        broadcastWeekly = program.getBroadcastInfo().getWeekly();
+        broadcastDay = program.getBroadcastInfo().getDay();
+        broadcastTime = program.getBroadcastInfo().getTime();
+
         //broadcastInfo = program.getBroadcastInfo();
+        */
     }
 
     // TODO this is broken until the API returns an integer instead of null for relatedProgram.getVideoProgramId()
@@ -144,6 +163,7 @@ public class ProgramInfo implements Serializable {
         this.active = active;
     }
 
+    /*
     public String getHostsAndTime(Context c)
     {
         if(!active)
@@ -169,47 +189,24 @@ public class ProgramInfo implements Serializable {
 
     private String getHostNames()
     {
-        //TODO: Implement using basic data types instead of using Host
-        return "";
-        /*
-        if(hosts.size() == 0)
-        {
-            return "";
-        }
-        String result = "";
-        String delimiter = hosts.size() == 2 ? " og " : ", ";
-
-        //for host in hosts
-        for(int i = 0 ; i < hosts.size() ; i++)
-        {
-            result += hosts.get(i).getName();//hosts[i].name!
-
-            if(i < hosts.size()-1)
-            {
-                result += delimiter;
-            }
-        }
-
-        return result;
-        */
+        return TextUtils.join(", ", hosts);
     }
 
     private String getBroadcastTime(Context c)
     {
         //TODO: Implement using basic data types instead of using BroadcastInfo
-        return "";
-        /*
-        if(broadcastInfo == null)
+        if(startTime == null || endTime == null)
         {
             return "";
         }
-        String frequency = broadcastInfo.getWeekly() ? "weekly" : "daily";
+
+        String frequency = broadcastWeekly ? "weekly" : "daily";
         String packageName = c.getPackageName();
         int resId = c.getResources().getIdentifier(frequency, "string", packageName);
+        return broadcastDay+", "+broadcastTime+", "+c.getResources().getString(resId);
 
-        return broadcastInfo.getDay()+", "+broadcastInfo.getTime()+", "+c.getResources().getString(resId);
-        */
     }
+    */
 
     public String getFormattedStartTime()
     {
@@ -227,18 +224,8 @@ public class ProgramInfo implements Serializable {
         {
             return "";
         }
+
         return time;
-
-        /*
-        let calendar = NSCalendar.currentCalendar()
-        //calendar.timeZone = NSTimeZone(name: "GMT")! //Don't. Use whatever time zone the phone has here.
-        let components = calendar.components(.CalendarUnitHour | .CalendarUnitMinute, fromDate: date)
-
-        let hour = String(format: "%02d", components.hour)
-        let minute = String(format: "%02d", components.minute)
-
-        return "\(hour):\(minute)"
-        */
     }
 
 }

@@ -15,6 +15,7 @@ import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Podcast;
+import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.RadioLibrary;
 import com.molamil.radio24syv.storage.Storage;
@@ -84,8 +85,9 @@ public class ProgramDetailsFragment extends PageFragment implements
     public View onCreateView(LayoutInflater inflater, final ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_program_details, container, false);
 
-       // ((TextView) v.findViewById(R.id.info_text)).setText(Integer.toString(program.getProgramId()));
-        ((TextView) v.findViewById(R.id.info_text)).setText(program.getHostsAndTime(getActivity().getApplicationContext()));
+        //ProgramInfo is sometimes generated from ConciseProgram which does not have broadcastInfo data or hosts. So load program data for this view when creating
+        //((TextView) v.findViewById(R.id.info_text)).setText(program.getHostsAndTime(getActivity().getApplicationContext()));
+        ((TextView) v.findViewById(R.id.info_text)).setText("");
         ((TextView) v.findViewById(R.id.name_text)).setText(program.getName());
         ((TextView) v.findViewById(R.id.title_text)).setText(program.getName());
         //((TextView) v.findViewById(R.id.topic_text)).setText(program.getTopic());
@@ -137,8 +139,9 @@ public class ProgramDetailsFragment extends PageFragment implements
         });
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
         getPodcasts(content, BATCH_SIZE, 1);
-
+        getDetails();
         updateExpandedState();
+
 
         return v;
     }
@@ -175,6 +178,27 @@ public class ProgramDetailsFragment extends PageFragment implements
 
         return full.substring(0,stubLength)+"...";
         //return program.getDescription();
+    }
+
+    private void getDetails()
+    {
+        RestClient.getApi().getProgram(program.getProgramSlug()).enqueue(new Callback<Program>() {
+            @Override
+            public void onResponse(Response<Program> response) {
+
+                if (response.body() == null) {
+                    return;
+                }
+                Program p = response.body();
+                Log.i("PS", "Details for program "+p);
+
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                //t.printStackTrace();
+            }
+        });
     }
 
     private void getPodcasts(final ViewGroup content, final int amount, final int batch) {
