@@ -37,6 +37,8 @@ public class Broadcast {
     private String imageUrl;
     @Expose
     private BroadcastTime broadcastTime;
+    @Expose
+    private AppImages appImages;
 
     /**
      * 
@@ -288,6 +290,23 @@ public class Broadcast {
      */
     public void setBroadcastTime(BroadcastTime broadcastTime) {
         this.broadcastTime = broadcastTime;
+    }
+    /**
+     *
+     * @return
+     *     The appImages
+     */
+    public AppImages getAppImages() {
+        return appImages;
+    }
+
+    /**
+     *
+     * @param appImages
+     *     The appImages
+     */
+    public void setAppImages(AppImages appImages) {
+        this.appImages = appImages;
     }
 
 }

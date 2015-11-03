@@ -594,7 +594,7 @@ public class MainActivity extends FragmentActivity implements
 
                             PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
                             if (playerFragment != null) {
-                                playerFragment.setImageUrl(broadcast.getImageUrl());
+                                playerFragment.setImageUrl(broadcast.getAppImages().getPlayer());
                             }
                         } else {
                             onError(response.message());
@@ -644,7 +644,7 @@ public class MainActivity extends FragmentActivity implements
                     if (program != null) {
                         PlayerFragment playerFragment = (PlayerFragment) mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
                         if (playerFragment != null) {
-                            playerFragment.setImageUrl(program.getImageUrl());
+                            playerFragment.setImageUrl(program.getAppImagePlayerUrl());
                         }
                     }
                 }

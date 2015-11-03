@@ -119,8 +119,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
                 //Log.i("PS", progress+", "+fromUser);
-                if(fromUser)
-                {
+                if (fromUser) {
                     RadioPlayer player = radioPlayerProvider.getRadioPlayer();
                     player.seekTo(progress / 100.0f);
                 }
@@ -325,7 +324,6 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     private void updateBigPlayer(View v, ProgramInfo p) {
         ProgramImageView programImage = ((ProgramImageView) v.findViewById(R.id.image));
-        //programImage.setImageUrl(p.getImageUrl());
         programImage.setImageUrl(p.getAppImagePlayerUrl());
         programImage.setTintColor(0x000000);
         TextView titleText =  ((TextView) v.findViewById(R.id.name_text));
@@ -334,14 +332,14 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         //TODO: Set podcast title when available, else program title
         ((TextView) v.findViewById(R.id.podcast_name_text)).setText(p.getName());
 
+
+        titleText.setTextColor(0xffffff);
         if(p.getTopic() != null)
         {
             TopicInfo topic = Storage.get().getTopic(p.getTopicId());
-            titleText.setTextColor(topic.getColorValue());
-        }
-        else
-        {
-            titleText.setTextColor(0xffffff);
+            if(topic != null) {
+                titleText.setTextColor(topic.getColorValue());
+            }
         }
 
         ((TextView) v.findViewById(R.id.time_text)).setText(p.getFormattedStartTime() + " - " + p.getFormattedEndTime());
