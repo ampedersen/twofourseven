@@ -594,7 +594,25 @@ public class MainActivity extends FragmentActivity implements
 
                             PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
                             if (playerFragment != null) {
-                                playerFragment.setImageUrl(broadcast.getAppImages().getPlayer());
+                                String url = broadcast.getImageUrl();
+                                if(broadcast.getAppImages() != null)
+                                {
+                                    if(broadcast.getAppImages().getPlayer() != null)
+                                    {
+                                        url = broadcast.getAppImages().getPlayer();
+                                    }
+                                    else if(broadcast.getAppImages().getOverview() != null)
+                                    {
+                                        url = broadcast.getAppImages().getOverview();
+                                    }
+                                    else if(broadcast.getAppImages().getLive() != null)
+                                    {
+                                        url = broadcast.getAppImages().getLive();
+                                    }
+
+                                }
+
+                                playerFragment.setImageUrl(url);
                             }
                         } else {
                             onError(response.message());
@@ -617,6 +635,7 @@ public class MainActivity extends FragmentActivity implements
                     if (podcast != null) {
                         programId = podcast.getProgramId(); // Program ID from database
                     } else {
+                        //TODO: FIX THIS CASE. LOAD DATA FROM SERVER
                         Log.w("JJJ", "Unable to get podcast's programId because we are playing an online podcast that is not in the database - this should be impossible?!");
                     }
                 } else if (url.startsWith(localUrlStartsWith)) {
@@ -636,6 +655,7 @@ public class MainActivity extends FragmentActivity implements
                         Log.w("JJJ", "Unable to get podcast's programId because we are playing a podcast from a file without podcastId in the filename - this should be impossible?!");
                     }
                 }
+
                 Log.d("JJJ", "programId" + programId);
                 if (programId != Storage.PROGRAM_ID_UNKNOWN) {
                     addToPlayerHistory(programId);
@@ -681,7 +701,7 @@ public class MainActivity extends FragmentActivity implements
                             }
                         }
                     }
-                    Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId + " " + program.getName());
+                    //Log.d("JJJ", "relatedPrograms " + relatedProgramIds.size() + " for programId " + programId + " " + program.getName());
                     if (relatedProgramIds.size() > 0) {
                         Storage.get().addRelatedPrograms(programId, relatedProgramIds);
                     }

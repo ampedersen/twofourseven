@@ -35,6 +35,9 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static final String KEY_TOPIC_ID = "topic_id";
     private static final String KEY_DESCRIPTION = "description";
     private static final String KEY_IMAGE_URL = "image_url";
+    private static final String KEY_APP_LIVE_IMAGE_URL = "app_live_image_url";
+    private static final String KEY_APP_PLAYER_IMAGE_URL = "app_player_image_url";
+    private static final String KEY_APP_OVERVIEW_IMAGE_URL = "app_overview_image_url";
     private static final String KEY_ACTIVE = "active";
     private static final String KEY_TITLE = "title";
     private static final String KEY_DATE = "date";
@@ -56,6 +59,9 @@ public class StorageDatabase extends SQLiteOpenHelper {
             + KEY_TOPIC_ID + " TEXT, "
             + KEY_DESCRIPTION + " TEXT, "
             + KEY_IMAGE_URL + " TEXT, "
+            + KEY_APP_LIVE_IMAGE_URL + " TEXT, "
+            + KEY_APP_PLAYER_IMAGE_URL + " TEXT, "
+            + KEY_APP_OVERVIEW_IMAGE_URL + " TEXT, "
             + KEY_ACTIVE + " TEXT"
             + ")";
 
@@ -97,7 +103,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 5;
+    private static final int DATABASE_VERSION = 6;
     private static final String DATABASE_NAME = "Storage.db";
 
     public StorageDatabase(Context context) {
@@ -734,6 +740,12 @@ public class StorageDatabase extends SQLiteOpenHelper {
         values.put(KEY_DESCRIPTION, program.getDescription());
         values.put(KEY_IMAGE_URL, program.getImageUrl());
         values.put(KEY_ACTIVE, Boolean.toString(program.getActive()));
+
+
+        values.put(KEY_APP_LIVE_IMAGE_URL, program.getAppImageLiveUrl());
+        values.put(KEY_APP_PLAYER_IMAGE_URL, program.getAppImagePlayerUrl());
+        values.put(KEY_APP_OVERVIEW_IMAGE_URL, program.getAppImageOverviewUrl());
+
         //Log.d("JJJ", "Writing " + program.getProgramSlug());
         db.replace(TABLE_PROGRAM, null, values);
     }
@@ -747,6 +759,10 @@ public class StorageDatabase extends SQLiteOpenHelper {
         program.setDescription(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
         program.setImageUrl(c.getString(c.getColumnIndex(KEY_IMAGE_URL)));
         program.setActive(Boolean.parseBoolean(c.getString(c.getColumnIndex(KEY_ACTIVE))));
+
+        program.setAppImageLiveUrl(c.getString(c.getColumnIndex(KEY_APP_LIVE_IMAGE_URL)));
+        program.setAppImagePlayerUrl(c.getString(c.getColumnIndex(KEY_APP_PLAYER_IMAGE_URL)));
+        program.setAppImageOverviewUrl(c.getString(c.getColumnIndex(KEY_APP_OVERVIEW_IMAGE_URL)));
         return program;
     }
 

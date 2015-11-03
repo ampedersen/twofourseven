@@ -299,6 +299,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         programInfo.setStartTime(player.getStartTime());
         programInfo.setEndTime(player.getEndTime());
 
+        //TODO: Image?
+
         //TODO: Handle Program title vs podcast title too.
         //programInfo.setName(player.getProgramTitle());
 
@@ -324,7 +326,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     private void updateBigPlayer(View v, ProgramInfo p) {
         ProgramImageView programImage = ((ProgramImageView) v.findViewById(R.id.image));
-        programImage.setImageUrl(p.getAppImagePlayerUrl());
+        programImage.setImageUrl(p.getImageUrl()); //This is set to player url externally so it will be correct
         programImage.setTintColor(0x000000);
         TextView titleText =  ((TextView) v.findViewById(R.id.name_text));
         titleText.setText(p.getName());
@@ -332,8 +334,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         //TODO: Set podcast title when available, else program title
         ((TextView) v.findViewById(R.id.podcast_name_text)).setText(p.getName());
 
-
-        titleText.setTextColor(0xffffff);
+        titleText.setTextColor(0xffffffff);
         if(p.getTopic() != null)
         {
             TopicInfo topic = Storage.get().getTopic(p.getTopicId());
@@ -342,7 +343,10 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             }
         }
 
-        ((TextView) v.findViewById(R.id.time_text)).setText(p.getFormattedStartTime() + " - " + p.getFormattedEndTime());
+        if(!(p.getFormattedStartTime() == "" || p.getFormattedEndTime() == ""))
+        {
+            ((TextView) v.findViewById(R.id.time_text)).setText(p.getFormattedStartTime() + " - " + p.getFormattedEndTime());
+        }
         ((TextView) v.findViewById(R.id.description_text)).setText(p.getDescription());
 
         //Next prev buttons activation

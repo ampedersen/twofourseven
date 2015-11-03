@@ -116,8 +116,8 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
 
                 if(response.body().size() > 0)
                 {
-
                     PodcastInfo podcast = new PodcastInfo(response.body().get(0));
+                    Storage.get().addPodcast(podcast);
                     button.setUrl(context.getString(R.string.url_offline_radio) + podcast.getAudioUrl());
                     button.clickAction();
                 }

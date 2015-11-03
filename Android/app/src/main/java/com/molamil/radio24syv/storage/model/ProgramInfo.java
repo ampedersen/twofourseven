@@ -220,6 +220,18 @@ public class ProgramInfo implements Serializable {
         return getImageUrl();
     }
 
+    public void setAppImageLiveUrl(String appImageLiveUrl) {
+        this.appImageLiveUrl = appImageLiveUrl;
+    }
+
+    public void setAppImageOverviewUrl(String appImageOverviewUrl) {
+        this.appImageOverviewUrl = appImageOverviewUrl;
+    }
+
+    public void setAppImagePlayerUrl(String appImagePlayerUrl) {
+        this.appImagePlayerUrl = appImagePlayerUrl;
+    }
+
     public String getFormattedStartTime()
     {
         return getFormattedTime(startTime);
