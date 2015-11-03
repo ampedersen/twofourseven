@@ -21,36 +21,28 @@
             android:paddingBottom="@dimen/tabbar_expanded_height"
             >
 
-            <TextView
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/offline_header"
-                style="@style/SectionTitleText"
-                />
+                android:layout_gravity="center">
 
-            <!-- DEV STUFF -->
-            <!--
-            <Button
-                android:id="@+id/delete_all_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reset all"
-                />
+                <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/offline_header"
+                    android:layout_gravity="center"
+                    style="@style/SectionTitleText"
+                    />
 
-            <Button
-                android:id="@+id/delete_history_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reset history"
-                />
+                <FrameLayout
+                    android:layout_width="2dp"
+                    android:layout_height="35dp"
+                    android:layout_marginLeft="1dp"
+                    android:layout_gravity="center"
+                    android:background="@color/radio_red">
+                </FrameLayout>
 
-            <Button
-                android:id="@+id/delete_image_cache_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Reset image cache"
-                />
-            -->
+            </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/content"

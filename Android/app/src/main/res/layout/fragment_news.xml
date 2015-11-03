@@ -20,12 +20,28 @@
             android:paddingBottom="@dimen/tabbar_expanded_height"
             >
 
-            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+            <FrameLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/news_header"
-                style="@style/SectionTitleText"
-                />
+                android:layout_gravity="center">
+
+                <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/news_header"
+                    android:layout_gravity="center"
+                    style="@style/SectionTitleText"
+                    />
+
+                <FrameLayout
+                    android:layout_width="2dp"
+                    android:layout_height="35dp"
+                    android:layout_marginLeft="26dp"
+                    android:layout_gravity="center"
+                    android:background="@color/radio_red">
+                </FrameLayout>
+
+            </FrameLayout>
 
             <LinearLayout
                 android:id="@+id/content"

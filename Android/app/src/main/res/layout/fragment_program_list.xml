@@ -24,13 +24,28 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+                <FrameLayout
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/programs_header"
-                    style="@style/SectionTitleText"
-                    android:layout_gravity="center"
-                    />
+                    android:layout_gravity="center">
+
+                    <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/programs_header"
+                        android:layout_gravity="center"
+                        style="@style/SectionTitleText"
+                        />
+
+                    <FrameLayout
+                        android:layout_width="2dp"
+                        android:layout_height="35dp"
+                        android:layout_marginRight="5dp"
+                        android:layout_gravity="center"
+                        android:background="@color/radio_red">
+                    </FrameLayout>
+
+                </FrameLayout>
 
                 <ImageButton
                     android:id="@+id/categories_button"
