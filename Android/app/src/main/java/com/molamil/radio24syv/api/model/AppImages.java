@@ -14,6 +14,9 @@ public class AppImages {
     @SerializedName("player")
     @Expose
     private String player;
+    @SerializedName("live")
+    @Expose
+    private String live;
 
     /**
      * 
@@ -49,6 +52,24 @@ public class AppImages {
      */
     public void setPlayer(String player) {
         this.player = player;
+    }
+
+    /**
+     *
+     * @return
+     *     The player
+     */
+    public String getLive() {
+        return live;
+    }
+
+    /**
+     *
+     * @param player
+     *     The player
+     */
+    public void setLive(String live) {
+        this.live = live;
     }
 
 }

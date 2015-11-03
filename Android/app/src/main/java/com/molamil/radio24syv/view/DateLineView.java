@@ -70,11 +70,13 @@ public class DateLineView extends LinearLayout {
     }
 
     public void setDate(DateTime previousDate, DateTime nextDate) {
+
+        Locale locale = new Locale("da_DK");
         TextView v = (TextView) findViewById(R.id.date_text);
         //String s = DateUtils.getRelativeTimeSpanString(nextDate.getMillis(), previousDate.getMillis(), DateUtils.DAY_IN_MILLIS, 0).toString();
         Calendar calendar = Calendar.getInstance();
         calendar.setTimeInMillis(nextDate.getMillis());
-        String s = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, Locale.getDefault());
+        String s = calendar.getDisplayName(Calendar.DAY_OF_WEEK, Calendar.LONG, locale);
         v.setText(s);
     }
 

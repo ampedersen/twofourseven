@@ -76,6 +76,9 @@ public class Program {
     @SerializedName("sponsorInfo")
     @Expose
     private SponsorInfo sponsorInfo;
+    @SerializedName("appImages")
+    @Expose
+    private AppImages appImages;
 
     /**
      * 
@@ -471,6 +474,24 @@ public class Program {
      */
     public void setSponsorInfo(SponsorInfo sponsorInfo) {
         this.sponsorInfo = sponsorInfo;
+    }
+
+    /**
+     *
+     * @return
+     *     The appImages
+     */
+    public AppImages getAppImages() {
+        return appImages;
+    }
+
+    /**
+     *
+     * @param appImages
+     *     The appImages
+     */
+    public void setAppImages(AppImages appImages) {
+        this.appImages = appImages;
     }
 
 }

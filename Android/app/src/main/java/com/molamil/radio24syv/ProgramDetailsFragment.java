@@ -139,7 +139,7 @@ public class ProgramDetailsFragment extends PageFragment implements
         });
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
         getPodcasts(content, BATCH_SIZE, 1);
-        getDetails();
+        getDetails(v);
         updateExpandedState();
 
 
@@ -180,7 +180,7 @@ public class ProgramDetailsFragment extends PageFragment implements
         //return program.getDescription();
     }
 
-    private void getDetails()
+    private void getDetails(final View view)
     {
         RestClient.getApi().getProgram(program.getProgramSlug()).enqueue(new Callback<Program>() {
             @Override
@@ -189,8 +189,50 @@ public class ProgramDetailsFragment extends PageFragment implements
                 if (response.body() == null) {
                     return;
                 }
+
                 Program p = response.body();
-                Log.i("PS", "Details for program "+p);
+
+                /*
+                ProgramImageView image = ((ProgramImageView) v.findViewById(R.id.image));
+                image.setImageUrl(program.getImageUrl());
+                TopicInfo topic = Storage.get().getTopic(program.getTopicId());
+                if (topic != null) {
+                    image.setTintColor(topic.getColorValue());
+                }
+                */
+
+                String hostsAndTime = "";
+                if(!p.getActive())
+                {
+                    hostsAndTime = getResources().getString(R.string.category_back_catalogue);//str = localizedString("category_back_catalogue")
+                }
+                else
+                {
+                    if(p.getHosts() != null)
+                    {
+                        String delimiter = ", ";
+                        for(int i = 0 ; i < p.getHosts().size(); i++)
+                        {
+                            hostsAndTime += p.getHosts().get(i).getName();
+
+                            if(i < p.getHosts().size()-1)
+                            {
+                                hostsAndTime += delimiter;
+                            }
+                        }
+                    }
+
+                    String frequency = p.getBroadcastInfo().getWeekly() ? "weekly" : "daily";
+                    String packageName = getMainActivity().getPackageName();
+                    int resId = getMainActivity().getResources().getIdentifier(frequency, "string", packageName);
+                    hostsAndTime +=  "\n" + p.getBroadcastInfo().getDay()+", "+p.getBroadcastInfo().getTime()+", "+getMainActivity().getResources().getString(resId);
+
+                }
+
+                ((TextView) view.findViewById(R.id.info_text)).setText(hostsAndTime);
+                ((TextView) view.findViewById(R.id.name_text)).setText(p.getIntro());
+                ((TextView) view.findViewById(R.id.title_text)).setText(p.getName());
+                updateExpandedState();
 
             }
 
@@ -235,7 +277,9 @@ public class ProgramDetailsFragment extends PageFragment implements
                         }
                         lastPodcastDate = date;
                         DateLineView separator = new DateLineView(content.getContext());
-                        separator.setDate(date.monthOfYear().getAsText(Locale.getDefault()), date.year().getAsText(Locale.getDefault()));
+                        Locale locale = new Locale("da_DK");
+                        //separator.setDate(date.monthOfYear().getAsText(Locale.getDefault()), date.year().getAsText(Locale.getDefault()));
+                        separator.setDate(date.monthOfYear().getAsText(locale), date.year().getAsText(locale));
                         content.addView(separator);
                     }
 

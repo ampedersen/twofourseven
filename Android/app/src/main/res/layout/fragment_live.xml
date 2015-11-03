@@ -40,7 +40,7 @@
                 android:id="@+id/program_title"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Wiki-værkstedet"
+                android:text=""
                 style="@style/PageTitleText"
                 />
 
@@ -130,7 +130,7 @@
                 android:layout_height="wrap_content"
                 android:textColor="@color/radio_white"
                 android:textSize="@dimen/body_text_size"
-                android:text="Hello world"
+                android:text=""
                 />
 
             <com.molamil.radio24syv.components.ButtonNeueHaasGrotesk55Rg
