@@ -325,7 +325,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     private void updateBigPlayer(View v, ProgramInfo p) {
         ProgramImageView programImage = ((ProgramImageView) v.findViewById(R.id.image));
-        programImage.setImageUrl(p.getImageUrl());
+        //programImage.setImageUrl(p.getImageUrl());
+        programImage.setImageUrl(p.getAppImagePlayerUrl());
         programImage.setTintColor(0x000000);
         TextView titleText =  ((TextView) v.findViewById(R.id.name_text));
         titleText.setText(p.getName());

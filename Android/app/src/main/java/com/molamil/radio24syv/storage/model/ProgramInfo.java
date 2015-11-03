@@ -28,6 +28,9 @@ public class ProgramInfo implements Serializable {
     private String imageUrl;
     private boolean active;
 
+    private String appImageLiveUrl;
+    private String appImageOverviewUrl;
+    private String appImagePlayerUrl;
     /*
     //TODO: Make BroadcastInfo Serializable
     //private com.molamil.radio24syv.api.model.BroadcastInfo broadcastInfo;
@@ -49,6 +52,9 @@ public class ProgramInfo implements Serializable {
         imageUrl = conciseProgram.getImageUrl();
         active = conciseProgram.getActive();
 
+        appImageLiveUrl = conciseProgram.getAppImages().getLive();
+        appImageOverviewUrl = conciseProgram.getAppImages().getOverview();
+        appImagePlayerUrl = conciseProgram.getAppImages().getPlayer();
     }
 
     public ProgramInfo(Program program) {
@@ -60,20 +66,9 @@ public class ProgramInfo implements Serializable {
         imageUrl = program.getImageUrl();
         active = program.getActive();
 
-        /*
-        //hosts = program.getHosts();
-        hosts = new ArrayList<String>();
-        for(int i = 0 ; i < program.getHosts().size() ; i++)
-        {
-            hosts.add(program.getHosts().get(i).getName());
-        }
-
-        broadcastWeekly = program.getBroadcastInfo().getWeekly();
-        broadcastDay = program.getBroadcastInfo().getDay();
-        broadcastTime = program.getBroadcastInfo().getTime();
-
-        //broadcastInfo = program.getBroadcastInfo();
-        */
+        appImageLiveUrl = program.getAppImages().getLive();
+        appImageOverviewUrl = program.getAppImages().getOverview();
+        appImagePlayerUrl = program.getAppImages().getPlayer();
     }
 
     // TODO this is broken until the API returns an integer instead of null for relatedProgram.getVideoProgramId()
@@ -163,50 +158,67 @@ public class ProgramInfo implements Serializable {
         this.active = active;
     }
 
-    /*
-    public String getHostsAndTime(Context c)
+    public String getAppImageLiveUrl()
     {
-        if(!active)
+        if(appImageLiveUrl != null )
         {
-            String packageName = c.getPackageName();
-            int resId = c.getResources().getIdentifier("old_programs", "string", packageName);
-            return c.getResources().getString(resId);
+            return appImageLiveUrl;
         }
 
-        String result = "";
-        String hostStr = getHostNames();
-        if(hostStr != "")
+        if(appImageOverviewUrl != null )
         {
-            result = hostStr + "\n" + getBroadcastTime(c);
-        }
-        else
-        {
-            result = getBroadcastTime(c);
+            return appImageOverviewUrl;
         }
 
-        return result;
+        if(appImagePlayerUrl != null )
+        {
+            return appImagePlayerUrl;
+        }
+
+        return getImageUrl();
     }
 
-    private String getHostNames()
+    public String getAppImageOverviewUrl()
     {
-        return TextUtils.join(", ", hosts);
-    }
 
-    private String getBroadcastTime(Context c)
-    {
-        //TODO: Implement using basic data types instead of using BroadcastInfo
-        if(startTime == null || endTime == null)
+        if(appImageOverviewUrl != null )
         {
-            return "";
+            return appImageOverviewUrl;
         }
 
-        String frequency = broadcastWeekly ? "weekly" : "daily";
-        String packageName = c.getPackageName();
-        int resId = c.getResources().getIdentifier(frequency, "string", packageName);
-        return broadcastDay+", "+broadcastTime+", "+c.getResources().getString(resId);
+        if(appImagePlayerUrl != null )
+        {
+            return appImagePlayerUrl;
+        }
 
+        if(appImageLiveUrl != null )
+        {
+            return appImageLiveUrl;
+        }
+
+
+        return getImageUrl();
     }
-    */
+
+    public String getAppImagePlayerUrl()
+    {
+        if(appImagePlayerUrl != null )
+        {
+            return appImagePlayerUrl;
+        }
+
+        if(appImageOverviewUrl != null )
+        {
+            return appImageOverviewUrl;
+        }
+
+        if(appImageLiveUrl != null )
+        {
+            return appImageLiveUrl;
+        }
+
+        return getImageUrl();
+    }
 
     public String getFormattedStartTime()
     {

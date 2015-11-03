@@ -94,7 +94,7 @@ public class ProgramDetailsFragment extends PageFragment implements
         desctiptionTv = ((TextView) v.findViewById(R.id.description_text));
 
         ProgramImageView image = ((ProgramImageView) v.findViewById(R.id.image));
-        image.setImageUrl(program.getImageUrl());
+        image.setImageUrl(program.getAppImageOverviewUrl());
         TopicInfo topic = Storage.get().getTopic(program.getTopicId());
         if (topic != null) {
             image.setTintColor(topic.getColorValue());
@@ -192,14 +192,12 @@ public class ProgramDetailsFragment extends PageFragment implements
 
                 Program p = response.body();
 
-                /*
-                ProgramImageView image = ((ProgramImageView) v.findViewById(R.id.image));
-                image.setImageUrl(program.getImageUrl());
+                ProgramImageView image = ((ProgramImageView) view.findViewById(R.id.image));
+                image.setImageUrl(p.getAppImages().getOverview());
                 TopicInfo topic = Storage.get().getTopic(program.getTopicId());
                 if (topic != null) {
                     image.setTintColor(topic.getColorValue());
                 }
-                */
 
                 String hostsAndTime = "";
                 if(!p.getActive())

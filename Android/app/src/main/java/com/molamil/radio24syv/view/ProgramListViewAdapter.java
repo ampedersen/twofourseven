@@ -85,7 +85,8 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
         if (topic != null) {
             holder.image.setTintColor(topic.getColorValue());
         }
-        holder.image.setImageUrl(program.getImageUrl());
+
+        holder.image.setImageUrl(program.getAppImageOverviewUrl());
 
         holder.playButton.setTitle(program.getName());
         holder.playButton.setDescription(program.getDescription());
@@ -106,7 +107,7 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
         return v;
     }
 
-    //TODO: CAncel previous calls
+    //TODO: Cancel previous calls
     private void playLatestPodcastForListItem(ProgramInfo program, final RadioPlayerButton button)
     {
         RestClient.getApi().getPodcasts(program.getProgramId(), 1).enqueue(new Callback<List<Podcast>>() {
