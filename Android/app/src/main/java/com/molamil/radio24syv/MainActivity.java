@@ -111,7 +111,6 @@ public class MainActivity extends FragmentActivity implements
             mainFragment.setStartupTab(MainFragment.TAG_TAB_OFFLINE);
         }
 
-
     }
 
     @Override
@@ -457,18 +456,22 @@ public class MainActivity extends FragmentActivity implements
         PendingIntent alarmIntent = getAlarmNotificationIntent(alarmId, programName);
         AlarmManager manager = (AlarmManager) getSystemService(Context.ALARM_SERVICE);
         DateTime alarmTime = DateTime.parse(programTime);
-        Log.d("JJJ", "Adding alarm notification at " + RestClient.getLocalTime(programTime) + " for alarmId " + alarmId + " " + programName);
-        long delayMilliseconds = alarmTime.getMillis() - 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
-        //long delayMilliseconds = 1000 * 5; //TESTING
-        boolean isAlarmInThePast = (delayMilliseconds < 0);
+        long fireTimeInMillis = alarmTime.getMillis() - 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
+
+        long millisLeft = fireTimeInMillis - System.currentTimeMillis();
+
+        //Log.d("PS_ALARM", "Adding alarm notification at " + RestClient.getLocalTime(programTime) + " for alarmId " + alarmId + " " + programName);
+        //Log.d("PS_ALARM",  "millisLeft: "+millisLeft+ ", delayMilliseconds: "+fireTimeInMillis);
+
+        boolean isAlarmInThePast = (millisLeft < 0);
         if (isAlarmInThePast) {
-            Log.d("JJJ", "Unable to set alarm because it is in the past");
+            Log.d("PS_ALARM", "Unable to set alarm because it is in the past");
             return false;
         }
         if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
-            manager.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + delayMilliseconds, alarmIntent);
+            manager.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + millisLeft, alarmIntent);
         } else {
-            manager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + delayMilliseconds, alarmIntent);
+            manager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + millisLeft, alarmIntent);
         }
         return true;
     }
