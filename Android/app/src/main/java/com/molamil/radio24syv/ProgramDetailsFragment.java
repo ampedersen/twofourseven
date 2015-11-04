@@ -275,7 +275,7 @@ public class ProgramDetailsFragment extends PageFragment implements
                         }
                         lastPodcastDate = date;
                         DateLineView separator = new DateLineView(content.getContext());
-                        Locale locale = new Locale("da_DK");
+                        Locale locale = new Locale("da", "DK");
                         //separator.setDate(date.monthOfYear().getAsText(Locale.getDefault()), date.year().getAsText(Locale.getDefault()));
                         separator.setDate(date.monthOfYear().getAsText(locale), date.year().getAsText(locale));
                         content.addView(separator);

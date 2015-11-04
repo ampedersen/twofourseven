@@ -465,7 +465,11 @@ public class MainActivity extends FragmentActivity implements
             Log.d("JJJ", "Unable to set alarm because it is in the past");
             return false;
         }
-        manager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + delayMilliseconds, alarmIntent);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.KITKAT) {
+            manager.setExact(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + delayMilliseconds, alarmIntent);
+        } else {
+            manager.set(AlarmManager.ELAPSED_REALTIME, SystemClock.elapsedRealtime() + delayMilliseconds, alarmIntent);
+        }
         return true;
     }
 
