@@ -111,6 +111,7 @@ public class MainActivity extends FragmentActivity implements
             mainFragment.setStartupTab(MainFragment.TAG_TAB_OFFLINE);
         }
 
+        //addAlarmNotification(0, "PS TEST", "2015-11-04T20:35:00.000Z");
     }
 
     @Override
@@ -460,6 +461,7 @@ public class MainActivity extends FragmentActivity implements
 
         long millisLeft = fireTimeInMillis - System.currentTimeMillis();
 
+        //Log.d("PS_ALARM", "For date: "+programTime);
         //Log.d("PS_ALARM", "Adding alarm notification at " + RestClient.getLocalTime(programTime) + " for alarmId " + alarmId + " " + programName);
         //Log.d("PS_ALARM",  "millisLeft: "+millisLeft+ ", delayMilliseconds: "+fireTimeInMillis);
 
