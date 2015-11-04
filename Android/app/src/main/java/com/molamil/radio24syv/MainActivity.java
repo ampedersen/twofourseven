@@ -598,6 +598,7 @@ public class MainActivity extends FragmentActivity implements
 
                             PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
                             if (playerFragment != null) {
+                                /*
                                 String url = broadcast.getImageUrl();
                                 if(broadcast.getAppImages() != null)
                                 {
@@ -617,6 +618,8 @@ public class MainActivity extends FragmentActivity implements
                                 }
 
                                 playerFragment.setImageUrl(url);
+                                */
+                                playerFragment.setImageUrl(broadcast.getAppImages().getPlayer());
                             }
                         } else {
                             onError(response.message());

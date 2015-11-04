@@ -165,17 +165,7 @@ public class ProgramInfo implements Serializable {
             return appImageLiveUrl;
         }
 
-        if(appImageOverviewUrl != null )
-        {
-            return appImageOverviewUrl;
-        }
-
-        if(appImagePlayerUrl != null )
-        {
-            return appImagePlayerUrl;
-        }
-
-        return getImageUrl();
+        return "";
     }
 
     public String getAppImageOverviewUrl()
@@ -186,18 +176,7 @@ public class ProgramInfo implements Serializable {
             return appImageOverviewUrl;
         }
 
-        if(appImagePlayerUrl != null )
-        {
-            return appImagePlayerUrl;
-        }
-
-        if(appImageLiveUrl != null )
-        {
-            return appImageLiveUrl;
-        }
-
-
-        return getImageUrl();
+        return "";
     }
 
     public String getAppImagePlayerUrl()
@@ -207,17 +186,7 @@ public class ProgramInfo implements Serializable {
             return appImagePlayerUrl;
         }
 
-        if(appImageOverviewUrl != null )
-        {
-            return appImageOverviewUrl;
-        }
-
-        if(appImageLiveUrl != null )
-        {
-            return appImageLiveUrl;
-        }
-
-        return getImageUrl();
+        return "";
     }
 
     public void setAppImageLiveUrl(String appImageLiveUrl) {
