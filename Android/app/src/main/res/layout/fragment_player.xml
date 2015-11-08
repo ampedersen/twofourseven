@@ -229,7 +229,7 @@
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:text="00:00"
-                android:textSize="12dp"
+                android:textSize="10dp"
                 android:textColor="@color/radio_gray_dark"
                 />
 
@@ -272,7 +272,7 @@
                 android:gravity="center"
                 android:layout_gravity="center"
                 android:text="00:00"
-                android:textSize="12dp"
+                android:textSize="10dp"
                 android:textColor="@color/radio_gray_dark"
                 />
 

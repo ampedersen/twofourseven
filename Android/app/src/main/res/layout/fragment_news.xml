@@ -36,7 +36,7 @@
                 <FrameLayout
                     android:layout_width="2dp"
                     android:layout_height="35dp"
-                    android:layout_marginLeft="26dp"
+                    android:layout_marginLeft="20dp"
                     android:layout_gravity="center"
                     android:background="@color/radio_red">
                 </FrameLayout>
