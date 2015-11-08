@@ -84,6 +84,7 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
         TopicInfo topic = Storage.get().getTopic(program.getTopicId());
         if (topic != null) {
             holder.image.setTintColor(topic.getColorValue());
+            v.setBackgroundColor(topic.getColorValue());
         }
 
         holder.image.setImageUrl(program.getAppImageOverviewUrl());

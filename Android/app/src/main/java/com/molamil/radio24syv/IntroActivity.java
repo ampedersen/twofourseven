@@ -43,7 +43,7 @@ public class IntroActivity extends FragmentActivity {
                 String name = getApplicationContext().getPackageName();
                 SharedPreferences settings = getSharedPreferences(name, Context.MODE_PRIVATE);
                 settings.edit().putBoolean("returningUser", true).commit();
-                
+
                 startMainActivity();
             }
         });
