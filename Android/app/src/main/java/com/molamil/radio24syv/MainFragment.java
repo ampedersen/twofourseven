@@ -231,4 +231,8 @@ public class MainFragment extends Fragment {
         public void onMainTabChanged(String tabTag);
         public void onDimmingChanged(Dimming newDimming, Dimming oldDimming);
     }
+
+    public PlayerFragment getPlayerFragment() {
+        return playerFragment;
+    }
 }

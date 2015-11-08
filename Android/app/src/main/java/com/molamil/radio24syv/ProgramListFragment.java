@@ -151,6 +151,10 @@ public class ProgramListFragment extends PageFragment {
                 if (isCached) {
                     programs.clear(); // Clear old values
                 }
+                if (response.body() == null) {
+                    return;
+                }
+
                 for (int i = 0; i < response.body().size(); i++) {
                     ConciseProgram conciseProgram = response.body().get(i);
                     programs.add(new ProgramInfo(conciseProgram));
@@ -416,6 +420,9 @@ public class ProgramListFragment extends PageFragment {
             public void onResponse(Response<TopicColors> response) {
                 if (listener != null) {
                     listener.onError(null);
+                }
+                if (response.body() == null) {
+                    return;
                 }
                 TopicColors colors = response.body();
                 ArrayList<TopicInfo> topics = new ArrayList<TopicInfo>();

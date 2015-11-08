@@ -66,7 +66,11 @@ public class NewsFragment extends Fragment {
                 if (listener != null) {
                     listener.onError(null);
                 }
+
                 showActivityIndicator(v, false);
+                if (response.body() == null) {
+                    return;
+                }
                 List<Podcast> podcasts = response.body();
                 PodcastInfo p = null;
                 if ((podcasts != null) && (podcasts.size() > 0)) {

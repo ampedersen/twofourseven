@@ -122,6 +122,7 @@ public class ProgramsFragment extends PageFragment {
         }
         pager.setAdapter(new DetailsPagerAdapter(getChildFragmentManager(), program));
         //pager.setCurrentItem(1, true); // This changes page instantly even though told otherwise. It happens when setCurrentItem() is called straight after changing adapter.
+
         new Handler().post(new Runnable() {
             @Override
             public void run() {

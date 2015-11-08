@@ -137,8 +137,11 @@ public class ProgramDetailsFragment extends PageFragment implements
             }
         });
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
+
+        //DEV
         getPodcasts(content, BATCH_SIZE, 1);
         getDetails(v);
+
         updateExpandedState();
 
 
@@ -241,12 +244,8 @@ public class ProgramDetailsFragment extends PageFragment implements
     }
 
     private void getPodcasts(final ViewGroup content, final int amount, final int batch) {
-        Log.d("JJJ", "getPodcasts id " + program.getProgramId() + " content " + content + " amount " + amount + " batch " + batch);
         final ViewGroup parent = (ViewGroup) content.getParent();
-
-        //final TextView progressSpinner = (TextView) parent.findViewById(R.id.loading_text);
         progressSpinner.setVisibility(View.VISIBLE);
-
         final Button loadButton = (Button) parent.findViewById(R.id.load_button);
         loadButton.setVisibility(View.GONE);
 
@@ -256,8 +255,9 @@ public class ProgramDetailsFragment extends PageFragment implements
                 if (listener != null) {
                     listener.onError(null);
                 }
-                //for (Podcast p : response.body()) { // For some reason this does not work
-                //for (Podcast p : response.body().iterator) { // For some reason this does not work neither
+                if (response.body() == null) {
+                    return;
+                }
 
                 PodcastEpisodeView prevView = null;
 

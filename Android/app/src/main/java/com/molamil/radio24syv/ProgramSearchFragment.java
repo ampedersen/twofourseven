@@ -107,6 +107,9 @@ public class ProgramSearchFragment extends PageFragment {
             RestClient.getApi().search(query, "program", 50, 0).enqueue(new Callback<Search>() {
                 @Override
                 public void onResponse(Response<Search> response) {
+                    if (response.body() == null) {
+                        return;
+                    }
                     if (isQueryStillRelevant(query)) {
                         state = State.READY;
                         if (listener != null) {

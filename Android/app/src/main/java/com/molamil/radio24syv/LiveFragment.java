@@ -81,8 +81,13 @@ public class LiveFragment extends PageFragment {
         RestClient.getApi().getCurrentBroadcast().enqueue(new Callback<List<Broadcast>>() {
             @Override
             public void onResponse(Response<List<Broadcast>> response) {
+
                 if (listener != null) {
                     listener.onError(null);
+                }
+                if(response == null)
+                {
+                    return;
                 }
                 List<Broadcast> body = response.body();
                 if (body != null) {

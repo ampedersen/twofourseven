@@ -148,6 +148,16 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void onBackPressed() {
+        //close player if it is big
+        if(mainFragment.getPlayerFragment() != null)
+        {
+            if(mainFragment.getPlayerFragment().getSize() == PlayerFragment.PlayerSize.BIG) {
+                //Log.i("PS", "Back click, player is expanded, close player");
+                mainFragment.getPlayerFragment().setSize(PlayerFragment.PlayerSize.SMALL);
+                return;
+            }
+        }
+
         boolean isSidePageInteractionEnabled = pager.isPagingEnabled();
         if (isSidePageInteractionEnabled) {
             boolean isViewingMainPage = (pager.getCurrentItem() == mainPagePosition);
@@ -357,7 +367,9 @@ public class MainActivity extends FragmentActivity implements
         RestClient.getApi().getNextBroadcasts(slug).enqueue(new Callback<List<Broadcast>>() {
             @Override
             public void onResponse(Response<List<Broadcast>> response) {
-
+                if (response.body() == null) {
+                    return;
+                }
                 List<Broadcast> broadcasts = response.body();
                 for (int i = 0; i < broadcasts.size(); i++) {
                     Broadcast broadcast = broadcasts.get(i);
@@ -460,10 +472,6 @@ public class MainActivity extends FragmentActivity implements
         long fireTimeInMillis = alarmTime.getMillis() - 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
 
         long millisLeft = fireTimeInMillis - System.currentTimeMillis();
-
-        //Log.d("PS_ALARM", "For date: "+programTime);
-        //Log.d("PS_ALARM", "Adding alarm notification at " + RestClient.getLocalTime(programTime) + " for alarmId " + alarmId + " " + programName);
-        //Log.d("PS_ALARM",  "millisLeft: "+millisLeft+ ", delayMilliseconds: "+fireTimeInMillis);
 
         boolean isAlarmInThePast = (millisLeft < 0);
         if (isAlarmInThePast) {
@@ -595,7 +603,9 @@ public class MainActivity extends FragmentActivity implements
                     @Override
                     public void onResponse(Response<List<Broadcast>> response) {
                         onError(null);
-
+                        if (response.body() == null) {
+                            return;
+                        }
                         List<Broadcast> body = response.body();
                         if (body != null) {
                             Broadcast broadcast = body.get(0);
@@ -698,6 +708,9 @@ public class MainActivity extends FragmentActivity implements
             @Override
             public void onResponse(Response<Program> response) {
                 MainActivity.this.onError(null);
+                if (response.body() == null) {
+                    return;
+                }
                 Program program = response.body();
                 if ((program != null) && (program.getRelatedPrograms() != null)) {
                     ArrayList<Integer> relatedProgramIds = new ArrayList<>(program.getRelatedPrograms().size());

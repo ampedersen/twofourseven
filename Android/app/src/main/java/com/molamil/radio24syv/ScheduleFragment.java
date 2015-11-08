@@ -68,7 +68,9 @@ public class ScheduleFragment extends PageFragment {
 
                 ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
                 content.removeAllViews();
-
+                if (response.body() == null) {
+                    return;
+                }
                 List<Broadcast> broadcasts = response.body();
 
                 DateTime previousDate = null;

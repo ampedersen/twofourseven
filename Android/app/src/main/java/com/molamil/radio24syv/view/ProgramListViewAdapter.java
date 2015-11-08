@@ -114,7 +114,9 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
         RestClient.getApi().getPodcasts(program.getProgramId(), 1).enqueue(new Callback<List<Podcast>>() {
             @Override
             public void onResponse(Response<List<Podcast>> response) {
-
+                if (response.body() == null) {
+                    return;
+                }
                 if(response.body().size() > 0)
                 {
                     PodcastInfo podcast = new PodcastInfo(response.body().get(0));
@@ -130,7 +132,5 @@ public class ProgramListViewAdapter extends ArrayAdapter<ProgramInfo> {
                 //t.printStackTrace();
             }
         });
-
     }
-
 }
