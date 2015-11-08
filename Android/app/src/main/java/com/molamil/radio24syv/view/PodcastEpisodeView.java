@@ -2,10 +2,12 @@ package com.molamil.radio24syv.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
@@ -140,6 +142,17 @@ public class PodcastEpisodeView extends LinearLayout implements
         playButton.setProgramId(podcast.getProgramId());
 
         RadioLibrary.getInstance().addListener(getContext(), podcast.getPodcastId(), this); // Listen for updates for this podcast ID
+    }
+
+    public void setPlayable(boolean playable)
+    {
+        RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
+        playButton.setVisibility(playable ? VISIBLE : GONE);
+
+        ProgressBar activity = (ProgressBar) findViewById(R.id.download_activity_indicator);
+        activity.setVisibility(playable ? GONE : VISIBLE);
+        activity.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.MULTIPLY);
+
     }
 
     public void setRadioPlayer(RadioPlayer player) {

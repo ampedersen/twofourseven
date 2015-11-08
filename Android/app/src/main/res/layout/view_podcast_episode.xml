@@ -37,6 +37,16 @@
             app:action="play"
             />
 
+        <ProgressBar
+            android:id="@+id/download_activity_indicator"
+            style="?android:attr/progressBarStyleSmall"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_weight="0"
+            android:layout_gravity="center"
+            android:visibility="gone">
+        </ProgressBar>
+
     </LinearLayout>
 
     <LinearLayout

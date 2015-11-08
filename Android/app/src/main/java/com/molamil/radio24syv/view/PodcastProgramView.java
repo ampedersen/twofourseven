@@ -2,6 +2,7 @@ package com.molamil.radio24syv.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -125,10 +126,16 @@ public class PodcastProgramView extends LinearLayout implements
     public void setPodcasts(List<PodcastInfo> podcasts) {
         ViewGroup expandedLayout = (ViewGroup) findViewById(R.id.expanded_layout);
         for (PodcastInfo p : podcasts) {
+
             PodcastEpisodeView v = new PodcastEpisodeView(getContext());
             v.setPodcast(p);
             v.setRadioPlayer(radioPlayer);
             v.setOnPodcastEpisodeViewUpdatedListener(this);
+
+            //Handle non downloaded items (hide play button and show loader)
+            RadioLibrary.Status status = RadioLibrary.getInstance().getStatus(getContext(), p.getPodcastId());
+            v.setPlayable(status.getDownloadStatus() == RadioLibrary.DOWNLOAD_STATUS_SUCCESSFUL);
+
             expandedLayout.addView(v); // Add podcast as a child
         }
 

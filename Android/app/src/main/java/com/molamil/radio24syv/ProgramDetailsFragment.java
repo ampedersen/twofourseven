@@ -118,7 +118,6 @@ public class ProgramDetailsFragment extends PageFragment implements
             }
         });
 
-
         progressSpinner = (ProgressBar) v.findViewById(R.id.activity_indicator);
         progressSpinner.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.MULTIPLY);
 

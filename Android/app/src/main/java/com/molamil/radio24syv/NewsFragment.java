@@ -17,7 +17,11 @@ import com.molamil.radio24syv.view.NewsDateView;
 import com.molamil.radio24syv.view.NewsTextView;
 import com.molamil.radio24syv.view.RadioPlayerButton;
 
+import org.joda.time.DateTime;
+import org.joda.time.LocalDateTime;
+
 import java.util.List;
+import java.util.Locale;
 
 import retrofit.Callback;
 import retrofit.Response;
@@ -110,7 +114,11 @@ public class NewsFragment extends Fragment {
             // Date
             NewsDateView date = new NewsDateView(v.getContext());
             String dateString = podcast.getDate();
-            date.setDate(RestClient.getLocalTime(dateString), RestClient.getLocalDate(dateString));
+
+            //QUICK FIX: Time is one hour off here but not elsewhere in app, so we simply subtract 1 hour here as a quick fix.
+            LocalDateTime dateTime = new DateTime(dateString).toLocalDateTime().minusHours(1);
+            date.setDate(dateTime.toString("HH:mm"), String.format(Locale.US, "%d/%d", dateTime.getDayOfMonth(), dateTime.getMonthOfYear()));
+
             content.addView(date);
 
             // News items

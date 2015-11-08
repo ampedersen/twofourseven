@@ -134,7 +134,7 @@ public class RadioLibrary {
         }
     }
 
-    private Status getStatus(Context context, int podcastId) {
+    public Status getStatus(Context context, int podcastId) {
         long downloadId = Storage.get().getLibraryDownloadId(podcastId);
         return getStatus(context, downloadId);
     }
