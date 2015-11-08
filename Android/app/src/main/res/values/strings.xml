@@ -81,6 +81,7 @@
     <string name="remove_podcast">Slet</string>
     <string name="episode_count">%1$s  podcast</string> <!-- %1$s is replaced with the number of episodes -->
     <string name="episodes_count">%1$s  podcasts</string> <!-- %1$s is replaced with the number of episodes -->
+    <string name="no_items_message"><![CDATA[Du kan downloade programmer under “Podcasts” og lytte her, når du ikke har internetforbindelse.]]></string>
 
     <!-- URLs (no slash at the end please) -->
     <string name="url_live_radio">http://streaming.radio24syv.dk/nice</string>

@@ -7,6 +7,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.ImageLibrary;
@@ -48,32 +49,12 @@ public class OfflineFragment extends PageFragment {
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_offline, container, false);
 
-        //Dev buttons
-        /*
-        v.findViewById(R.id.delete_all_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Storage.get().deleteAll(v.getContext());
-            }
-        });
-
-        v.findViewById(R.id.delete_history_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Storage.get().deleteHistory();
-            }
-        });
-
-        v.findViewById(R.id.delete_image_cache_button).setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Storage.get().deleteImageCache();
-            }
-        });
-        */
+        TextView statusText = (TextView) v.findViewById(R.id.status_text);
+        List<ProgramInfo> programs = Storage.get().getProgramsWithPodcastsInLibrary();
+        statusText.setVisibility(programs.size() > 0 ? View.GONE : View.VISIBLE);
 
         ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
-        for (ProgramInfo program : Storage.get().getProgramsWithPodcastsInLibrary()) {
+        for (ProgramInfo program :programs) {
             PodcastProgramView p = new PodcastProgramView(v.getContext());
             p.setProgram(program);
             p.setRadioPlayer(radioPlayerProvider.getRadioPlayer());

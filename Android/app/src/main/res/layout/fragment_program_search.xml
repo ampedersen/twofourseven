@@ -7,7 +7,7 @@
     android:background="@color/radio_white"
     >
 
-    <TextView
+    <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
         android:id="@+id/status_text"
         android:layout_width="match_parent"
         android:layout_height="match_parent"

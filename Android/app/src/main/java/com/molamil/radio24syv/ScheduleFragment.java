@@ -58,6 +58,7 @@ public class ScheduleFragment extends PageFragment {
         RestClient.getApi().getNextBroadcasts(20, 0).enqueue(new Callback<List<Broadcast>>() {
             @Override
             public void onResponse(Response<List<Broadcast>> response) {
+
                 if (listener != null) {
                     listener.onError(null);
                 }

@@ -338,6 +338,21 @@ public class RadioPlayerService extends Service implements
         */
     }
 
+    public int getDuration()
+    {
+        if(player == null)
+        {
+            return 0;
+        }
+
+        if (state == RadioPlayer.STATE_STARTED)
+        {
+            return player.getDuration();
+        }
+
+        return 0;
+    }
+
     public void seekTo(float pct)
     {
         if (state != RadioPlayer.STATE_UNASSIGNED && state != RadioPlayer.STATE_BUSY)

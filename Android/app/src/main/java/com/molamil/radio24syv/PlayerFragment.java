@@ -59,6 +59,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     private TimeLine smallTimeLine;
     private TimeLineSeekBar timeLineSeekBar;
 
+    private TextView startTimeLabel;
+    private TextView endTimeLabel;
 
     private long timelineUpdateInterval = 5000;
     private Handler timelineHandler = new Handler(); //Refactor to player service and let it update all necesary timelines
@@ -111,6 +113,9 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
         prevButton = (RadioPlayerButton) v.findViewById(R.id.previous_button);
         nextButton = (RadioPlayerButton) v.findViewById(R.id.next_button);
+
+        startTimeLabel = (TextView) v.findViewById(R.id.time_start_text);
+        endTimeLabel = (TextView) v.findViewById(R.id.time_end_text);
 
         timeline = (TimeLine) v.findViewById(R.id.player_progress);
         smallTimeLine = (TimeLine) v.findViewById(R.id.small_player_progress);
@@ -299,7 +304,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         programInfo.setStartTime(player.getStartTime());
         programInfo.setEndTime(player.getEndTime());
 
-        //TODO: Image?
+        //Start end time
 
         //TODO: Handle Program title vs podcast title too.
         //programInfo.setName(player.getProgramTitle());
@@ -414,9 +419,23 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         if(player.getUrl() != getString(R.string.url_live_radio))
         {
             float pct = player.getProgress();
+            int duration = player.getDuration();
             timeline.setProgress(pct);
             smallTimeLine.setProgress(pct);
             timeLineSeekBar.setProgress(pct);
+
+            //start and end times
+            int past = (int)(pct*duration);
+            int left = duration - past;
+
+            int s0 = (int) (past / 1000) % 60 ;
+            int m0 = (int) ((past / (1000*60)) % 60);
+            int s1 = (int) (left / 1000) % 60 ;
+            int m1 = (int) ((left / (1000*60)) % 60);
+
+            startTimeLabel.setText( String.format("%02d", m0)+":"+ String.format("%02d", s0));
+            endTimeLabel.setText( "-"+String.format("%02d", m1)+":"+ String.format("%02d", s1));
+
             return;
         }
 
@@ -426,6 +445,10 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
         Date startDate = timeStringToDate(start);
         Date endDate = timeStringToDate(end);
+
+        startTimeLabel.setText(start);
+        endTimeLabel.setText(end);
+
         if(startDate != null && endDate != null && curr != null)
         {
             long t0 = startDate.getTime();

@@ -7,6 +7,18 @@
     android:background="@color/radio_black"
     >
 
+    <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk65Md
+        android:id="@+id/status_text"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:text="@string/no_items_message"
+        android:gravity="center"
+        android:textColor="@color/radio_gray"
+        android:layout_marginTop="@dimen/program_category_text_size"
+        style="@style/ProgramCategoryText"
+        android:layout_margin="@dimen/app_margin_25"
+        />
+
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
@@ -54,5 +66,7 @@
         </LinearLayout>
 
     </ScrollView>
+
+
 
 </RelativeLayout>

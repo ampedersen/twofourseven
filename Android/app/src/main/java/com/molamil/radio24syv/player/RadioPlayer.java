@@ -203,6 +203,14 @@ public class RadioPlayer {
         }
     }
 
+    public int getDuration() {
+        if (isBoundToService) {
+            return service.getDuration();
+        } else {
+            return 0;
+        }
+    }
+
     public void seekTo(float pct)
     {
         if (isBoundToService) {
