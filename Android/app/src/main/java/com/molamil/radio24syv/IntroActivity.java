@@ -40,6 +40,10 @@ public class IntroActivity extends FragmentActivity {
             @Override
             public void onClick(View v)
             {
+                String name = getApplicationContext().getPackageName();
+                SharedPreferences settings = getSharedPreferences(name, Context.MODE_PRIVATE);
+                settings.edit().putBoolean("returningUser", true).commit();
+                
                 startMainActivity();
             }
         });
@@ -98,7 +102,8 @@ public class IntroActivity extends FragmentActivity {
         }
         else
         {
-            settings.edit().putBoolean("returningUser", true).commit();
+            //Set when user end intro.
+            //settings.edit().putBoolean("returningUser", true).commit();
         }
     }
 
@@ -120,6 +125,11 @@ public class IntroActivity extends FragmentActivity {
         }
         else if (currentPage == pager.getAdapter().getCount()-1)
         {
+
+            String name = getApplicationContext().getPackageName();
+            SharedPreferences settings = getSharedPreferences(name, Context.MODE_PRIVATE);
+            settings.edit().putBoolean("returningUser", true).commit();
+
             pager.setPagingEnabled(false);
             startMainActivity();
         }
