@@ -355,6 +355,11 @@ public class RadioPlayerService extends Service implements
 
     public void seekTo(float pct)
     {
+        if(player == null)
+        {
+            return;
+        }
+
         if (state != RadioPlayer.STATE_UNASSIGNED && state != RadioPlayer.STATE_BUSY)
         {
             int millis = (int)(pct*player.getDuration());
