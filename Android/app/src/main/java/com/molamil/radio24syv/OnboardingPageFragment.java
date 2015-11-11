@@ -90,7 +90,6 @@ public class OnboardingPageFragment extends Fragment
 
         if(videoPoster != null)
         {
-            Log.i("YUP", ""+videoPoster.getHeight());
             videoPoster.setImageResource(posterId);
         }
 

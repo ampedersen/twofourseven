@@ -98,12 +98,11 @@ public class IntroActivity extends FragmentActivity {
 
         if (settings.getBoolean("returningUser", false))
         {
-            startMainActivity();
+           // startMainActivity();
         }
         else
         {
-            //Set when user end intro.
-            //settings.edit().putBoolean("returningUser", true).commit();
+
         }
     }
 
