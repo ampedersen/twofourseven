@@ -26,6 +26,7 @@ import com.molamil.radio24syv.api.model.RelatedProgram;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.receiver.AlarmNotificationReceiver;
 import com.molamil.radio24syv.storage.ImageLibrary;
+import com.molamil.radio24syv.storage.RadioLibrary;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.BroadcastInfo;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
@@ -129,6 +130,9 @@ public class MainActivity extends FragmentActivity implements
     @Override
     protected void onPause() {
         super.onPause();
+
+        RadioLibrary.getInstance().disableDownloadReceiver();
+
         // Hockeyapp
         if (BuildConfig.HOCKEYAPP_UPDATES_ENABLED) {
             UpdateManager.unregister();
@@ -139,8 +143,11 @@ public class MainActivity extends FragmentActivity implements
     protected void onResume() {
         super.onResume();
 
+        RadioLibrary.getInstance().resumeDownloadReceiver();
+
         //Update Program notifications
         UpdateProgramNotifications();
+
 
         // Hockeyapp
         checkForCrashes();

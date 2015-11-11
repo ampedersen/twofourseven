@@ -16,6 +16,7 @@ import android.widget.TextView;
 
 import org.w3c.dom.Text;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class MainFragment extends Fragment {
@@ -83,6 +84,7 @@ public class MainFragment extends Fragment {
 //                    .commit();
 //        }
 
+
         if (savedInstanceState != null) {
             playerFragment = (PlayerFragment) getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
         } else {
@@ -90,7 +92,9 @@ public class MainFragment extends Fragment {
                 playerFragment = new PlayerFragment();
             }
         }
+
         getChildFragmentManager().beginTransaction().replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
+
 
         // create fragments to use
 //        if (savedInstanceState != null) {
@@ -133,10 +137,22 @@ public class MainFragment extends Fragment {
         }
     }
 
+
     @Override
     public void onDetach() {
         super.onDetach();
         listener = null;
+
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
+
     }
 
     private void addTab(LayoutInflater inflater, String tag, int textId, int iconId, Class<?> fragment) {

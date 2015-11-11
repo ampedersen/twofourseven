@@ -122,7 +122,7 @@ public class PodcastEpisodeView extends LinearLayout implements
         super.onDetachedFromWindow();
         // View is now detached, and about to be destroyed
         if (podcast != null) {
-            RadioLibrary.getInstance().removeListener(podcast.getPodcastId(), this);
+            RadioLibrary.getInstance().removeListener(getContext(), podcast.getPodcastId(), this);
         }
     }
 
@@ -141,7 +141,7 @@ public class PodcastEpisodeView extends LinearLayout implements
         playButton.setPlayListType(RadioPlayer.PLAYLIST_PODCAST);
         playButton.setProgramId(podcast.getProgramId());
 
-        RadioLibrary.getInstance().addListener(getContext(), podcast.getPodcastId(), this); // Listen for updates for this podcast ID
+        RadioLibrary.getInstance().addListener(getContext(), podcast.getPodcastId(), this); // Listen for download updates for this podcast ID
     }
 
     public void setPlayable(boolean playable)
@@ -246,6 +246,12 @@ public class PodcastEpisodeView extends LinearLayout implements
                 downloadButtonText.setText(R.string.remove_podcast);
                 downloadButton.setOnClickListener(removeOnClick);
                 playButton.setUrl(status.getLocalPodcastUrl()); // Play local file
+
+                //remove listener, it is no longer needed?
+                if (podcast != null) {
+                    RadioLibrary.getInstance().removeListener(getContext(), podcast.getPodcastId(), this);
+                }
+
                 break;
         }
    }

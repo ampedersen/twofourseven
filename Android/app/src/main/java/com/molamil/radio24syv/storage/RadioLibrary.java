@@ -17,6 +17,7 @@ import com.molamil.radio24syv.storage.model.ProgramInfo;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 
 /**
  * Podcast download manager. Uses Android's built-in download manager for file download and local file management.
@@ -192,9 +193,11 @@ public class RadioLibrary {
         return status;
     }
 
+    private Context recieverContext;
     public void addListener(Context context, int podcastId, OnRadioLibraryStatusUpdatedListener listener) {
         boolean isInitialized = (listenersByPodcastId.size() != 0);
         if (!isInitialized) {
+            recieverContext = context;
             context.registerReceiver(downloadCompleteReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)); // Create broadcast receiver for "download complete" messages
         }
 
@@ -209,12 +212,34 @@ public class RadioLibrary {
         }
     }
 
-    public void removeListener(int podcastId, OnRadioLibraryStatusUpdatedListener listener) {
+    public void removeListener(Context context, int podcastId, OnRadioLibraryStatusUpdatedListener listener) {
         if (listenersByPodcastId.containsKey(podcastId)) {
             if (listenersByPodcastId.get(podcastId).contains(listener)) {
                 listenersByPodcastId.get(podcastId).remove(listener); // Remove listener
             }
         }
+    }
+
+    public void disableDownloadReceiver()
+    {
+        if(recieverContext != null) {
+            try {
+                recieverContext.unregisterReceiver(downloadCompleteReceiver);
+            } catch (IllegalArgumentException e) {
+
+            }
+        }
+    }
+
+
+    public void resumeDownloadReceiver()
+    {
+        /*
+        if(recieverContext != null)
+        {
+            recieverContext.registerReceiver(downloadCompleteReceiver, new IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE));
+        }
+        */
     }
 
     // Our handler for received Intents. This will be called whenever an Intent with an action named ACTION_DOWNLOAD_COMPLETE is broadcasted.
