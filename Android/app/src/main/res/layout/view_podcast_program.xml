@@ -87,7 +87,7 @@
         android:orientation="vertical"
         android:layout_marginTop="16dp"
         android:divider="@android:drawable/divider_horizontal_bright"
-        android:showDividers="middle"
+        android:showDividers="none"
         >
 
         <!-- This is where the individual episodes are added -->

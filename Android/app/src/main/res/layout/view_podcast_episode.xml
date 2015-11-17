@@ -127,8 +127,7 @@
             android:layout_height="wrap_content"
             android:textColor="@color/radio_white"
             android:textSize="@dimen/body_text_size"
-            android:text="Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbla blabal bal Blab blab lbl"
-            />
+            android:text="hello world"/>
 
 
         <LinearLayout
