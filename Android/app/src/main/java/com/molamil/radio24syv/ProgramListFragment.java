@@ -357,6 +357,15 @@ public class ProgramListFragment extends PageFragment {
         } else {
             ArrayList<ProgramInfo> filteredPrograms = new ArrayList<>(programs);
             filteredPrograms = getFilteredPrograms(filteredPrograms, matchActive, matchTopicId);
+
+            //TODO: FIX THIS QUICK FIX
+            //Quick fix. Limit count when showing bagkatalog
+            if(matchActive == false)
+            {
+                int maxCount = 40;
+                filteredPrograms = capPrograms(filteredPrograms, maxCount);
+            }
+
             filteredPrograms = getSortedPrograms(filteredPrograms, sorting);
 
             content.removeAllViews(); // Clear old content
@@ -389,6 +398,19 @@ public class ProgramListFragment extends PageFragment {
         });
         return programs;
     }
+
+    private static ArrayList<ProgramInfo> capPrograms(ArrayList<ProgramInfo> programs,int count) {
+        if(programs.size() < count)
+        {
+            return programs;
+        }
+        ArrayList<ProgramInfo> cappedPrograms = new ArrayList<>();
+        for (int i = 0; i < count;i++) {
+            cappedPrograms.add(programs.get(i));
+        }
+        return cappedPrograms;
+    }
+
 
     private void addPrograms(final ViewGroup content, final List<ProgramInfo> programs) {
         if(getActivity() == null)
