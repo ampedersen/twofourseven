@@ -29,5 +29,9 @@ public class TextViewNeueHaasGrotesk55Rg extends TextView
     {
         Typeface font = Typeface.createFromAsset(context.getAssets(), "fonts/NHaasGroteskDSPro-55Rg.otf");
         this.setTypeface(font);
+        if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP)
+        {
+            this.setFontFeatureSettings("ss01");
+        }
     }
 }
