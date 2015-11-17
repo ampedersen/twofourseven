@@ -63,7 +63,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     private TextView startTimeLabel;
     private TextView endTimeLabel;
 
-    private long timelineUpdateInterval = 5000;
+    private long timelineUpdateInterval = 500;
     private Handler timelineHandler = new Handler(); //Refactor to player service and let it update all necesary timelines
     private Runnable timelineRunnable = new Runnable() {
         @Override
@@ -444,8 +444,13 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             int s1 = (int) (left / 1000) % 60 ;
             int m1 = (int) ((left / (1000*60)) % 60);
 
-            startTimeLabel.setText( String.format("%02d", m0)+":"+ String.format("%02d", s0));
-            endTimeLabel.setText( "-"+String.format("%02d", m1)+":"+ String.format("%02d", s1));
+            String elapsed = String.format("%02d", m0)+":"+ String.format("%02d", s0);
+            String remaining = "-"+String.format("%02d", m1)+":"+ String.format("%02d", s1);
+
+
+
+            startTimeLabel.setText( elapsed );
+            endTimeLabel.setText( remaining );
 
             return;
         }

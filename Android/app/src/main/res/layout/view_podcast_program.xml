@@ -85,6 +85,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="vertical"
+        android:layout_marginTop="16dp"
         android:divider="@android:drawable/divider_horizontal_bright"
         android:showDividers="middle"
         >

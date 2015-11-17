@@ -641,7 +641,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
             } while (c.moveToNext());
             c.close();
         } else {
-            Log.d("PS", "no program notifications");
+           // Log.d("PS", "no program notifications");
         }
 
         return slugs;

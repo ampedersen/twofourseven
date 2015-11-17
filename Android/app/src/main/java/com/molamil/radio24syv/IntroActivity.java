@@ -98,7 +98,7 @@ public class IntroActivity extends FragmentActivity {
 
         if (settings.getBoolean("returningUser", false))
         {
-           // startMainActivity();
+            startMainActivity();
         }
         else
         {
