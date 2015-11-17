@@ -144,7 +144,6 @@ public class ProgramDetailsFragment extends PageFragment implements
 
         updateExpandedState();
 
-
         return v;
     }
 

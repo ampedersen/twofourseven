@@ -11,6 +11,13 @@
     <color name="radio_white">#eeeeee</color>
     <color name="radio_yellow">#ffdd33</color>
     <color name="player_background">#393939</color>
+    <color name="intro_poster_red">#E6041F</color>
+    <color name="intro_video_red">#e10018</color>
+
+    <color name="intro_video_red_1">#e3001a</color>
+    <color name="intro_video_red_2">#db0012</color>
+    <color name="intro_video_red_3">#e5001c</color>
+    <color name="intro_video_red_4">#e5001c</color>
     <!-- <color name="mini_player_background">#262626</color> -->
 
 </resources>

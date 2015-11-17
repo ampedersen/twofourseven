@@ -29,6 +29,7 @@ public class OnboardingPageFragment extends Fragment
     private FrameLayout videoWrapper;
     private ImageView videoPoster;
     private TextView videoTv;
+    private FrameLayout rootView;
     private int posterId = 0;
 
     @Override
@@ -98,6 +99,11 @@ public class OnboardingPageFragment extends Fragment
             videoTv.setText(videoMessage);
         }
 
+        if(resourceID ==  R.layout.fragment_onboarding_video_page)
+        {
+            rootView = (FrameLayout)v;
+        }
+
         return v;
     }
 
@@ -132,11 +138,14 @@ public class OnboardingPageFragment extends Fragment
                         @Override
                         public void run() {
                             if(videoView.getCurrentPosition() != 0){
-                                Log.i("PS", "video prepared, show it");
                                 //View placeholder = findViewById(R.id.placeholder);
                                 //placeholder.setVisibility(View.GONE);
                                 videoView.setAlpha(1);
                                 videoPoster.setAlpha(0f);
+                                //BACKGROUND COLOR ADAPT
+                                int colorResourceId = getResources().getIdentifier("intro_video_red_"+position, "color", getActivity().getPackageName());
+                                rootView.setBackgroundColor(getResources().getColor(colorResourceId));
+                                //rootView.setBackgroundColor(getResources().getColor(R.color.intro_video_red));
                             } else {
                                 new Handler().postDelayed(this, 50);
                             }
@@ -161,6 +170,9 @@ public class OnboardingPageFragment extends Fragment
             videoView.setVisibility(View.GONE);
             videoView.setAlpha(0);
             videoPoster.setAlpha(1f);
+
+            rootView.setBackgroundColor(getResources().getColor(R.color.intro_poster_red));
+
         }
     }
 

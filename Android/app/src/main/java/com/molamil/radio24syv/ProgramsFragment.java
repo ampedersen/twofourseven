@@ -120,7 +120,9 @@ public class ProgramsFragment extends PageFragment {
         if (listener != null) {
             listener.onShowSidePage(PageFragment.OnFragmentInteractionListener.Side.HIDE); // Show main page (program search side page could be showing)
         }
+
         pager.setAdapter(new DetailsPagerAdapter(getChildFragmentManager(), program));
+
         //pager.setCurrentItem(1, true); // This changes page instantly even though told otherwise. It happens when setCurrentItem() is called straight after changing adapter.
 
         new Handler().post(new Runnable() {
@@ -129,6 +131,7 @@ public class ProgramsFragment extends PageFragment {
                 pager.setCurrentItem(1, true); // This animates the page as expected. It is executed a jiffy after the adapter is changed, and probably works because the ViewPager has had time to instantiate the fragment's views.
             }
         });
+
     }
 
     public void showProgramCategory(int category, TopicInfo topic) {
