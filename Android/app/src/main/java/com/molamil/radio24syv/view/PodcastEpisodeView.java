@@ -184,6 +184,8 @@ public class PodcastEpisodeView extends LinearLayout implements
 
     @Override
     public void OnRadioLibraryStatusUpdated(int podcastId, RadioLibrary.Status status) {
+
+
         ImageView downloadedImage = (ImageView) findViewById(R.id.downloaded_image);
 
         View downloadButton = findViewById(R.id.download_button);
@@ -246,6 +248,8 @@ public class PodcastEpisodeView extends LinearLayout implements
                 downloadButtonText.setText(R.string.remove_podcast);
                 downloadButton.setOnClickListener(removeOnClick);
                 playButton.setUrl(status.getLocalPodcastUrl()); // Play local file
+
+                setPlayable(true);
 
                 //remove listener, it is no longer needed?
                 if (podcast != null) {
