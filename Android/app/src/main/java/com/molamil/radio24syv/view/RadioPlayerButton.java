@@ -363,7 +363,8 @@ public class RadioPlayerButton extends Button implements
                 boolean isPlayingMyUrl = isPlayingMyUrl(player);
                 if (adaptActionAfterPlay) {
                     if (isPlayingMyUrl) {
-                        if (RadioPlayer.isLocalUrl(player.getUrl())) {
+                        if(!player.getUrl().equalsIgnoreCase(getResources().getString(R.string.url_live_radio))) {
+                        // if (RadioPlayer.isLocalUrl(player.getUrl())) {
                             setAction(RadioPlayer.ACTION_PAUSE);
                         } else {
                             setAction(RadioPlayer.ACTION_STOP);

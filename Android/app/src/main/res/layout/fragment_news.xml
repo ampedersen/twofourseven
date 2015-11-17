@@ -60,7 +60,7 @@
                 android:background="@drawable/button_play_live"
                 app:action="play"
                 app:playIcon="@drawable/button_play_live"
-                app:stopIcon="@drawable/button_pause_live"
+                app:pauseIcon="@drawable/button_pause_live"
                 android:visibility="gone"
                 />
         </LinearLayout>
