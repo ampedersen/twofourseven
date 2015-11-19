@@ -252,7 +252,7 @@ public class RadioPlayerService extends Service implements
             // to ensure that users are aware of the running service and allow them to open an activity that can interact with the service.
 
 //            String audioInfo = null; // TODO audio info (not needed, remove it if unwanted)
-            int smallIconId = R.drawable.status_bar_play_logo; // TODO icon for player state
+            int smallIconId = R.drawable.status_bar_play_logo_white; // TODO icon for player state
 
             // Start MainActivity when notification is touched
             PendingIntent intent = PendingIntent.getActivity(getApplicationContext(), 0,
