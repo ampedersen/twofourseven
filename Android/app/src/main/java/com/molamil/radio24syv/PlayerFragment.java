@@ -8,11 +8,11 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.molamil.radio24syv.components.OnSwipeTouchListener;
 import com.molamil.radio24syv.components.TimeLine;
 import com.molamil.radio24syv.components.TimeLineSeekBar;
 import com.molamil.radio24syv.player.RadioPlayer;
@@ -21,10 +21,6 @@ import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.RadioPlayerButton;
-
-import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
-import org.joda.time.format.DateTimeFormatter;
 
 import java.lang.reflect.Field;
 import java.text.ParseException;
@@ -142,6 +138,18 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             }
         });
         updateSize(v);
+
+        v.setOnTouchListener(new OnSwipeTouchListener(getActivity()) {
+            @Override
+            public void onSwipeUp() {
+                setSize(PlayerSize.BIG);
+            }
+
+            @Override
+            public void onSwipeDown() {
+                setSize(PlayerSize.SMALL);
+            }
+        });
 
         return v;
     }
@@ -299,11 +307,15 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
                 smallPlayer.setVisibility(View.GONE);
                 expandButton.setImageResource(R.drawable.collapse_player_button);
                 targetColorId = R.color.player_background;
+
+                //Remove fling gesture
             } else {
                 bigPlayer.setVisibility(View.GONE);
                 smallPlayer.setVisibility(View.VISIBLE);
                 expandButton.setImageResource(R.drawable.expand_player_button);
                 targetColorId = R.color.radio_gray_darker;//R.color.mini_player_background;
+
+                //add fling gesture
             }
             parentView.setBackgroundColor(getResources().getColor(targetColorId));
             updatePlayer();

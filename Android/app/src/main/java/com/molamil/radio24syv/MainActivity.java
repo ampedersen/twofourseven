@@ -92,6 +92,8 @@ public class MainActivity extends FragmentActivity implements
         pager.setAdapter(new LiveTabPagerAdapter(getSupportFragmentManager())); // The pager adapter, which provides the pages to the view pager widget
         pager.setPageTransformer(false, pageTransformer);
         pager.setOverScrollMode(ViewPager.OVER_SCROLL_NEVER); // No feedback when trying to scroll but there are no next page (Android 4 blue edge tint)
+        //pager.setPageMargin(30);
+        pager.setClipToPadding (false);
 
         radioPlayer = new RadioPlayer(this);
         radioPlayer.addListener(this);
