@@ -97,7 +97,9 @@ public class ProgramImageView extends ImageView {
             if (drawable instanceof BitmapDrawable) {
                 BitmapDrawable bitmapDrawable = (BitmapDrawable) drawable;
                 Bitmap bitmap = bitmapDrawable.getBitmap();
-                bitmap.recycle();
+                if(bitmap != null) {
+                    bitmap.recycle();
+                }
             }
         }
         setImageDrawable(null);

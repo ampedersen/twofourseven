@@ -282,6 +282,10 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     }
 
     private void updateSize(final View parentView) {
+        if(getActivity() == null)
+        {
+            return;
+        }
         if (size == PlayerSize.NONE) {
             parentView.setVisibility(View.GONE);
         } else {

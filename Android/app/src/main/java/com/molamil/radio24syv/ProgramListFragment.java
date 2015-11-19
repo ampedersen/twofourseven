@@ -327,6 +327,12 @@ public class ProgramListFragment extends PageFragment {
                     if ((response.body() == null) || (response.body().size() == 0)) {
                         return;
                     }
+
+                    if(getActivity() == null)
+                    {
+                        return;
+                    }
+
                     ArrayList<ProgramInfo> popularPrograms = new ArrayList<ProgramInfo>(response.body().size());
                     for (Program program : response.body()) {
                         popularPrograms.add(new ProgramInfo(program));
@@ -334,7 +340,7 @@ public class ProgramListFragment extends PageFragment {
 
                     //TextView t = new TextView(content.getContext());
                     com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg t = new com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg(content.getContext());
-                    t.setTextColor(getResources().getColor(R.color.radio_white));
+                    t.setTextColor(getActivity().getResources().getColor(R.color.radio_white));
                     int paddingTop = DisplayUtil.dpToPx(getActivity().getApplicationContext(), (int)getResources().getDimension(R.dimen.app_margin_half25));
                     int padding = DisplayUtil.dpToPx(getActivity().getApplicationContext(), 10);
                     t.setPadding(0,paddingTop,0,padding);
