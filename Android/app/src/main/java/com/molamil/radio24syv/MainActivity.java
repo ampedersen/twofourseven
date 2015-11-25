@@ -565,10 +565,13 @@ public class MainActivity extends FragmentActivity implements
 
 
         PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
-        if (playerFragment.getSize() == PlayerFragment.PlayerSize.BIG) {
-            playerFragment.setSize(PlayerFragment.PlayerSize.SMALL); // Small player
+        if(playerFragment != null)
+        {
+            if (playerFragment.getSize() == PlayerFragment.PlayerSize.BIG) {
+                playerFragment.setSize(PlayerFragment.PlayerSize.SMALL); // Small player
+            }
+            playerFragment.updatePlayer();
         }
-        playerFragment.updatePlayer();
 
         mainFragment.setTabSize(MainFragment.TabSize.NORMAL); // Normal tab size
         mainFragment.setError(null); // Clear error message

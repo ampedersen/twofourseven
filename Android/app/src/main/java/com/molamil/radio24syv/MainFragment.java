@@ -180,6 +180,10 @@ public class MainFragment extends Fragment {
     }
 
     private void updateDimming(View parentView, boolean isAnimated) {
+        if(parentView == null)
+        {
+            return;
+        }
         View dimmer = parentView.findViewById(R.id.dimmer);
 
         long targetAlpha;
