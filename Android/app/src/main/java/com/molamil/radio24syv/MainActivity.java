@@ -618,6 +618,7 @@ public class MainActivity extends FragmentActivity implements
                         List<Broadcast> body = response.body();
                         if (body != null) {
                             Broadcast broadcast = body.get(0);
+                            //TODO: videoProgramId is sometimes null. Should use slug here instead?
                             addToPlayerHistory(broadcast.getVideoProgramId()); // Add program ID to player history
 
                             PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());

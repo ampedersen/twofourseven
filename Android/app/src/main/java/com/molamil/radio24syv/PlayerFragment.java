@@ -256,6 +256,10 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     }
 
     private void setupButton(RadioPlayer player, View parentView, int buttonId) {
+        if(parentView == null || player == null)
+        {
+            return;
+        }
         RadioPlayerButton b = (RadioPlayerButton)parentView.findViewById(buttonId);
         b.setUrl(player.getUrl());
         b.setTitle(player.getTitle());
@@ -281,6 +285,11 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     private void updateSizeSafely(final View parentView) {
         // Delay updating UI until the view's own thread. We may be called from the background thread handling radio playback, and only UI thread can touch UI stuff.
+        if(parentView == null)
+        {
+            return;
+        }
+
         parentView.post(new Runnable() {
             @Override
             public void run() {

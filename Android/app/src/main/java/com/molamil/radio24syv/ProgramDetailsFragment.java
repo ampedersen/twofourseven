@@ -191,6 +191,11 @@ public class ProgramDetailsFragment extends PageFragment implements
                     return;
                 }
 
+                if(getMainActivity() == null)
+                {
+                    return;
+                }
+
                 Program p = response.body();
 
                 ProgramImageView image = ((ProgramImageView) view.findViewById(R.id.image));

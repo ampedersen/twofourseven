@@ -46,6 +46,10 @@ public class Broadcast {
      *     The videoProgramId
      */
     public Integer getVideoProgramId() {
+        if(videoProgramId == null)
+        {
+            return -1;
+        }
         return videoProgramId;
     }
 
