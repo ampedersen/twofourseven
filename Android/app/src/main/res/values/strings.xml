@@ -17,11 +17,8 @@
     <string name="title_fragment_program_details">ProgramDetailsFragment</string>
 
     <!-- Generic -->
-
-    <string name="weekly">Ugentlig</string>
-    <string name="daily">Daglig</string>
-
     <string name="category_back_catalogue">Bagkatalog</string>
+
     <!-- Intro -->
     <string name="intro_next">Videre</string>
 

@@ -8,13 +8,6 @@ android {
 
 signingConfigs {
     release {
-        /*
-        storeFile file("keystore.jks")
-        storePassword "radio123"
-        keyAlias "Radio24syv"
-        keyPassword "radio123"
-        */
-        
         storeFile file("app.keystore")
         storePassword "dagognat"
         keyAlias "releasekey"

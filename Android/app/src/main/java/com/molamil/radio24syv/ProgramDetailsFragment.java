@@ -226,11 +226,7 @@ public class ProgramDetailsFragment extends PageFragment implements
                         }
                     }
 
-                    String frequency = p.getBroadcastInfo().getWeekly() ? "weekly" : "daily";
-                    String packageName = getMainActivity().getPackageName();
-                    int resId = getMainActivity().getResources().getIdentifier(frequency, "string", packageName);
-                    hostsAndTime +=  "\n" + p.getBroadcastInfo().getDay()+", "+p.getBroadcastInfo().getTime()+", "+getMainActivity().getResources().getString(resId);
-
+                    hostsAndTime +=  "\n" + p.getBroadcastInfo().getDay()+", "+p.getBroadcastInfo().getTime();
                 }
 
                 ((TextView) view.findViewById(R.id.info_text)).setText(hostsAndTime);
