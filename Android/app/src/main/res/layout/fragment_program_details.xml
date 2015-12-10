@@ -20,8 +20,10 @@
             >
 
             <FrameLayout
+                android:id="@+id/image_container"
                 android:layout_width="match_parent"
-                android:layout_height="100dp">
+                android:layout_height="100dp"
+                android:background="#333333">
 
                 <com.molamil.radio24syv.view.ProgramImageView
                     android:id="@+id/image"

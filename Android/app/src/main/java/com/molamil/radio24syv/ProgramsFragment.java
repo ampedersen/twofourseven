@@ -24,6 +24,7 @@ public class ProgramsFragment extends PageFragment {
     RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
     SidePageTransformer pageTransformer;
     ProgramListFragment programListFragment;
+    ProgramDetailsFragment programDetailsFragment;
 
     private boolean isKeyboardNeeded = false;
 
@@ -122,15 +123,19 @@ public class ProgramsFragment extends PageFragment {
         }
 
         pager.setAdapter(new DetailsPagerAdapter(getChildFragmentManager(), program));
+        pager.setCurrentItem(1, true); // This changes page instantly even though told otherwise. It happens when setCurrentItem() is called straight after changing adapter.
 
-        //pager.setCurrentItem(1, true); // This changes page instantly even though told otherwise. It happens when setCurrentItem() is called straight after changing adapter.
+        //Supposed to fix animation not working if changing adapter just before setCurrentItem
+        //Causing slow transition and sometimes page simply jumps back
 
+        /*
         new Handler().post(new Runnable() {
             @Override
             public void run() {
                 pager.setCurrentItem(1, true); // This animates the page as expected. It is executed a jiffy after the adapter is changed, and probably works because the ViewPager has had time to instantiate the fragment's views.
             }
         });
+        */
 
     }
 
@@ -175,6 +180,17 @@ public class ProgramsFragment extends PageFragment {
                 case 0:
                     return programListFragment;
                 case 1:
+                    /*
+                    if(programDetailsFragment == null)
+                    {
+                        programDetailsFragment = ProgramDetailsFragment.newInstance(program);
+                    }
+                    else
+                    {
+                        programDetailsFragment.setProgram(program);
+                    }
+                    return programDetailsFragment;
+                */
                     return ProgramDetailsFragment.newInstance(program);
             }
             Log.e("JJJ", "Unable to determine a fragment for page " + position + " - returning null");

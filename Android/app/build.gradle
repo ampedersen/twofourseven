@@ -1,19 +1,18 @@
 apply plugin: 'com.android.application'
 
 android {
-    signingConfigs {
-    }
+
     compileSdkVersion 22
     buildToolsVersion "21.1.2"
 
-signingConfigs {
-    release {
-        storeFile file("app.keystore")
-        storePassword "dagognat"
-        keyAlias "releasekey"
-        keyPassword "dagognat"
+    signingConfigs {
+        release {
+          storeFile file("app.keystore")
+          storePassword "dagognat"
+          keyAlias "releasekey"
+          keyPassword "dagognat"
+        }
     }
-}
 
     defaultConfig {
         applicationId "dk.radio24syv.android"
@@ -23,6 +22,10 @@ signingConfigs {
         versionName "3.0.1"
         signingConfig signingConfigs.release
     }
+
+    productFlavors {
+    }
+
     buildTypes {
         debug {
             // Hockeyapp
@@ -41,8 +44,6 @@ signingConfigs {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
-    }
-    productFlavors {
     }
 
     // Remove license files. If any of the dependencies have the same license file the build will fail...

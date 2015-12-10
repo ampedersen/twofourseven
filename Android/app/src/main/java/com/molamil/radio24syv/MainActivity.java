@@ -13,6 +13,8 @@ import android.support.v4.app.FragmentActivity;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.view.ViewPager;
+import android.telephony.PhoneStateListener;
+import android.telephony.TelephonyManager;
 import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -79,6 +81,21 @@ public class MainActivity extends FragmentActivity implements
 
     private int selectedProgramCategory;
     private TopicInfo selectedProgramTopic;
+
+    PhoneStateListener phoneStateListener = new PhoneStateListener() {
+        @Override
+        public void onCallStateChanged(int state, String incomingNumber) {
+            if (state == TelephonyManager.CALL_STATE_RINGING) {
+                Log.i("PS", "Incoming call: Pause music");
+            } else if(state == TelephonyManager.CALL_STATE_IDLE) {
+                Log.i("PS", "Not in call: Play music");
+                //Not in call: Play music
+            } else if(state == TelephonyManager.CALL_STATE_OFFHOOK) {
+                Log.i("PS", "/A call is dialing, active or on hold");
+            }
+            super.onCallStateChanged(state, incomingNumber);
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -161,7 +178,7 @@ public class MainActivity extends FragmentActivity implements
         if(mainFragment.getPlayerFragment() != null)
         {
             if(mainFragment.getPlayerFragment().getSize() == PlayerFragment.PlayerSize.BIG) {
-                //Log.i("PS", "Back click, player is expanded, close player");
+
                 mainFragment.getPlayerFragment().setSize(PlayerFragment.PlayerSize.SMALL);
                 return;
             }
@@ -171,6 +188,7 @@ public class MainActivity extends FragmentActivity implements
         if (isSidePageInteractionEnabled) {
             boolean isViewingMainPage = (pager.getCurrentItem() == mainPagePosition);
             if (isViewingMainPage) {
+                cleanupFragmentBackStack();
                 super.onBackPressed(); // Return to system
             } else {
                 pager.setCurrentItem(mainPagePosition); // Back to main page
@@ -179,6 +197,7 @@ public class MainActivity extends FragmentActivity implements
             ProgramsFragment f = (ProgramsFragment) mainFragment.getChildFragmentManager().findFragmentByTag(MainFragment.TAG_TAB_PROGRAMS);
             if (f == null) {
                 Log.d("JJJ", "OMG no programs fragment");
+                cleanupFragmentBackStack();
                 super.onBackPressed(); // Return to system
                 return;
             }
@@ -186,9 +205,21 @@ public class MainActivity extends FragmentActivity implements
             if (f.isShowingDetails()) {
                 f.showList(); // Back to list page
             } else {
+                cleanupFragmentBackStack();
                 super.onBackPressed(); // Return to system
             }
         }
+    }
+
+    private void cleanupFragmentBackStack()
+    {
+        /*
+        int count = mainFragment.getFragmentManager().getBackStackEntryCount();
+        int countChild = mainFragment.getChildFragmentManager().getBackStackEntryCount();
+        Log.i("PS", "cleanupFragmentBackStack: " + count+" / "+countChild);
+        */
+        //FragmentManager.getBackStackEntryCount()/getBackStackEntryAt().getId()
+        //FragmentManager.popBackStack(int id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
     public void onFragmentInteraction(Uri uri) {
@@ -259,7 +290,9 @@ public class MainActivity extends FragmentActivity implements
     }
 
     private void showProgramDetails(ProgramInfo program) {
-        mainFragment.tabHost.setCurrentTabByTag(MainFragment.TAG_TAB_PROGRAMS);
+
+        //Only needed if you need to go to program details form different tab than Podcasts
+        //mainFragment.tabHost.setCurrentTabByTag(MainFragment.TAG_TAB_PROGRAMS);
 
         ProgramsFragment f = (ProgramsFragment) mainFragment.getChildFragmentManager().findFragmentByTag(MainFragment.TAG_TAB_PROGRAMS);
         if (f == null) {
@@ -267,6 +300,7 @@ public class MainActivity extends FragmentActivity implements
             return;
         }
         f.showDetails(program);
+
     }
 
     @Override
@@ -327,36 +361,28 @@ public class MainActivity extends FragmentActivity implements
     public void OnProgramNotificationButtonClicked(CheckBox view, String slug)
     {
         boolean checked = view.isChecked();
-        //Log.i("PS", "Button is checked: "+checked);
 
         if (checked) {
-            //Log.i("PS", "Add notifications for "+slug);
             int alarmId = Storage.get().addProgramAlarm(slug); // Store alarm in database and get unique alarm ID that can be used to distinguish alarm notifications
             if(alarmId != Storage.ALARM_ID_UNKNOWN)
             {
-                //Log.i("PS", "Add notifications success, TODO: Load next broadcasts for this program and add alarms...");
                 UpdateProgramNotificationsForProgram(slug);
             }
             else
             {
-                //Log.i("PS", "Add notifications fail");
             }
         } else {
-            //Log.i("PS", "Remove notifications for " + slug);
             int alarmId = Storage.get().getProgramAlarmId(slug);
             if ((alarmId != Storage.ALARM_ID_UNKNOWN) && removeAlarmNotification(alarmId)) {
 
-                //Log.i("PS", "Remove notifications success");
                 // Success
                 Storage.get().removeProgramAlarm(alarmId);
                 List<Integer> idsToRemove = Storage.get().getAlarmIdsForSlug(slug);
                 for(int alarmIdToRemove : idsToRemove )
                 {
-                    //Log.i("PS", "Remove individual alarm: "+alarmIdToRemove);
                     Storage.get().removeAlarm(alarmIdToRemove);
                 }
             } else {
-                //Log.i("PS", "Remove notifications fail");
             }
         }
     }
@@ -364,7 +390,6 @@ public class MainActivity extends FragmentActivity implements
     private void UpdateProgramNotifications()
     {
         List<String> slugs = Storage.get().getAllProgramsWithAlarm();
-        //Log.i("PS", "Update program notifications for " + slugs.size() + " programs");
         for (String slug : slugs) {
             UpdateProgramNotificationsForProgram(slug);
         }
@@ -372,7 +397,6 @@ public class MainActivity extends FragmentActivity implements
 
     private void UpdateProgramNotificationsForProgram(final String slug)
     {
-        //Log.i("PS", "Update notifications for "+slug);
         RestClient.getApi().getNextBroadcasts(slug).enqueue(new Callback<List<Broadcast>>() {
             @Override
             public void onResponse(Response<List<Broadcast>> response) {
@@ -387,21 +411,17 @@ public class MainActivity extends FragmentActivity implements
                     int alarmId = Storage.get().getAlarmId(slug, broadcastTime); // Check if there is an alarm for this program and time
                     if(alarmId == Storage.ALARM_ID_UNKNOWN)
                     {
-                        //Log.i("PS", "ADD: Add alarm for "+slug+" @ "+broadcastTime);
                         String message;
                         alarmId = Storage.get().addAlarm(slug, broadcastTime); // Store alarm in database and get unique alarm ID that can be used to distinguish alarm notifications
                         if (addAlarmNotification(alarmId, programName, broadcastTime)) {
-                            //Log.i("PS", "ADD: Added alarm for "+slug+" @ "+broadcastTime);
 
 
                         } else {
-                            //Log.i("PS", "ADD: Failed to add alarm for " + slug + " @ " + broadcastTime);
                             Storage.get().removeAlarm(alarmId);
                         }
                     }
                     else
                     {
-                        //Log.i("PS", "Alarm already exists for "+slug+" @ "+broadcastTime);
                     }
                 }
 
@@ -602,6 +622,7 @@ public class MainActivity extends FragmentActivity implements
 
     @Override
     public void OnStarted(final RadioPlayer player) {
+        AddPhoneStateListener();
         // This determines the programId by looking at the player's URL. Maybe this should be used other places (and put in the RadioPlayer class) to figure out what is playing. Or maybe something else. This is very WIP.
         String url = player.getUrl();
         String liveUrlStartsWith = getString(R.string.url_live_radio);
@@ -758,11 +779,33 @@ public class MainActivity extends FragmentActivity implements
     @Override
     public void OnStopped(RadioPlayer player) {
 
+        RemovePhoneStateListener();
     }
 
     @Override
     public void OnPaused(RadioPlayer player) {
 
+    }
+
+    /*
+    PhoneStateListener stuff
+     */
+    private void AddPhoneStateListener()
+    {
+        RemovePhoneStateListener();
+        Log.i("PS", "AddPhoneStateListener");
+        TelephonyManager mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        if(mgr != null) {
+            mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
+        }
+    }
+    private void RemovePhoneStateListener()
+    {
+        Log.i("PS", "RemovePhoneStateListener");
+        TelephonyManager mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
+        if(mgr != null) {
+            mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
+        }
     }
 
     /*

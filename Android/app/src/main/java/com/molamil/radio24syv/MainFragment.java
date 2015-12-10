@@ -40,6 +40,16 @@ public class MainFragment extends Fragment {
 
     String startupTabTag = TAG_TAB_LIVE;
 
+    /*
+    @Override
+    public void onActivityCreated (Bundle savedInstanceState)
+    {
+        super.onActivityCreated(savedInstanceState);
+
+        setupPlayerFragment(savedInstanceState);
+    }
+    */
+
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
@@ -85,26 +95,7 @@ public class MainFragment extends Fragment {
 //        }
 
 
-        if (savedInstanceState != null) {
-            playerFragment = (PlayerFragment) getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
-        } else {
-            if (playerFragment == null) {
-                playerFragment = new PlayerFragment();
-            }
-        }
-
-        getChildFragmentManager().beginTransaction().replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
-
-
-        // create fragments to use
-//        if (savedInstanceState != null) {
-//            playerFragment = (PlayerFragment) getChildFragmentManager().getFragment(
-//                    savedInstanceState, PlayerFragment.class.getName());
-//        }
-//        if (playerFragment == null)
-//            playerFragment = new PlayerFragment();
-//
-//        getChildFragmentManager().beginTransaction().replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
+        setupPlayerFragment(savedInstanceState);
 
         View dimmer = v.findViewById(R.id.dimmer);
         dimmer.setOnClickListener(new View.OnClickListener() {
@@ -116,6 +107,27 @@ public class MainFragment extends Fragment {
         updateDimming(v, false);
 
         return v;
+    }
+
+    private void setupPlayerFragment(Bundle savedInstanceState)
+    {
+        if (savedInstanceState != null) {
+            playerFragment = (PlayerFragment) getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
+        } else {
+            if (playerFragment == null) {
+                playerFragment = new PlayerFragment();
+            }
+
+        }
+        //if(!playerFragment.isAdded() && getActivity() != null)
+        //{
+
+        // BUG: This is causing a crash when reopening app after it has been closed while the player is playing (podcast, not sure abt live)
+        // java.lang.IllegalStateException: Activity has been destroyed
+        getChildFragmentManager().beginTransaction().replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
+
+        //}
+
     }
 
 //    @Override
@@ -152,7 +164,6 @@ public class MainFragment extends Fragment {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
-
     }
 
     private void addTab(LayoutInflater inflater, String tag, int textId, int iconId, Class<?> fragment) {

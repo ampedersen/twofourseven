@@ -1,6 +1,7 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.graphics.Color;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.util.Log;
@@ -9,6 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.CheckBox;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.TextView;
@@ -28,6 +30,7 @@ import com.molamil.radio24syv.view.ProgramImageView;
 
 import org.joda.time.DateTime;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -45,6 +48,12 @@ public class ProgramDetailsFragment extends PageFragment implements
     private OnFragmentInteractionListener listener;
     private PodcastEpisodeView expandedView = null;
     private DateTime lastPodcastDate = null;
+
+    /*
+    public void setProgram(ProgramInfo program) {
+        this.program = program;
+    }
+    */
 
     private ProgramInfo program;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
@@ -93,6 +102,16 @@ public class ProgramDetailsFragment extends PageFragment implements
         //((TextView) v.findViewById(R.id.topic_text)).setText(program.getTopic());
         desctiptionTv = ((TextView) v.findViewById(R.id.description_text));
 
+        final Collection<TopicInfo> topics = Storage.get().getTopics();
+        FrameLayout imageContainer = (FrameLayout) v.findViewById(R.id.image_container);
+        for(TopicInfo topic : topics)
+        {
+            if(topic.getTopicId().equalsIgnoreCase(program.getTopicId()))
+            {
+                imageContainer.setBackgroundColor(Color.parseColor(topic.getColor()));
+                break;
+            }
+        }
         ProgramImageView image = ((ProgramImageView) v.findViewById(R.id.image));
         image.setImageUrl(program.getAppImageOverviewUrl());
         TopicInfo topic = Storage.get().getTopic(program.getTopicId());
@@ -146,6 +165,8 @@ public class ProgramDetailsFragment extends PageFragment implements
 
         return v;
     }
+
+
 
     private void toggleExpanded()
     {
