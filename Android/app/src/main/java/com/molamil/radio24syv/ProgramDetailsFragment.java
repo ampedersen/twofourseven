@@ -102,7 +102,7 @@ public class ProgramDetailsFragment extends PageFragment implements
         //((TextView) v.findViewById(R.id.topic_text)).setText(program.getTopic());
         desctiptionTv = ((TextView) v.findViewById(R.id.description_text));
 
-        /*
+
         final Collection<TopicInfo> topics = Storage.get().getTopics();
         FrameLayout imageContainer = (FrameLayout) v.findViewById(R.id.image_container);
         for(TopicInfo topic : topics)
@@ -113,7 +113,6 @@ public class ProgramDetailsFragment extends PageFragment implements
                 break;
             }
         }
-        */
 
         ProgramImageView image = ((ProgramImageView) v.findViewById(R.id.image));
         image.setImageUrl(program.getAppImageOverviewUrl());
