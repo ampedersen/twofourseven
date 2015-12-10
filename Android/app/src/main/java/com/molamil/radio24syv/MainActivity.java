@@ -86,12 +86,14 @@ public class MainActivity extends FragmentActivity implements
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
-                Log.i("PS", "Incoming call: Pause music");
+                //Nothing
+                //Stop player here if it is playing, this will update the interface
+                //Log.i("PS", "Incoming call: Pause music");
             } else if(state == TelephonyManager.CALL_STATE_IDLE) {
-                Log.i("PS", "Not in call: Play music");
-                //Not in call: Play music
+                //Nothing
+                //Log.i("PS", "Not in call: Play music");
             } else if(state == TelephonyManager.CALL_STATE_OFFHOOK) {
-                Log.i("PS", "/A call is dialing, active or on hold");
+                //Log.i("PS", "A call is dialing, active or on hold");
             }
             super.onCallStateChanged(state, incomingNumber);
         }
@@ -188,7 +190,6 @@ public class MainActivity extends FragmentActivity implements
         if (isSidePageInteractionEnabled) {
             boolean isViewingMainPage = (pager.getCurrentItem() == mainPagePosition);
             if (isViewingMainPage) {
-                cleanupFragmentBackStack();
                 super.onBackPressed(); // Return to system
             } else {
                 pager.setCurrentItem(mainPagePosition); // Back to main page
@@ -197,7 +198,6 @@ public class MainActivity extends FragmentActivity implements
             ProgramsFragment f = (ProgramsFragment) mainFragment.getChildFragmentManager().findFragmentByTag(MainFragment.TAG_TAB_PROGRAMS);
             if (f == null) {
                 Log.d("JJJ", "OMG no programs fragment");
-                cleanupFragmentBackStack();
                 super.onBackPressed(); // Return to system
                 return;
             }
@@ -205,21 +205,9 @@ public class MainActivity extends FragmentActivity implements
             if (f.isShowingDetails()) {
                 f.showList(); // Back to list page
             } else {
-                cleanupFragmentBackStack();
                 super.onBackPressed(); // Return to system
             }
         }
-    }
-
-    private void cleanupFragmentBackStack()
-    {
-        /*
-        int count = mainFragment.getFragmentManager().getBackStackEntryCount();
-        int countChild = mainFragment.getChildFragmentManager().getBackStackEntryCount();
-        Log.i("PS", "cleanupFragmentBackStack: " + count+" / "+countChild);
-        */
-        //FragmentManager.getBackStackEntryCount()/getBackStackEntryAt().getId()
-        //FragmentManager.popBackStack(int id, FragmentManager.POP_BACK_STACK_INCLUSIVE)
     }
 
     public void onFragmentInteraction(Uri uri) {
@@ -793,7 +781,6 @@ public class MainActivity extends FragmentActivity implements
     private void AddPhoneStateListener()
     {
         RemovePhoneStateListener();
-        Log.i("PS", "AddPhoneStateListener");
         TelephonyManager mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         if(mgr != null) {
             mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_CALL_STATE);
@@ -801,7 +788,6 @@ public class MainActivity extends FragmentActivity implements
     }
     private void RemovePhoneStateListener()
     {
-        Log.i("PS", "RemovePhoneStateListener");
         TelephonyManager mgr = (TelephonyManager) getSystemService(TELEPHONY_SERVICE);
         if(mgr != null) {
             mgr.listen(phoneStateListener, PhoneStateListener.LISTEN_NONE);
