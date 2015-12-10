@@ -89,6 +89,10 @@ public class MainActivity extends FragmentActivity implements
                 //Nothing
                 //Stop player here if it is playing, this will update the interface
                 //Log.i("PS", "Incoming call: Pause music");
+                if(radioPlayer != null)
+                {
+                    radioPlayer.stop();
+                }
             } else if(state == TelephonyManager.CALL_STATE_IDLE) {
                 //Nothing
                 //Log.i("PS", "Not in call: Play music");
