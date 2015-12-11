@@ -8,6 +8,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
@@ -342,14 +343,14 @@ public class RadioPlayerService extends Service implements
                     RemoteControlClient.PLAYSTATE_PLAYING);
 
             mRemoteControlClientCompat.setTransportControlFlags(
-                    RemoteControlClient.FLAG_KEY_MEDIA_PLAY |
+                            RemoteControlClient.FLAG_KEY_MEDIA_PLAY |
                             RemoteControlClient.FLAG_KEY_MEDIA_PAUSE |
-                            //RemoteControlClient.FLAG_KEY_MEDIA_NEXT |
                             RemoteControlClient.FLAG_KEY_MEDIA_STOP);
 
             String title = this.title;
             String album = this.programTitle; //Live/podcast/offline
             String artist = getResources().getString(R.string.app_name);
+            Bitmap artwork = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
 
             // Update the remote controls
             mRemoteControlClientCompat.editMetadata(true)
@@ -358,7 +359,7 @@ public class RadioPlayerService extends Service implements
                     .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, artist)
                     //.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, playingItem.getDuration())
                             // TODO: fetch real item artwork
-                            //.putBitmap( RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK,  mDummyAlbumArt)
+                    .putBitmap(RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK, artwork)
                     .apply();
         }
     }
