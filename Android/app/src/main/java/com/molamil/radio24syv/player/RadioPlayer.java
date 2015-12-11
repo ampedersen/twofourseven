@@ -283,13 +283,6 @@ public class RadioPlayer {
         return (url == RadioPlayer.URL_UNASSIGNED) || (!url.startsWith("http://"));
     }
 
-    //TODO: Remove
-    /*
-    public void play(String url, String title, String description) {
-        this.play(url, title, description, null, null);
-    }
-    */
-
     public void play(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId) {
         this.url = url;
         this.title = title;
@@ -476,7 +469,6 @@ public class RadioPlayer {
 
     public boolean hasPrevious()
     {
-        //Log.i("PS", "hasPrevious: program id: "+programId);
         switch (playlistType)
         {
             case PLAYLIST_NONE:
@@ -494,7 +486,6 @@ public class RadioPlayer {
 
     public boolean hasNext()
     {
-        //Log.i("PS", "hasNext: program id: "+programId);
         switch (playlistType)
         {
             case PLAYLIST_NONE:

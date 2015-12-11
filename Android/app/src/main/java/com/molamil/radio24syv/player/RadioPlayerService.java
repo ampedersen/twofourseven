@@ -3,6 +3,7 @@ package com.molamil.radio24syv.player;
 import android.app.Notification;
 import android.app.PendingIntent;
 import android.app.Service;
+import android.content.ComponentName;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -10,6 +11,7 @@ import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.RemoteControlClient;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -22,12 +24,18 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.example.android.musicplayer.MediaButtonHelper;
+import com.example.android.musicplayer.RemoteControlClientCompat;
+import com.example.android.musicplayer.RemoteControlHelper;
 import com.molamil.radio24syv.MainActivity;
 import com.molamil.radio24syv.R;
 import com.molamil.radio24syv.api.model.Podcast;
+import com.molamil.radio24syv.receiver.AudioNoisyReceiver;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
+
+import android.media.MediaMetadataRetriever;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -69,16 +77,30 @@ public class RadioPlayerService extends Service implements
     private PlayUrlTask task = null;
     private WifiManager.WifiLock wifiLock; // Used to keep wifi running while streaming
 
+
+    // The component name of MusicIntentReceiver, for use with media button and remote control
+    // APIs
+    ComponentName mMediaButtonReceiverComponent;
+
+    // our RemoteControlClient object, which will use remote control APIs available in
+    // SDK level >= 14, if they're available.
+    RemoteControlClientCompat mRemoteControlClientCompat;
+
     @Override
     public void onCreate() {
         // The service is being created
         // TODO start as foreground + notifications on lock screen
         wifiLock = ((WifiManager) getSystemService(Context.WIFI_SERVICE)).createWifiLock(WifiManager.WIFI_MODE_FULL, "playerLock");
         wifiLock.setReferenceCounted(false); // For convenience, do not keep track of how many times the lock has been required. Release it when release() is called no matter what.
+
+
+        mMediaButtonReceiverComponent = new ComponentName(this, AudioNoisyReceiver.class);
     }
 
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
+        String action = intent.getAction();
+        Log.i("PS", "onStartCommand, action: "+action);
         // The service is starting, due to a call to startService()
         return Service.START_REDELIVER_INTENT; // If the system kills the service after onStartCommand() returns, recreate the service and call onStartCommand() with the last intent that was delivered to the service
     }
@@ -215,6 +237,7 @@ public class RadioPlayerService extends Service implements
 
         updateWifiLock();
         updateRunInForeground();
+        updateLockScreenControls();
     }
 
     private boolean isActionAllowed(int newAction) {
@@ -288,6 +311,55 @@ public class RadioPlayerService extends Service implements
         } else {
             Log.d("JJJ", "Run in background " + RadioPlayer.getActionName(action));
             stopForeground(true); // TODO keep notification if paused?
+        }
+    }
+
+    private void updateLockScreenControls()
+    {
+        if (action == RadioPlayer.ACTION_PLAY) {
+
+            Log.i("PS", "updateLockScreenControls");
+            AudioManager mAudioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
+            // Use the media button APIs (if available) to register ourselves for media button
+            // events
+
+            MediaButtonHelper.registerMediaButtonEventReceiverCompat(
+                    mAudioManager, mMediaButtonReceiverComponent);
+
+            // Use the remote control APIs (if available) to set the playback state
+
+            if (mRemoteControlClientCompat == null) {
+                Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+                intent.setComponent(mMediaButtonReceiverComponent);
+                mRemoteControlClientCompat = new RemoteControlClientCompat(
+                        PendingIntent.getBroadcast(this /*context*/,
+                                0 /*requestCode, ignored*/, intent /*intent*/, 0 /*flags*/));
+                RemoteControlHelper.registerRemoteControlClient(mAudioManager,
+                        mRemoteControlClientCompat);
+            }
+
+            mRemoteControlClientCompat.setPlaybackState(
+                    RemoteControlClient.PLAYSTATE_PLAYING);
+
+            mRemoteControlClientCompat.setTransportControlFlags(
+                    RemoteControlClient.FLAG_KEY_MEDIA_PLAY |
+                            RemoteControlClient.FLAG_KEY_MEDIA_PAUSE |
+                            //RemoteControlClient.FLAG_KEY_MEDIA_NEXT |
+                            RemoteControlClient.FLAG_KEY_MEDIA_STOP);
+
+            String title = this.title;
+            String album = this.programTitle; //Live/podcast/offline
+            String artist = getResources().getString(R.string.app_name);
+
+            // Update the remote controls
+            mRemoteControlClientCompat.editMetadata(true)
+                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artist)
+                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, album)
+                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, artist)
+                    //.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, playingItem.getDuration())
+                            // TODO: fetch real item artwork
+                            //.putBitmap( RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK,  mDummyAlbumArt)
+                    .apply();
         }
     }
 

@@ -4,6 +4,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import android.view.KeyEvent;
 
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.player.RadioPlayerService;
@@ -22,6 +23,37 @@ public class AudioNoisyReceiver extends BroadcastReceiver {
                 player.setAction(player.getUrl(), player.getTitle(), player.getDescription(), player.getProgramTitle(), player.getTopic(), player.getStartTime(), player.getEndTime(), RadioPlayer.ACTION_PAUSE);
             } else {
                 Log.d("JJJ", "Unable to pause playback because the service is not started (null)");
+            }
+        }
+
+        //Remote control
+        else if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
+            Log.i("PS", "Intent.ACTION_MEDIA_BUTTON received");
+            KeyEvent keyEvent = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
+            if (keyEvent.getAction() != KeyEvent.ACTION_DOWN)
+                return;
+
+            Log.i("PS", "(keyEvent.getKeyCode(): "+keyEvent.getKeyCode());
+            switch (keyEvent.getKeyCode()) {
+                case KeyEvent.KEYCODE_HEADSETHOOK:
+                case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
+                    //context.startService(new Intent(MusicService.ACTION_TOGGLE_PLAYBACK));
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PLAY:
+                    //context.startService(new Intent(MusicService.ACTION_PLAY));
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PAUSE:
+                    //context.startService(new Intent(MusicService.ACTION_PAUSE));
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_STOP:
+                    //context.startService(new Intent(MusicService.ACTION_STOP));
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_NEXT:
+                    //context.startService(new Intent(MusicService.ACTION_SKIP));
+                    break;
+                case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
+                    //context.startService(new Intent(MusicService.ACTION_REWIND));
+                    break;
             }
         }
     }
