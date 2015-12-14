@@ -20,7 +20,7 @@ public class AudioNoisyReceiver extends BroadcastReceiver {
             if (binder != null) {
                 Log.d("JJJ", "Pausing playback");
                 RadioPlayerService player = binder.getService();
-                player.setAction(player.getUrl(), player.getTitle(), player.getDescription(), player.getProgramTitle(), player.getTopic(), player.getStartTime(), player.getEndTime(), RadioPlayer.ACTION_PAUSE);
+                player.setAction(player.getUrl(), player.getTitle(), player.getDescription(), player.getProgramTitle(), player.getTopic(), player.getStartTime(), player.getEndTime(), player.getProgramId(), RadioPlayer.ACTION_PAUSE);
             } else {
                 Log.d("JJJ", "Unable to pause playback because the service is not started (null)");
             }
@@ -47,16 +47,12 @@ public class AudioNoisyReceiver extends BroadcastReceiver {
                 case KeyEvent.KEYCODE_MEDIA_STOP:
                     context.startService(new Intent(RadioPlayerService.ACTION_STOP));
                     break;
-                /*
                 case KeyEvent.KEYCODE_MEDIA_NEXT:
-                    Log.i("PS", "Next");
-                    //context.startService(new Intent(MusicService.ACTION_SKIP));
+                    context.startService(new Intent(RadioPlayerService.ACTION_NEXT));
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PREVIOUS:
-                    Log.i("PS", "Prev");
-                    //context.startService(new Intent(MusicService.ACTION_REWIND));
+                    context.startService(new Intent(RadioPlayerService.ACTION_PREVIOUS));
                     break;
-                */
             }
         }
     }

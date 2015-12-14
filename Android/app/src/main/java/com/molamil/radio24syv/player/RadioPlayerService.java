@@ -41,6 +41,7 @@ import android.media.MediaMetadataRetriever;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 /**
  * Encapsulates MediaPlayer and makes it possible to keep playing audio even when app is sent to background.
@@ -63,6 +64,8 @@ public class RadioPlayerService extends Service implements
     public static final String ACTION_PLAY = "dk.radio24syv.android.action.PLAY";
     public static final String ACTION_PAUSE = "dk.radio24syv.android.action.PAUSE";
     public static final String ACTION_STOP = "dk.radio24syv.android.action.STOP";
+    public static final String ACTION_PREVIOUS = "dk.radio24syv.android.action.PREVIOUS";
+    public static final String ACTION_NEXT = "dk.radio24syv.android.action.NEXT";
 
     /*
     public static final String ACTION_SKIP = "dk.radio24syv.android.action.SKIP";
@@ -87,6 +90,7 @@ public class RadioPlayerService extends Service implements
     private String topic;
     private String startTime;
     private String endTime;
+    private int programId;
 
     private MediaPlayer player;
     private int action = RadioPlayer.ACTION_STOP;
@@ -127,27 +131,46 @@ public class RadioPlayerService extends Service implements
                 if(getAction() == RadioPlayer.ACTION_PLAY)
                 {
                     //TODO: PAUSE OR STOP
-                    setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
                 }
                 else
                 {
-                    setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_PLAY);
+                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PLAY);
                 }
             }
             else if (action.equals(ACTION_PLAY))
             {
-                Log.i("PS", "RadioPlayerService intent play");
-                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_PLAY);
+                setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PLAY);
             }
             else if (action.equals(ACTION_PAUSE))
             {
-                Log.i("PS", "RadioPlayerService intent pause");
-                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_PAUSE);
+                setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PAUSE);
             }
             else if (action.equals(ACTION_STOP))
             {
-                Log.i("PS", "RadioPlayerService intent stop");
-                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
+            }
+            else if (action.equals(ACTION_PREVIOUS))
+            {
+                //Currently this is handled by RadioPlayer, not service...
+                PodcastInfo info = getPrevious();
+                Log.i("PS", "Previous: "+info);
+                if(info != null)
+                {
+                    //TODO: Correct start and endtimes
+                    setAction(info.getAudioUrl(), info.getTitle(), info.getDescription(), programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PLAY);
+                }
+            }
+            else if (action.equals(ACTION_NEXT))
+            {
+                //Currently this is handled by RadioPlayer, not service...
+                PodcastInfo info = getNext();
+                Log.i("PS", "Next: "+info);
+                if(info != null)
+                {
+                    //TODO: Correct start and endtimes
+                    setAction(info.getAudioUrl(), info.getTitle(), info.getDescription(), programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PLAY);
+                }
             }
         }
 
@@ -201,7 +224,7 @@ public class RadioPlayerService extends Service implements
                 return true; // Return true, internet is happy
             } else {
                 Log.d("JJJ", "Unable to play " + url + " because internet connection is down");
-                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
                 return false; // Return false, internet is not happy
             }
         }
@@ -211,7 +234,7 @@ public class RadioPlayerService extends Service implements
     {
         return action;
     }
-    public void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int newAction) {
+    public void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int programId, int newAction) {
         Log.d("JJJ", "service setAction " + RadioPlayer.getActionName(newAction) + " (was " + RadioPlayer.getActionName(action) + ") + audioId " + (player == null ? "NULL" : player.getAudioSessionId()));
 
         if (!isActionAllowed(newAction)) {
@@ -450,9 +473,9 @@ public class RadioPlayerService extends Service implements
         return startTime;
     }
 
-    public String getEndTime() {
-        return endTime;
-    }
+    public String getEndTime() { return endTime; }
+
+    public int getProgramId() { return programId; }
 
     public float getProgress()
     {
@@ -530,7 +553,7 @@ public class RadioPlayerService extends Service implements
                 Log.d("JJJ", "Audio focus gained");
                 // Resume playback
                 if (action == RadioPlayer.ACTION_PAUSE) {
-                    setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_PLAY);
+                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PLAY);
                 }
                 if (player != null) {
                     player.setVolume(1, 1);
@@ -541,16 +564,16 @@ public class RadioPlayerService extends Service implements
                 Log.d("JJJ", "Audio focus lost");
                 // Lost focus for an unbounded amount of time
                 if (action == RadioPlayer.ACTION_PLAY) {
-                    setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_PAUSE);
+                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PAUSE);
                 } else {
-                    setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
                 }
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
                 Log.d("JJJ", "Audio focus lost temporarily");
                 // Lost focus for a short time, but we have to stop playback. Playback is likely to resume.
-                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_PAUSE);
+                setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PAUSE);
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
@@ -581,7 +604,7 @@ public class RadioPlayerService extends Service implements
         protected Void doInBackground(String... arguments) {
             if ((arguments == null) || (arguments.length != 3) || (arguments[ARGUMENT_URL] == null)) {
                 Log.e("JJJ", "Unable to play URL because it is empty " + url);
-                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
                 return null; // Return, no url to play
             }
             //Log.d("JJJ", "url " + arguments[ARGUMENT_URL]);
@@ -600,7 +623,7 @@ public class RadioPlayerService extends Service implements
             } catch (MalformedURLException e) {
                 Log.d("JJJ", "Unable play URL because it is not valid " + url);
                 e.printStackTrace();
-                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
                 return null; // Return, bad URL
             }
 
@@ -613,7 +636,7 @@ public class RadioPlayerService extends Service implements
                     @Override
                     public void onCompletion(MediaPlayer mp) {
                         Log.d("JJJ", "Playback completed " + url);
-                        setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                        setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
                     }
                 });
             } else {
@@ -628,7 +651,7 @@ public class RadioPlayerService extends Service implements
             } catch (IOException e) {
                 Log.e("JJJ", "Unable to play URL because of data source error " + url);
                 e.printStackTrace();
-                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
                 return null; // Return, data source error
             }
 
@@ -641,12 +664,12 @@ public class RadioPlayerService extends Service implements
                 } catch (IOException e) {
                     Log.e("JJJ", "Unable to play URL because of some playback error " + url);
                     e.printStackTrace();
-                    setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
                     return null; // Return, playback error
                 } catch (IllegalStateException e) {
                     Log.e("JJJ", "Unable to play URL because player is in an unexpected state (maybe headphones got unplugged while buffering?) " + url);
                     e.printStackTrace();
-                    setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
                     return null; // Return, playback error
                 }
             }
@@ -674,5 +697,56 @@ public class RadioPlayerService extends Service implements
             // Return this instance of RadioPlayerService so clients can call public methods
             return RadioPlayerService.this;
         }
+    }
+
+
+    /**
+     * Duplicate implementation. Also exists in RadioPlayer. TODO: Cleanup
+     */
+
+    public List<PodcastInfo> getPlayList()
+    {
+        return Storage.get().getPodcasts(programId);
+    }
+
+    private PodcastInfo getNext()
+    {
+        List<PodcastInfo> playlist = getPlayList();
+        if(playlist == null)
+        {
+            return null;
+        }
+
+        int i=0;
+        for(PodcastInfo p: playlist)
+        {
+            if(i<playlist.size()-2 && getUrl().toLowerCase().contains(p.getAudioUrl().toLowerCase()))
+            {
+                return playlist.get(i+1);
+            }
+            i++;
+        }
+        return null;
+    }
+
+    private PodcastInfo getPrevious()
+    {
+        List<PodcastInfo> playlist = getPlayList();
+        if(playlist == null)
+        {
+            return null;
+        }
+
+        int i=0;
+        for(PodcastInfo p: playlist)
+        {
+            //if(p.getAudioUrl() == getUrl() && i>0)
+            if(i>0 && getUrl().toLowerCase().contains(p.getAudioUrl().toLowerCase()))
+            {
+                return playlist.get(i-1);
+            }
+            i++;
+        }
+        return null;
     }
 }

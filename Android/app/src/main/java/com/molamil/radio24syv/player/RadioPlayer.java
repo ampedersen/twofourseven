@@ -75,6 +75,7 @@ public class RadioPlayer {
     private String startTime = null;
     private String endTime = null;
     private int playlistType = PLAYLIST_NONE;
+
     private int programId = -1;
     private Context context;
     private RadioPlayerService service = null;
@@ -90,9 +91,6 @@ public class RadioPlayer {
     private String pendingEndTime = null;
     private int pendingPlaylistType = PLAYLIST_NONE;
     private int pendingProgramId = -1;
-
-    //PS. Quick and dirty playlist for next / prev buttons.
-    //private List<PodcastInfo> playList = null;
 
     public RadioPlayer(Context context) {
         Log.d("JJJ", "Create RadioPlayer - starting radio service");
@@ -166,6 +164,15 @@ public class RadioPlayer {
             return service.getTopic();
         } else {
             return null;
+        }
+    }
+
+    public int getProgramId()
+    {
+        if (isBoundToService) {
+            return service.getProgramId();
+        } else {
+            return -1;
         }
     }
 
@@ -305,19 +312,21 @@ public class RadioPlayer {
         setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_PAUSE);
     }
 
+    //Hacked. TODO: Implement in service?
     public void next() {
-        //Hacked. Implement in service?
         PodcastInfo next = getNext();
         if(next == null)
         {
             return;
         }
 
+        String nextUrl = next.getAudioUrl();
+        if(!nextUrl.startsWith("https://") && !nextUrl.startsWith("http://") && !nextUrl.startsWith("file://"))
+        {
+            nextUrl = context.getString(R.string.url_offline_radio) + nextUrl;
+        }
         //TODO: Update times
-        play(next.getAudioUrl(), next.getTitle(), next.getDescription(), programTitle, topic, startTime, endTime, playlistType, programId);
-
-        //OBSOLETE
-        //setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_NEXT);
+        play(nextUrl, next.getTitle(), next.getDescription(), programTitle, topic, startTime, endTime, playlistType, programId);
     }
 
     public void previous() {
@@ -328,11 +337,14 @@ public class RadioPlayer {
             return;
         }
 
-        //TODO: Update times
-        play(previous.getAudioUrl(), previous.getTitle(), previous.getDescription(), programTitle, topic, startTime, endTime, playlistType, programId);
+        String previousUrl = previous.getAudioUrl();
+        if(!previousUrl.startsWith("https://") && !previousUrl.startsWith("http://") && !previousUrl.startsWith("file://"))
+        {
+            previousUrl = context.getString(R.string.url_offline_radio) + previousUrl;
+        }
 
-        //OBSOLETE
-        //setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_PREVIOUS);
+        //TODO: Update times
+        play(previousUrl, previous.getTitle(), previous.getDescription(), programTitle, topic, startTime, endTime, playlistType, programId);
     }
 
     private void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId, int action) {
@@ -361,7 +373,7 @@ public class RadioPlayer {
                 audioTitle = audioDescription; // TODO download program info
             }
             */
-            service.setAction(url, title, description, programTitle, topic, startTime, endTime, action);
+            service.setAction(url, title, description, programTitle, topic, startTime, endTime, programId, action);
             clearPendingAction(); // We got hole through to the service, clear pending action
         } else {
             Log.d("JJJ", "Unable to set action for service because service is not bound - will set the action when it getInstance bound");

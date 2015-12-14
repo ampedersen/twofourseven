@@ -49,6 +49,8 @@
                 <action android:name="dk.radio24syv.android.action.PLAY" />
                 <action android:name="dk.radio24syv.android.action.PAUSE" />
                 <action android:name="dk.radio24syv.android.action.STOP" />
+                <action android:name="dk.radio24syv.android.action.PREVIOUS" />
+                <action android:name="dk.radio24syv.android.action.NEXT" />
             </intent-filter>
 
         </service>
