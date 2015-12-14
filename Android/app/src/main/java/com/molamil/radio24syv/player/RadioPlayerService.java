@@ -154,7 +154,6 @@ public class RadioPlayerService extends Service implements
             {
                 //Currently this is handled by RadioPlayer, not service...
                 PodcastInfo info = getPrevious();
-                Log.i("PS", "Previous: "+info);
                 if(info != null)
                 {
                     //TODO: Correct start and endtimes
@@ -165,7 +164,6 @@ public class RadioPlayerService extends Service implements
             {
                 //Currently this is handled by RadioPlayer, not service...
                 PodcastInfo info = getNext();
-                Log.i("PS", "Next: "+info);
                 if(info != null)
                 {
                     //TODO: Correct start and endtimes
@@ -391,7 +389,6 @@ public class RadioPlayerService extends Service implements
     {
         if (action == RadioPlayer.ACTION_PLAY) {
 
-            Log.i("PS", "updateLockScreenControls");
             AudioManager mAudioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
             // Use the media button APIs (if available) to register ourselves for media button
             // events
@@ -411,11 +408,8 @@ public class RadioPlayerService extends Service implements
                         mRemoteControlClientCompat);
             }
 
-            mRemoteControlClientCompat.setPlaybackState(
-                    RemoteControlClient.PLAYSTATE_PLAYING);
-
             mRemoteControlClientCompat.setTransportControlFlags(
-                            RemoteControlClient.FLAG_KEY_MEDIA_PLAY |
+                    RemoteControlClient.FLAG_KEY_MEDIA_PLAY |
                             RemoteControlClient.FLAG_KEY_MEDIA_PAUSE |
                             RemoteControlClient.FLAG_KEY_MEDIA_STOP);
 
@@ -704,6 +698,7 @@ public class RadioPlayerService extends Service implements
      * Duplicate implementation. Also exists in RadioPlayer. TODO: Cleanup
      */
 
+    //Not working from lock screen,
     public List<PodcastInfo> getPlayList()
     {
         return Storage.get().getPodcasts(programId);
