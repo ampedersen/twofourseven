@@ -44,14 +44,11 @@
             android:enabled="true"
             android:exported="false" >
 
-            <!-- PS -->
             <intent-filter>
-                <action android:name="com.example.android.musicplayer.action.TOGGLE_PLAYBACK" />
-                <action android:name="com.example.android.musicplayer.action.PLAY" />
-                <action android:name="com.example.android.musicplayer.action.PAUSE" />
-                <!-- <action android:name="com.example.android.musicplayer.action.SKIP" /> -->
-                <!-- <action android:name="com.example.android.musicplayer.action.REWIND" /> -->
-                <action android:name="com.example.android.musicplayer.action.STOP" />
+                <action android:name="dk.radio24syv.android.action.TOGGLE_PLAYBACK" />
+                <action android:name="dk.radio24syv.android.action.PLAY" />
+                <action android:name="dk.radio24syv.android.action.PAUSE" />
+                <action android:name="dk.radio24syv.android.action.STOP" />
             </intent-filter>
 
         </service>

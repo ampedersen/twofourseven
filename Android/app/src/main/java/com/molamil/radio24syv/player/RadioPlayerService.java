@@ -55,6 +55,21 @@ public class RadioPlayerService extends Service implements
 //        MediaPlayer.OnSeekCompleteListener,
         AudioManager.OnAudioFocusChangeListener {
 
+    // These are the Intent actions that we are prepared to handle. Notice that the fact these
+    // constants exist in our class is a mere convenience: what really defines the actions our
+    // service can handle are the <action> tags in the <intent-filters> tag for our service in
+    // AndroidManifest.xml.
+    public static final String ACTION_TOGGLE_PLAYBACK = "dk.radio24syv.android.action.TOGGLE_PLAYBACK";
+    public static final String ACTION_PLAY = "dk.radio24syv.android.action.PLAY";
+    public static final String ACTION_PAUSE = "dk.radio24syv.android.action.PAUSE";
+    public static final String ACTION_STOP = "dk.radio24syv.android.action.STOP";
+
+    /*
+    public static final String ACTION_SKIP = "dk.radio24syv.android.action.SKIP";
+    public static final String ACTION_REWIND = "dk.radio24syv.android.action.REWIND";
+    public static final String ACTION_URL = "dk.radio24syv.android.action.URL";
+    */
+
     // Broadcast IDs used when sending messages to connected clients
     public final static String BROADCAST_ID = "RadioPlayerServiceEvent";
     public final static String BROADCAST_STATE = "State";
@@ -101,7 +116,41 @@ public class RadioPlayerService extends Service implements
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
-        Log.i("PS", "onStartCommand, action: "+action);
+
+        Log.i("PS", "RadioPlayerService onStartCommand, action: "+action+ ", flags: "+flags+", startId: "+startId);
+
+        if(action != null)
+        {
+            if (action.equals(ACTION_TOGGLE_PLAYBACK))
+            {
+                Log.i("PS", "RadioPlayerService intent toggle");
+                if(getAction() == RadioPlayer.ACTION_PLAY)
+                {
+                    //TODO: PAUSE OR STOP
+                    setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+                }
+                else
+                {
+                    setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_PLAY);
+                }
+            }
+            else if (action.equals(ACTION_PLAY))
+            {
+                Log.i("PS", "RadioPlayerService intent play");
+                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_PLAY);
+            }
+            else if (action.equals(ACTION_PAUSE))
+            {
+                Log.i("PS", "RadioPlayerService intent pause");
+                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_PAUSE);
+            }
+            else if (action.equals(ACTION_STOP))
+            {
+                Log.i("PS", "RadioPlayerService intent stop");
+                setAction(url, title, description, programTitle, topic, startTime, endTime, RadioPlayer.ACTION_STOP);
+            }
+        }
+
         // The service is starting, due to a call to startService()
         return Service.START_REDELIVER_INTENT; // If the system kills the service after onStartCommand() returns, recreate the service and call onStartCommand() with the last intent that was delivered to the service
     }
@@ -356,11 +405,24 @@ public class RadioPlayerService extends Service implements
             mRemoteControlClientCompat.editMetadata(true)
                     .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artist)
                     .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, album)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, artist)
-                    //.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, playingItem.getDuration())
-                            // TODO: fetch real item artwork
+                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, title)
+                    //.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, playingItem.getDuration())//Add duration for podcasts?
                     .putBitmap(RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK, artwork)
                     .apply();
+        }
+        else if (action == RadioPlayer.ACTION_PAUSE)
+        {
+            if (mRemoteControlClientCompat != null) {
+                mRemoteControlClientCompat
+                        .setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
+            }
+        }
+        else if (action == RadioPlayer.ACTION_STOP)
+        {
+            if (mRemoteControlClientCompat != null) {
+                mRemoteControlClientCompat
+                        .setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
+            }
         }
     }
 

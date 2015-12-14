@@ -36,21 +36,18 @@ public class AudioNoisyReceiver extends BroadcastReceiver {
             switch (keyEvent.getKeyCode()) {
                 case KeyEvent.KEYCODE_HEADSETHOOK:
                 case KeyEvent.KEYCODE_MEDIA_PLAY_PAUSE:
-                    Log.i("PS", "Toggle");
-                    //context.startService(new Intent(MusicService.ACTION_TOGGLE_PLAYBACK));
+                    context.startService(new Intent(RadioPlayerService.ACTION_TOGGLE_PLAYBACK));
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PLAY:
-                    Log.i("PS", "Play");
-                    //context.startService(new Intent(MusicService.ACTION_PLAY));
+                    context.startService(new Intent(RadioPlayerService.ACTION_PLAY));
                     break;
                 case KeyEvent.KEYCODE_MEDIA_PAUSE:
-                    Log.i("PS", "Pause");
-                    //context.startService(new Intent(MusicService.ACTION_PAUSE));
+                    context.startService(new Intent(RadioPlayerService.ACTION_PAUSE));
                     break;
                 case KeyEvent.KEYCODE_MEDIA_STOP:
-                    Log.i("PS", "Stop");
-                    //context.startService(new Intent(MusicService.ACTION_STOP));
+                    context.startService(new Intent(RadioPlayerService.ACTION_STOP));
                     break;
+                /*
                 case KeyEvent.KEYCODE_MEDIA_NEXT:
                     Log.i("PS", "Next");
                     //context.startService(new Intent(MusicService.ACTION_SKIP));
@@ -59,6 +56,7 @@ public class AudioNoisyReceiver extends BroadcastReceiver {
                     Log.i("PS", "Prev");
                     //context.startService(new Intent(MusicService.ACTION_REWIND));
                     break;
+                */
             }
         }
     }
