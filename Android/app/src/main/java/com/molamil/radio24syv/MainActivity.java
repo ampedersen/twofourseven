@@ -86,18 +86,14 @@ public class MainActivity extends FragmentActivity implements
         @Override
         public void onCallStateChanged(int state, String incomingNumber) {
             if (state == TelephonyManager.CALL_STATE_RINGING) {
-                //Nothing
-                //Stop player here if it is playing, this will update the interface
-                //Log.i("PS", "Incoming call: Pause music");
                 if(radioPlayer != null)
                 {
                     radioPlayer.stop();
                 }
             } else if(state == TelephonyManager.CALL_STATE_IDLE) {
-                //Nothing
-                //Log.i("PS", "Not in call: Play music");
+
             } else if(state == TelephonyManager.CALL_STATE_OFFHOOK) {
-                //Log.i("PS", "A call is dialing, active or on hold");
+
             }
             super.onCallStateChanged(state, incomingNumber);
         }

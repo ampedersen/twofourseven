@@ -28,7 +28,6 @@ public class AudioNoisyReceiver extends BroadcastReceiver {
 
         //Remote control
         else if (intent.getAction().equals(Intent.ACTION_MEDIA_BUTTON)) {
-            Log.i("PS", "Intent.ACTION_MEDIA_BUTTON received");
             KeyEvent keyEvent = (KeyEvent) intent.getExtras().get(Intent.EXTRA_KEY_EVENT);
             if (keyEvent.getAction() != KeyEvent.ACTION_DOWN)
                 return;

@@ -121,13 +121,10 @@ public class RadioPlayerService extends Service implements
     public int onStartCommand(Intent intent, int flags, int startId) {
         String action = intent.getAction();
 
-        Log.i("PS", "RadioPlayerService onStartCommand, action: "+action+ ", flags: "+flags+", startId: "+startId);
-
         if(action != null)
         {
             if (action.equals(ACTION_TOGGLE_PLAYBACK))
             {
-                Log.i("PS", "RadioPlayerService intent toggle");
                 if(getAction() == RadioPlayer.ACTION_PLAY)
                 {
                     //TODO: PAUSE OR STOP
