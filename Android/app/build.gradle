@@ -1,6 +1,16 @@
 apply plugin: 'com.android.application'
 
+String APK_NAME = "Radio24syv"
+
 android {
+
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.outputFile = new File(
+                    output.outputFile.parent,
+                    output.outputFile.name.replace(".apk", "-${variant.versionName}-${variant.versionCode}.apk"))
+        }
+    }
 
     compileSdkVersion 22
     buildToolsVersion "21.1.2"
@@ -18,7 +28,7 @@ android {
         applicationId "dk.radio24syv.android"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 200
+        versionCode 207
         versionName "3.0.1"
         signingConfig signingConfigs.release
     }

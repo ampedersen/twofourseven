@@ -11,6 +11,12 @@ import android.util.Log;
  */
 public class NetworkChangeReceiver extends BroadcastReceiver
 {
+    /*
+    public static final String WIFI_AVAILABLE_AND_CONNECTED = "wifi_state_available_and_connected";
+    public static final String MOBILE_AVAILABLE_AND_CONNECTED = "mobile_state_available_and_connected";
+    public static final String UNKNOWN = "availability_and_connection_unknown";
+    */
+
     @Override
     public void onReceive(Context context, Intent intent)
     {
@@ -18,17 +24,20 @@ public class NetworkChangeReceiver extends BroadcastReceiver
         final android.net.NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         final android.net.NetworkInfo mobile =  connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
-        //Context.getSystemService(Context.CONNECTIVITY_SERVICE).isActiveNetworkMetered()
         Log.i("PS", "NetworkChangeReceiver...");
         Log.i("PS", "NetworkChangeReceiver, wifi: "+wifi.isAvailable()+", "+wifi.getState());
         Log.i("PS", "NetworkChangeReceiver, mobile: "+mobile.isAvailable()+", "+mobile.getState());
 
-        /*
-        if (wifi.isAvailable()) {
-            //Do something
-            if (mobile.isAvailable()) {
-                //Do something else
-            }
-            */
+        /**
+         * CASES TO HANDLE:
+         *
+         * No connection -> wifi
+         * No connection -> mobile
+         * mobile -> wifi
+         * wifi -> mobile
+         *
+         * when currently no connection we just wait...
+         *
+         */
     }
 }
