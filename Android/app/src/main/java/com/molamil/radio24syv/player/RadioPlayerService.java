@@ -723,24 +723,6 @@ public class RadioPlayerService extends Service implements
 
     MediaSessionCompat mSession;
 
-    private void updateMediaSessionMetaData()
-    {
-        String title = this.title;
-        String album = this.description;//this.programTitle; //Live/podcast/offline
-        //String artist = getResources().getString(R.string.app_name);
-        Bitmap artwork = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-
-        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
-        //builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
-        builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album);
-        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
-        builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 5000); //DEV
-        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, artwork);
-
-        mSession.setMetadata(builder.build());
-
-    }
-
     private void updateLockScreenControls()
     {
         AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -753,6 +735,9 @@ public class RadioPlayerService extends Service implements
         ComponentName mRemoteControlResponder = new ComponentName(getPackageName(), RemoteControlReceiver.class.getName());
         final Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
         mediaButtonIntent.setComponent(mRemoteControlResponder);
+
+        //Log.i("PS", "getApplication(): " + getApplication());
+        //Log.i("PS", "mRemoteControlResponder: "+mRemoteControlResponder);
 
         mSession = new MediaSessionCompat(getApplication(), "Radio24syv", mRemoteControlResponder, null);
         mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
@@ -778,6 +763,24 @@ public class RadioPlayerService extends Service implements
 
         //TODO: Purpose?
        // mTransportController = mSession.getController().getTransportControls();
+
+    }
+
+    private void updateMediaSessionMetaData()
+    {
+        String title = this.title;
+        String album = this.description;//this.programTitle; //Live/podcast/offline
+        //String artist = getResources().getString(R.string.app_name);
+        Bitmap artwork = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        //builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
+        builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 5000); //DEV
+        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, artwork);
+
+        mSession.setMetadata(builder.build());
 
     }
 

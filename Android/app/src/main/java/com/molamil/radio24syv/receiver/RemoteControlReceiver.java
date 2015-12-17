@@ -14,13 +14,17 @@ public class RemoteControlReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
+
             Log.d("PS", "Headphones unplugged");
+
             Intent i = new Intent(context, RadioPlayerService.class);
             RadioPlayerService.RadioPlayerServiceBinder binder = (RadioPlayerService.RadioPlayerServiceBinder) peekService(context, i);
             if (binder != null) {
                 Log.d("PS", "Pausing playback");
                 RadioPlayerService player = binder.getService();
-                player.setAction(player.getUrl(), player.getTitle(), player.getDescription(), player.getProgramTitle(), player.getTopic(), player.getStartTime(), player.getEndTime(), player.getProgramId(), RadioPlayer.ACTION_PAUSE);
+                //TODO: Choose stop or pause...
+                player.setAction(player.getUrl(), player.getTitle(), player.getDescription(), player.getProgramTitle(), player.getTopic(), player.getStartTime(), player.getEndTime(), player.getProgramId(), RadioPlayer.ACTION_STOP);
+                //player.setAction(player.getUrl(), player.getTitle(), player.getDescription(), player.getProgramTitle(), player.getTopic(), player.getStartTime(), player.getEndTime(), player.getProgramId(), RadioPlayer.ACTION_PAUSE);
             } else {
                 Log.d("PS", "Unable to pause playback because the service is not started (null)");
             }
