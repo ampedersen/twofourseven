@@ -12,7 +12,6 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
-import android.media.RemoteControlClient;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
@@ -20,23 +19,18 @@ import android.os.AsyncTask;
 import android.os.Binder;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.provider.MediaStore;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaSessionCompat;
+import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
 
-import com.example.android.musicplayer.MediaButtonHelper;
-import com.example.android.musicplayer.RemoteControlClientCompat;
-import com.example.android.musicplayer.RemoteControlHelper;
 import com.molamil.radio24syv.MainActivity;
 import com.molamil.radio24syv.R;
-import com.molamil.radio24syv.api.model.Podcast;
-import com.molamil.radio24syv.receiver.AudioNoisyReceiver;
+import com.molamil.radio24syv.receiver.RemoteControlReceiver;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
-import com.molamil.radio24syv.storage.model.ProgramInfo;
-
-import android.media.MediaMetadataRetriever;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -97,7 +91,13 @@ public class RadioPlayerService extends Service implements
     private PlayUrlTask task = null;
     private WifiManager.WifiLock wifiLock; // Used to keep wifi running while streaming
 
+    /*
+    private MediaSessionManager mManager;
+    private MediaSession mSession;
+    private MediaController mController;
+    */
 
+    /*
     // The component name of MusicIntentReceiver, for use with media button and remote control
     // APIs
     ComponentName mMediaButtonReceiverComponent;
@@ -105,6 +105,7 @@ public class RadioPlayerService extends Service implements
     // our RemoteControlClient object, which will use remote control APIs available in
     // SDK level >= 14, if they're available.
     RemoteControlClientCompat mRemoteControlClientCompat;
+    */
 
     @Override
     public void onCreate() {
@@ -114,7 +115,7 @@ public class RadioPlayerService extends Service implements
         wifiLock.setReferenceCounted(false); // For convenience, do not keep track of how many times the lock has been required. Release it when release() is called no matter what.
 
 
-        mMediaButtonReceiverComponent = new ComponentName(this, AudioNoisyReceiver.class);
+        //mMediaButtonReceiverComponent = new ComponentName(this, AudioNoisyReceiver.class);
     }
 
     @Override
@@ -382,67 +383,6 @@ public class RadioPlayerService extends Service implements
         }
     }
 
-    private void updateLockScreenControls()
-    {
-        if (action == RadioPlayer.ACTION_PLAY) {
-
-            AudioManager mAudioManager = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-            // Use the media button APIs (if available) to register ourselves for media button
-            // events
-
-            MediaButtonHelper.registerMediaButtonEventReceiverCompat(
-                    mAudioManager, mMediaButtonReceiverComponent);
-
-            // Use the remote control APIs (if available) to set the playback state
-
-            if (mRemoteControlClientCompat == null) {
-                Intent intent = new Intent(Intent.ACTION_MEDIA_BUTTON);
-                intent.setComponent(mMediaButtonReceiverComponent);
-                mRemoteControlClientCompat = new RemoteControlClientCompat(
-                        PendingIntent.getBroadcast(this /*context*/,
-                                0 /*requestCode, ignored*/, intent /*intent*/, 0 /*flags*/));
-                RemoteControlHelper.registerRemoteControlClient(mAudioManager,
-                        mRemoteControlClientCompat);
-            }
-
-            mRemoteControlClientCompat.setPlaybackState(
-                    RemoteControlClient.PLAYSTATE_PLAYING);
-
-            mRemoteControlClientCompat.setTransportControlFlags(
-                    RemoteControlClient.FLAG_KEY_MEDIA_PLAY |
-                            RemoteControlClient.FLAG_KEY_MEDIA_PAUSE |
-                            RemoteControlClient.FLAG_KEY_MEDIA_STOP);
-
-            String title = this.title;
-            String album = this.programTitle; //Live/podcast/offline
-            String artist = getResources().getString(R.string.app_name);
-            Bitmap artwork = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-
-            // Update the remote controls
-            mRemoteControlClientCompat.editMetadata(true)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ARTIST, artist)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_ALBUM, album)
-                    .putString(MediaMetadataRetriever.METADATA_KEY_TITLE, title)
-                    //.putLong(MediaMetadataRetriever.METADATA_KEY_DURATION, playingItem.getDuration())//Add duration for podcasts?
-                    .putBitmap(RemoteControlClientCompat.MetadataEditorCompat.METADATA_KEY_ARTWORK, artwork)
-                    .apply();
-        }
-        else if (action == RadioPlayer.ACTION_PAUSE)
-        {
-            if (mRemoteControlClientCompat != null) {
-                mRemoteControlClientCompat
-                        .setPlaybackState(RemoteControlClient.PLAYSTATE_PAUSED);
-            }
-        }
-        else if (action == RadioPlayer.ACTION_STOP)
-        {
-            if (mRemoteControlClientCompat != null) {
-                mRemoteControlClientCompat
-                        .setPlaybackState(RemoteControlClient.PLAYSTATE_STOPPED);
-            }
-        }
-    }
-
     public String getUrl() {
         return url;
     }
@@ -537,14 +477,19 @@ public class RadioPlayerService extends Service implements
     private void updateAudioFocus() {
         if (state == RadioPlayer.STATE_STARTED) {
             AudioManager a = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
-            a.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            int result = a.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+
+            if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
+                a.registerMediaButtonEventReceiver(new ComponentName(getPackageName(), RemoteControlReceiver.class.getName()));
+                // Start playback.
+            }
         }
     }
 
     public void onAudioFocusChange(int focusChange) {
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
-                Log.d("JJJ", "Audio focus gained");
+                Log.d("PS", "Audio focus gained");
                 // Resume playback
                 if (action == RadioPlayer.ACTION_PAUSE) {
                     setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PLAY);
@@ -555,7 +500,10 @@ public class RadioPlayerService extends Service implements
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS:
-                Log.d("JJJ", "Audio focus lost");
+                Log.d("PS", "Audio focus lost");
+                AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+                mAudioManager.unregisterMediaButtonEventReceiver(new ComponentName(getPackageName(), RemoteControlReceiver.class.getName()));
+
                 // Lost focus for an unbounded amount of time
                 if (action == RadioPlayer.ACTION_PLAY) {
                     setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PAUSE);
@@ -565,13 +513,13 @@ public class RadioPlayerService extends Service implements
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                Log.d("JJJ", "Audio focus lost temporarily");
+                Log.d("PS", "Audio focus lost temporarily");
                 // Lost focus for a short time, but we have to stop playback. Playback is likely to resume.
                 setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PAUSE);
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                Log.d("JJJ", "Audio focus duck");
+                Log.d("PS", "Audio focus duck");
                 // Lost focus for a short time, but it's ok to keep playing at an attenuated level
                 if (player != null) {
                     player.setVolume(0.2f, 0.2f);
@@ -633,6 +581,7 @@ public class RadioPlayerService extends Service implements
                         setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
                     }
                 });
+
             } else {
                 if (player.isPlaying()) {
                     player.stop();
@@ -743,5 +692,79 @@ public class RadioPlayerService extends Service implements
             i++;
         }
         return null;
+    }
+
+    /**
+     * REMOTE CONTROL FROM LOCK SCREEN
+     */
+
+    MediaSessionCompat mSession;
+
+    private void updateLockScreenControls()
+    {
+        /* Activate Audio Manager */
+        AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int result = mAudioManager.requestAudioFocus(this,
+                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        if (result != AudioManager.AUDIOFOCUS_GAIN) {
+            return; //Failed to gain audio focus
+        }
+
+        ComponentName mRemoteControlResponder = new ComponentName(getPackageName(), RemoteControlReceiver.class.getName());
+        final Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
+        mediaButtonIntent.setComponent(mRemoteControlResponder);
+
+        mSession = new MediaSessionCompat(getApplication(), "Radio24syv", mRemoteControlResponder, null);
+        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+
+        PlaybackStateCompat playbackStateCompat = new PlaybackStateCompat.Builder()
+                .setActions(
+                                PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                                PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                                PlaybackStateCompat.ACTION_PLAY |
+                                PlaybackStateCompat.ACTION_PAUSE |
+                                PlaybackStateCompat.ACTION_STOP
+                )
+                .setState(action == RadioPlayer.ACTION_PLAY ? PlaybackStateCompat.STATE_PLAYING : action == RadioPlayer.ACTION_PAUSE ? PlaybackStateCompat.STATE_PAUSED : PlaybackStateCompat.STATE_STOPPED, 0, 1.0f)
+                .build();
+        mSession.setPlaybackState(playbackStateCompat);
+        //mMediaSessionCompat.setCallback(mMediaSessionCallback);//For lollipop?
+        mSession.setSessionActivity(null); //For lollipop? What Intent should it be?
+        mSession.setActive(true);
+        updateMediaSessionMetaData();
+
+        //TODO: Purpose?
+        //mTransportController = mMediaSessionCompat.getController().getTransportControls();
+    }
+
+    private void updateMediaSessionMetaData()
+    {
+
+        String title = this.title;
+        String album = this.programTitle; //Live/podcast/offline
+        String artist = getResources().getString(R.string.app_name);
+        Bitmap artwork = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
+        //builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, getDuration());
+        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, artwork);
+
+        mSession.setMetadata(builder.build());
+
+        /*
+        int playState = action == RadioPlayer.ACTION_PLAY ? PlaybackStateCompat.STATE_PLAYING : action == RadioPlayer.ACTION_PAUSE ? PlaybackStateCompat.STATE_PAUSED : PlaybackStateCompat.STATE_STOPPED;
+        mSession.setPlaybackState(new PlaybackStateCompat.Builder()
+                .setState(playState, 0, 1.0f)
+                .setActions(
+                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
+                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
+                        PlaybackStateCompat.ACTION_PLAY |
+                        PlaybackStateCompat.ACTION_PAUSE |
+                        PlaybackStateCompat.ACTION_STOP
+                ).build());
+                */
     }
 }

@@ -2,6 +2,7 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     package="com.molamil.radio24syv" >
 
+    <!-- <permission android:name="android.permission.MEDIA_CONTENT_CONTROL" /> -->
     <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
     <uses-permission android:name="android.permission.ACCESS_WIFI_STATE" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -62,16 +63,13 @@
             </intent-filter>
         </receiver>
 
+        <!-- Media button receiver -->
         <receiver
-            android:name=".receiver.AudioNoisyReceiver"
+            android:name=".receiver.RemoteControlReceiver"
             android:enabled="true"
-            android:exported="false" >
+            android:exported="true" >
             <intent-filter>
                 <action android:name="android.media.AUDIO_BECOMING_NOISY" />
-            </intent-filter>
-
-            <!-- PS -->
-            <intent-filter>
                 <action android:name="android.intent.action.MEDIA_BUTTON" />
             </intent-filter>
 

@@ -9,7 +9,7 @@ import android.view.KeyEvent;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.player.RadioPlayerService;
 
-public class AudioNoisyReceiver extends BroadcastReceiver {
+public class RemoteControlReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
