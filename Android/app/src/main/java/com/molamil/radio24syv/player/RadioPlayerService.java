@@ -405,6 +405,9 @@ public class RadioPlayerService extends Service implements
                         mRemoteControlClientCompat);
             }
 
+            mRemoteControlClientCompat.setPlaybackState(
+                    RemoteControlClient.PLAYSTATE_PLAYING);
+
             mRemoteControlClientCompat.setTransportControlFlags(
                     RemoteControlClient.FLAG_KEY_MEDIA_PLAY |
                             RemoteControlClient.FLAG_KEY_MEDIA_PAUSE |
