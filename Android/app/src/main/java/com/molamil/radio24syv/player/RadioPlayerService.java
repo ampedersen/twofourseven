@@ -12,16 +12,21 @@ import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.media.session.MediaSession;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Bundle;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.support.v4.app.NotificationCompat;
+import android.os.ResultReceiver;
+//import android.support.v4.app.NotificationCompat;
+import android.support.v7.app.NotificationCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.MediaMetadataCompat;
+import android.support.v4.media.session.MediaControllerCompat;
 import android.support.v4.media.session.MediaSessionCompat;
 import android.support.v4.media.session.PlaybackStateCompat;
 import android.util.Log;
@@ -305,8 +310,9 @@ public class RadioPlayerService extends Service implements
         action = newAction;
 
         updateWifiLock();
-        updateRunInForeground();
+
         updateLockScreenControls();
+        updateRunInForeground();
     }
 
     private boolean isActionAllowed(int newAction) {
@@ -329,17 +335,17 @@ public class RadioPlayerService extends Service implements
     private void updateWifiLock() {
         boolean isPlayingOnlineStream = (action == RadioPlayer.ACTION_PLAY) && (!RadioPlayer.isLocalUrl(url));
         if (isPlayingOnlineStream) {
-            Log.d("JJJ", "Wifi lock on");
+            Log.d("PS", "Wifi lock on");
             wifiLock.acquire();
         } else {
-            Log.d("JJJ", "Wifi lock off");
+            Log.d("PS", "Wifi lock off");
             wifiLock.release();
         }
     }
 
     private void updateRunInForeground() {
-        if (action == RadioPlayer.ACTION_PLAY) {
-            Log.d("JJJ", "Run in foreground " + RadioPlayer.getActionName(action));
+        //if (action == RadioPlayer.ACTION_PLAY) {
+            Log.d("PS", "Run in foreground " + RadioPlayer.getActionName(action));
             // When running in the foreground, the service also must provide a status bar notification
             // to ensure that users are aware of the running service and allow them to open an activity that can interact with the service.
 
@@ -357,10 +363,76 @@ public class RadioPlayerService extends Service implements
                 largeIcon = ((BitmapDrawable) getPackageManager().getApplicationIcon(getApplicationContext().getPackageName())).getBitmap(); // Get app icon
             } catch (PackageManager.NameNotFoundException e) {
                 largeIcon = null; // Null means only the action icon will be used (e.g. play symbol). This will not happen anyway, our app always exists.
-                Log.d("JJJ", "Unable to getInstance app icon because of " + e.getMessage());
+                Log.d("PS", "Unable to getInstance app icon because of " + e.getMessage());
                 e.printStackTrace();
             }
 
+            NotificationCompat.Builder builder =  new NotificationCompat.Builder(getApplicationContext());
+
+            builder.setOngoing(true)
+                    .setShowWhen(false) // No timestamp (Android 5)
+                    .setWhen(0) // No timestamp (Android 4)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC) // Show everywhere
+                    .setColor(0x000000)
+                    .setLargeIcon(largeIcon)
+                    .setSmallIcon(smallIconId)
+                    .setContentTitle(title)
+                    .setContentText(description)
+                    .setContentIntent(intent);
+
+            //Style. Depends on state of player
+            //For now always show three controls. Disable/enable next / prev in actions
+            builder.setStyle(new NotificationCompat.MediaStyle()
+                    .setMediaSession(mSession.getSessionToken())// Attach our MediaSession token
+                    .setShowActionsInCompactView(0, 1, 2));// Show our playback controls in the compat view
+
+            //Prev action
+            builder.addAction(getPrevious() == null ? R.drawable.prev_button_disabled : R.drawable.prev_button, "prev", getPlaybackAction(ACTION_PREVIOUS));
+
+            //Play/pause/stop action.TODO: Stop button whith live content
+            int playBtnDrawable = getState() == RadioPlayer.STATE_STARTED ? R.drawable.button_pause_program : R.drawable.button_play_program;
+            builder.addAction(playBtnDrawable, "pause", getPlaybackAction(ACTION_TOGGLE_PLAYBACK));
+
+            //next action
+            builder.addAction(getPrevious() == null ? R.drawable.next_button_disabled : R.drawable.next_button, "prev", getPlaybackAction(ACTION_PREVIOUS));
+
+
+            /*
+            Notification notification = new NotificationCompat.Builder(getApplicationContext())
+                    .setOngoing(true)
+                    .setShowWhen(false) // No timestamp (Android 5)
+                    .setWhen(0) // No timestamp (Android 4)
+                    .setVisibility(Notification.VISIBILITY_PUBLIC) // Show everywhere
+                    .setPriority(Notification.PRIORITY_MAX) // Show in top of list
+
+                    // Set the Notification style
+                    .setStyle(new NotificationCompat.MediaStyle()
+                            // Attach our MediaSession token
+                            .setMediaSession(mSession.getSessionToken())
+                                    // Show our playback controls in the compat view
+                            .setShowActionsInCompactView(0, 1, 2))
+
+                    // Set the Notification color
+                    .setColor(0x000000)
+
+                    // Set the large and small icons
+                    .setLargeIcon(largeIcon)
+                    .setSmallIcon(smallIconId)
+
+                    // Set Notification content information
+                    .setContentTitle(title)
+                    .setContentText(description)
+                    //.setContentInfo(audioInfo)
+                    .setContentIntent(intent)
+
+                    // Add some playback controls
+                    .addAction(R.drawable.prev_button, "prev", getPlaybackAction(ACTION_PREVIOUS))
+                    .addAction(R.drawable.button_play_program, "pause", getPlaybackAction(ACTION_TOGGLE_PLAYBACK))
+                    .addAction(R.drawable.next_button, "next", getPlaybackAction(ACTION_NEXT))
+                    .build();
+                    */
+
+            /*
             // Create lock screen widget thingy
             Notification notification = new NotificationCompat.Builder(getApplicationContext())
                     .setContentTitle(title)
@@ -374,13 +446,19 @@ public class RadioPlayerService extends Service implements
                     .setVisibility(Notification.VISIBILITY_PUBLIC) // Show everywhere
                     .setPriority(Notification.PRIORITY_MAX) // Show in top of list
                     .setContentIntent(intent)
+                    .addAction(android.R.drawable.ic_media_play, "Play", intent)
+                    .setStyle(new NotificationCompat.MediaStyle().setMediaSession(mSession.getSessionToken()))
                     .build();
-
+*/
+            Notification notification = builder.build();
             startForeground(NOTIFICATION_ID, notification);
+
+        /*
         } else {
-            Log.d("JJJ", "Run in background " + RadioPlayer.getActionName(action));
+            Log.d("PS", "Run in background " + RadioPlayer.getActionName(action));
             stopForeground(true); // TODO keep notification if paused?
         }
+        */
     }
 
     public String getUrl() {
@@ -479,10 +557,12 @@ public class RadioPlayerService extends Service implements
             AudioManager a = (AudioManager) getSystemService(getApplicationContext().AUDIO_SERVICE);
             int result = a.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
 
+            /*
             if (result == AudioManager.AUDIOFOCUS_REQUEST_GRANTED) {
                 a.registerMediaButtonEventReceiver(new ComponentName(getPackageName(), RemoteControlReceiver.class.getName()));
                 // Start playback.
             }
+            */
         }
     }
 
@@ -502,7 +582,7 @@ public class RadioPlayerService extends Service implements
             case AudioManager.AUDIOFOCUS_LOSS:
                 Log.d("PS", "Audio focus lost");
                 AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                mAudioManager.unregisterMediaButtonEventReceiver(new ComponentName(getPackageName(), RemoteControlReceiver.class.getName()));
+                //mAudioManager.unregisterMediaButtonEventReceiver(new ComponentName(getPackageName(), RemoteControlReceiver.class.getName()));
 
                 // Lost focus for an unbounded amount of time
                 if (action == RadioPlayer.ACTION_PLAY) {
@@ -699,10 +779,28 @@ public class RadioPlayerService extends Service implements
      */
 
     MediaSessionCompat mSession;
+    //MediaControllerCompat.TransportControls mTransportController;
+
+    private void updateMediaSessionMetaData()
+    {
+        String title = this.title;
+        String album = this.programTitle; //Live/podcast/offline
+        String artist = getResources().getString(R.string.app_name);
+        Bitmap artwork = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
+
+        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album);
+        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
+        builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, 5000); //DEV
+        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, artwork);
+
+        mSession.setMetadata(builder.build());
+
+    }
 
     private void updateLockScreenControls()
     {
-        /* Activate Audio Manager */
         AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int result = mAudioManager.requestAudioFocus(this,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
@@ -719,6 +817,7 @@ public class RadioPlayerService extends Service implements
 
         PlaybackStateCompat playbackStateCompat = new PlaybackStateCompat.Builder()
                 .setActions(
+                                PlaybackStateCompat.ACTION_PLAY_PAUSE |
                                 PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
                                 PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
                                 PlaybackStateCompat.ACTION_PLAY |
@@ -728,43 +827,82 @@ public class RadioPlayerService extends Service implements
                 .setState(action == RadioPlayer.ACTION_PLAY ? PlaybackStateCompat.STATE_PLAYING : action == RadioPlayer.ACTION_PAUSE ? PlaybackStateCompat.STATE_PAUSED : PlaybackStateCompat.STATE_STOPPED, 0, 1.0f)
                 .build();
         mSession.setPlaybackState(playbackStateCompat);
-        //mMediaSessionCompat.setCallback(mMediaSessionCallback);//For lollipop?
-        mSession.setSessionActivity(null); //For lollipop? What Intent should it be?
+        mSession.setCallback(mMediaSessionCallback);//For lollipop?
+
+        //TODO: Figure out what this does
+
+        //Context context = getApplicationContext();
+        //Intent intent = new Intent(context, MainActivity.class);
+        //PendingIntent pi = PendingIntent.getActivity(context, 99, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        //mSession.setSessionActivity(pi); //For lollipop? What Intent should it be?
+
+        mSession.setSessionActivity(null);
+
         mSession.setActive(true);
         updateMediaSessionMetaData();
 
         //TODO: Purpose?
-        //mTransportController = mMediaSessionCompat.getController().getTransportControls();
+       // mTransportController = mSession.getController().getTransportControls();
+
     }
 
-    private void updateMediaSessionMetaData()
+
+
+    private final MediaSessionCompat.Callback mMediaSessionCallback = new MediaSessionCompat.Callback() {
+        @Override
+        public void onCommand(String command, Bundle extras, ResultReceiver cb) {
+            Log.i("PS", "MediaSessionCompat.Callback.onCommand");
+            super.onCommand(command, extras, cb);
+        }
+
+        @Override
+        public boolean onMediaButtonEvent(Intent mediaButtonEvent) {
+            Log.i("PS", "MediaSessionCompat.Callback.onMediaButtonEvent");
+            return super.onMediaButtonEvent(mediaButtonEvent);
+        }
+
+        @Override
+        public void onPlay() {
+            Log.i("PS", "MediaSessionCompat.Callback.onPlay");
+            super.onPlay();
+        }
+
+        @Override
+        public void onPause() {
+            Log.i("PS", "MediaSessionCompat.Callback.onPause");
+            super.onPause();
+        }
+
+        @Override
+        public void onStop() {
+            Log.i("PS", "MediaSessionCompat.Callback.onStop");
+            super.onStop();
+        }
+    };
+
+    private PendingIntent getPlaybackAction(String action)
     {
-
-        String title = this.title;
-        String album = this.programTitle; //Live/podcast/offline
-        String artist = getResources().getString(R.string.app_name);
-        Bitmap artwork = BitmapFactory.decodeResource(getResources(), R.mipmap.ic_launcher);
-
-        MediaMetadataCompat.Builder builder = new MediaMetadataCompat.Builder();
-        builder.putString(MediaMetadataCompat.METADATA_KEY_ARTIST, artist);
-        builder.putString(MediaMetadataCompat.METADATA_KEY_ALBUM, album);
-        builder.putString(MediaMetadataCompat.METADATA_KEY_TITLE, title);
-        //builder.putLong(MediaMetadataCompat.METADATA_KEY_DURATION, getDuration());
-        builder.putBitmap(MediaMetadataCompat.METADATA_KEY_ALBUM_ART, artwork);
-
-        mSession.setMetadata(builder.build());
+        Intent intent = new Intent(this, RemoteControlReceiver.class);
+        intent.setAction(action);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this.getApplicationContext(), 0, intent, 0);
+        return pendingIntent;
 
         /*
-        int playState = action == RadioPlayer.ACTION_PLAY ? PlaybackStateCompat.STATE_PLAYING : action == RadioPlayer.ACTION_PAUSE ? PlaybackStateCompat.STATE_PAUSED : PlaybackStateCompat.STATE_STOPPED;
-        mSession.setPlaybackState(new PlaybackStateCompat.Builder()
-                .setState(playState, 0, 1.0f)
-                .setActions(
-                        PlaybackStateCompat.ACTION_SKIP_TO_PREVIOUS |
-                        PlaybackStateCompat.ACTION_SKIP_TO_NEXT |
-                        PlaybackStateCompat.ACTION_PLAY |
-                        PlaybackStateCompat.ACTION_PAUSE |
-                        PlaybackStateCompat.ACTION_STOP
-                ).build());
-                */
+        Intent action;
+        PendingIntent pendingIntent;
+        final ComponentName serviceName = new ComponentName(this, BackgroundService.class);
+        switch (which) {
+            case 1:
+                // Play and pause
+                action = new Intent("boom");
+                action.setComponent(serviceName);
+                pendingIntent = PendingIntent.getService(this, 1, action, 0);
+                return pendingIntent;
+            default:
+                break;
+        }
+        */
+
+        //return null;
     }
 }

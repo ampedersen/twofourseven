@@ -73,7 +73,7 @@ android {
 
 dependencies {
     compile fileTree(dir: 'libs', include: ['*.jar'])
-    compile 'com.android.support:appcompat-v7:22.1.1'
+    compile 'com.android.support:appcompat-v7:22.2.1'
     compile files('libs/HockeySDK-3.5.0.jar')
     compile 'org.glassfish.main:javax.annotation:4.0-b33'
     compile 'com.google.code.gson:gson:2.3.1'
