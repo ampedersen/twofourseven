@@ -674,7 +674,7 @@ public class RadioPlayerService extends Service implements
         }
     }
 
-    private  boolean isLiveUrl(final String url) {
+    public  boolean isLiveUrl(final String url) {
         return (url.equals(getString(R.string.url_live_radio)));
     }
 
