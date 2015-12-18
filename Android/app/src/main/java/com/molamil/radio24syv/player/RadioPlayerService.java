@@ -730,7 +730,8 @@ public class RadioPlayerService extends Service implements
     }
 
     /**
-     * REMOTE CONTROL FROM LOCK SCREEN
+     * REMOTE CONTROL FROM LOCK SCREEN, API <21.
+     * API 21+ uses lock screen notifications with media styles & actions (see updateRunInForeground())
      */
 
     MediaSessionCompat mSession;
@@ -738,8 +739,7 @@ public class RadioPlayerService extends Service implements
     private boolean updateLockScreenControls()
     {
         AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        int result = mAudioManager.requestAudioFocus(this,
-                AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+        int result = mAudioManager.requestAudioFocus(this,AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         if (result != AudioManager.AUDIOFOCUS_GAIN) {
             return false; //Failed to gain audio focus
         }

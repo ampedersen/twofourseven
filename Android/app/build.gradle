@@ -1,7 +1,5 @@
 apply plugin: 'com.android.application'
 
-String APK_NAME = "Radio24syv"
-
 android {
 
     applicationVariants.all { variant ->
@@ -28,8 +26,8 @@ android {
         applicationId "dk.radio24syv.android"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 207
-        versionName "3.0.1"
+        versionCode 216
+        versionName "3.0.2"
         signingConfig signingConfigs.release
     }
 
