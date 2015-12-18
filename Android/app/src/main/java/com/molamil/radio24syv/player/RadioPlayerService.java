@@ -130,9 +130,16 @@ public class RadioPlayerService extends Service implements
             {
                 if(getAction() == RadioPlayer.ACTION_PLAY)
                 {
-                    //TODO: PAUSE OR STOP
-                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
-                }
+                    if(isLiveUrl(url))
+                    {
+                        setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
+                    }
+                    else
+                    {
+                        setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PAUSE);
+                    }
+
+                 }
                 else
                 {
                     setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PLAY);
@@ -192,9 +199,6 @@ public class RadioPlayerService extends Service implements
 
     @Override
     public void onDestroy() {
-        // The service is no longer used and is being destroyed
-        // TODO cleanup
-        Log.d("JJJ", "service onDestroy");
         cleanup();
     }
 
@@ -308,8 +312,13 @@ public class RadioPlayerService extends Service implements
 
         updateWifiLock();
 
-        updateLockScreenControls();
-        updateRunInForeground();
+        //Different check. Media session?
+        if(url != null) {
+            if(updateLockScreenControls())
+            {
+                updateRunInForeground();
+            }
+        }
     }
 
     private boolean isActionAllowed(int newAction) {
@@ -665,6 +674,9 @@ public class RadioPlayerService extends Service implements
         }
     }
 
+    private  boolean isLiveUrl(final String url) {
+        return (url.equals(getString(R.string.url_live_radio)));
+    }
 
     /**
      * Duplicate implementation. Also exists in RadioPlayer. TODO: Cleanup
@@ -723,13 +735,13 @@ public class RadioPlayerService extends Service implements
 
     MediaSessionCompat mSession;
 
-    private void updateLockScreenControls()
+    private boolean updateLockScreenControls()
     {
         AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int result = mAudioManager.requestAudioFocus(this,
                 AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
         if (result != AudioManager.AUDIOFOCUS_GAIN) {
-            return; //Failed to gain audio focus
+            return false; //Failed to gain audio focus
         }
 
         ComponentName mRemoteControlResponder = new ComponentName(getPackageName(), RemoteControlReceiver.class.getName());
@@ -763,6 +775,8 @@ public class RadioPlayerService extends Service implements
 
         //TODO: Purpose?
        // mTransportController = mSession.getController().getTransportControls();
+
+        return true;
 
     }
 

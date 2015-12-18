@@ -24,9 +24,9 @@ public class NetworkChangeReceiver extends BroadcastReceiver
         final android.net.NetworkInfo wifi = connMgr.getNetworkInfo(ConnectivityManager.TYPE_WIFI);
         final android.net.NetworkInfo mobile =  connMgr.getNetworkInfo(ConnectivityManager.TYPE_MOBILE);
 
-        Log.i("PS", "NetworkChangeReceiver...");
-        Log.i("PS", "NetworkChangeReceiver, wifi: "+wifi.isAvailable()+", "+wifi.getState());
-        Log.i("PS", "NetworkChangeReceiver, mobile: "+mobile.isAvailable()+", "+mobile.getState());
+        //Log.i("PS", "NetworkChangeReceiver...");
+        //Log.i("PS", "NetworkChangeReceiver, wifi: "+wifi.isAvailable()+", "+wifi.getState());
+        //Log.i("PS", "NetworkChangeReceiver, mobile: "+mobile.isAvailable()+", "+mobile.getState());
 
         /**
          * CASES TO HANDLE:
