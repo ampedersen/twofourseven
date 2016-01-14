@@ -2,6 +2,7 @@ package com.molamil.radio24syv;
 
 import android.app.Activity;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,6 +23,7 @@ import com.molamil.radio24syv.util.DisplayUtil;
 import com.molamil.radio24syv.view.ProgramCategoryButton;
 import com.molamil.radio24syv.view.ProgramListView;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -500,6 +502,16 @@ public class ProgramListFragment extends PageFragment {
     public void onDetach() {
         super.onDetach();
         listener = null;
+
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 

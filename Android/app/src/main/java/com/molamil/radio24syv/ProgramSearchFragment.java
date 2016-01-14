@@ -25,6 +25,7 @@ import com.molamil.radio24syv.view.ProgramListView;
 
 import org.apache.http.auth.BasicUserPrincipal;
 
+import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -245,6 +246,16 @@ public class ProgramSearchFragment extends PageFragment {
     public void onDetach() {
         super.onDetach();
         listener = null;
+
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {
