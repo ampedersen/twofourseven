@@ -23,7 +23,7 @@ import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.view.ProgramButtonView;
 import com.molamil.radio24syv.view.ProgramListView;
 
-import org.apache.http.auth.BasicUserPrincipal;
+//import org.apache.http.auth.BasicUserPrincipal;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
