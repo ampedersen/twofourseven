@@ -16,6 +16,8 @@ import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.RadioViewPager;
 
+import java.lang.reflect.Field;
+
 
 public class ProgramsFragment extends PageFragment {
 
@@ -105,6 +107,16 @@ public class ProgramsFragment extends PageFragment {
     public void onDetach() {
         super.onDetach();
         listener = null;
+
+        try {
+            Field childFragmentManager = Fragment.class.getDeclaredField("mChildFragmentManager");
+            childFragmentManager.setAccessible(true);
+            childFragmentManager.set(this, null);
+        } catch (NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        } catch (IllegalAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     public boolean isShowingDetails() {
