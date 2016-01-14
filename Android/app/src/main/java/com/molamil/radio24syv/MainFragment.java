@@ -1,6 +1,7 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
@@ -51,6 +52,13 @@ public class MainFragment extends Fragment {
     */
 
     @Override
+    public void onCreate(Bundle savedInstanceState)
+    {
+        super.onCreate(savedInstanceState);
+        setupPlayerFragment(savedInstanceState);
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View v = inflater.inflate(R.layout.fragment_main, container, false);
 
@@ -77,25 +85,7 @@ public class MainFragment extends Fragment {
 
         updateTabSize();
 
-//        if (playerFragment == null) {
-//            playerFragment = new PlayerFragment();
-//        }
-
-        // However, if we're being restored from a previous state,
-        // then we don't need to do anything and should return or else
-        // we could end up with overlapping fragments.
-//        if (savedInstanceState == null) {
-            // Create a new Fragment to be placed in the activity layout
-//            PlayerFragment playerFragment = new PlayerFragment();
-
-            // Add the fragment to the container
-//            getChildFragmentManager().beginTransaction()
-//                    .add(R.id.player_fragment_container, playerFragment)
-//                    .commit();
-//        }
-
-
-        setupPlayerFragment(savedInstanceState);
+        //setupPlayerFragment(savedInstanceState);
 
         View dimmer = v.findViewById(R.id.dimmer);
         dimmer.setOnClickListener(new View.OnClickListener() {
@@ -124,9 +114,11 @@ public class MainFragment extends Fragment {
 
         // BUG: This is causing a crash when reopening app after it has been closed while the player is playing (podcast, not sure abt live)
         // java.lang.IllegalStateException: Activity has been destroyed
+        //}
+
         getChildFragmentManager().beginTransaction().replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
 
-        //}
+
 
     }
 
@@ -139,12 +131,12 @@ public class MainFragment extends Fragment {
 //    }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            listener = (OnMainFragmentInteractionListener) activity;
+            listener = (OnMainFragmentInteractionListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement OnMainFragmentInteractionListener");
         }
     }

@@ -226,13 +226,14 @@ public class RadioPlayerButton extends Button implements
             return;
         }
 
+        if (!isAvailable()) {
+            return; // Return, cannot click button
+        }
+
         if(radioPlayButtonListener != null)
         {
             radioPlayButtonListener.onClick(action);
-        }
-
-        if (!isAvailable()) {
-            return; // Return, cannot click button
+            return;
         }
 
         clickAction();

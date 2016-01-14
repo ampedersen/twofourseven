@@ -1,6 +1,7 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
@@ -163,18 +164,18 @@ public class NewsFragment extends Fragment {
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            listener = (OnFragmentInteractionListener) activity;
+            listener = (OnFragmentInteractionListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
         try {
-            radioPlayerProvider = (RadioPlayer.RadioPlayerProvider) activity;
+            radioPlayerProvider = (RadioPlayer.RadioPlayerProvider) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement PlayerFragment.RadioPlayerProvider");
         }
     }
