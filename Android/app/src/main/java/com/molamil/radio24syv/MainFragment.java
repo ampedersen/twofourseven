@@ -41,16 +41,6 @@ public class MainFragment extends Fragment {
 
     String startupTabTag = TAG_TAB_LIVE;
 
-    /*
-    @Override
-    public void onActivityCreated (Bundle savedInstanceState)
-    {
-        super.onActivityCreated(savedInstanceState);
-
-        setupPlayerFragment(savedInstanceState);
-    }
-    */
-
     @Override
     public void onCreate(Bundle savedInstanceState)
     {

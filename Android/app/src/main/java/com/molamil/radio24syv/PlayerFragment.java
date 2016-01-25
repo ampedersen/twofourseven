@@ -447,6 +447,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     //HACK. Using formatted time strings HH:mm to calculate progress. Should use dates
     private void UpdateTimeLines(RadioPlayer player)
     {
+        Log.i("PS", "UpdateTimeLines");
 
         String start = player.getStartTime();
         String end = player.getEndTime();
@@ -504,7 +505,11 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
                 smallTimeLine.setProgress(0);
                 timeLineSeekBar.setProgress(0);
             }
+
             float pct = time/duration;
+
+            //TODO: If we've reached pct = 1 (or something like 0.9999), then start checking for new live content
+            Log.i("PS", "UpdateTimeLines, pct: "+pct);
 
             timeline.setProgress(pct);
             smallTimeLine.setProgress(pct);
