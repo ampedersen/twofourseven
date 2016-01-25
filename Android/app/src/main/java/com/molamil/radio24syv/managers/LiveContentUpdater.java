@@ -83,15 +83,13 @@ public class LiveContentUpdater
         {
             return;
         }
-        Log.i("PS", "checking if we need to update live content");
         RadioPlayer player = radioPlayerProvider.getRadioPlayer();
         if(player != null)
         {
             if(player.isLive())
             {
                 float progress = getProgress();
-                Log.i("PS", "content is live..., progress: "+progress);
-                if(progress >= 0.85 && !isLoadingCurrentBroadcast)
+                if(progress >= 0.995 && !isLoadingCurrentBroadcast)
                 {
                     loadBroadcast();
                 }

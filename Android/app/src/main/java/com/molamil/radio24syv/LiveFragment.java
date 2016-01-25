@@ -114,8 +114,7 @@ public class LiveFragment extends PageFragment implements OnUpdateListener {
                         return; // We are still assigned as a callback to the previous instance of the fragment. TODO store the call in a variable, cancel it in onDestroy to getInstance rid of callbacks.
 
                     //TODO: Pass data to populate function
-                    populateView(b.getProgramName(), b.getDescriptionText(), b.getBroadcastTime().getStart(), b.getBroadcastTime().getEnd(), b.getTopic());
-
+                    populateView(b);
                     /*
                     titleTv.setText(b.getProgramName());
                     beginTimeTv.setText(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
@@ -159,8 +158,15 @@ public class LiveFragment extends PageFragment implements OnUpdateListener {
         return v;
     }
 
-    private void populateView(String title, String description, String startTime, String endTime, String topic)
+    private void populateView(Broadcast b)
     {
+
+        String title = b.getProgramName();
+        String description = b.getDescriptionText();
+        String startTime = b.getBroadcastTime().getStart();
+        String endTime = b.getBroadcastTime().getEnd();
+        String topic = b.getTopic();
+
         titleTv.setText(title);
         beginTimeTv.setText(RestClient.getLocalTime(startTime));
         endTimeTv.setText(RestClient.getLocalTime(endTime));
@@ -272,6 +278,6 @@ public class LiveFragment extends PageFragment implements OnUpdateListener {
     @Override
     public void OnUpdate(Broadcast broadcast)
     {
-        Log.i("PS", "update content in live view");
+        populateView(broadcast);
     }
 }

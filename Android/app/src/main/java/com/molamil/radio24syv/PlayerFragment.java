@@ -546,6 +546,6 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     @Override
     public void OnUpdate(Broadcast broadcast)
     {
-        Log.i("PS", "update content in player view");
+        updatePlayer();
     }
 }
