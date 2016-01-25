@@ -306,6 +306,9 @@ public class RadioPlayerService extends Service implements
                 Log.d("JJJ", "TODO implement ACTION_PREVIOUS - ignoring");
                 newAction = action; // Ignore new action
                 break;
+            case RadioPlayer.ACTION_UPDATE_DATA_ONLY:
+                newAction = action; // Ignore new action
+                break;
         }
 
         action = newAction;
@@ -333,6 +336,8 @@ public class RadioPlayerService extends Service implements
                 return (action == RadioPlayer.ACTION_PLAY) || (action == RadioPlayer.ACTION_STOP) || (action == RadioPlayer.ACTION_PAUSE);
             case RadioPlayer.ACTION_PREVIOUS:
                 return (action == RadioPlayer.ACTION_PLAY) || (action == RadioPlayer.ACTION_STOP) || (action == RadioPlayer.ACTION_PAUSE);
+            case RadioPlayer.ACTION_UPDATE_DATA_ONLY:
+                return isLiveUrl(getUrl()); //Data update only allowed if playing live content
             default:
                 return true;
         }
@@ -341,17 +346,15 @@ public class RadioPlayerService extends Service implements
     private void updateWifiLock() {
         boolean isPlayingOnlineStream = (action == RadioPlayer.ACTION_PLAY) && (!RadioPlayer.isLocalUrl(url));
         if (isPlayingOnlineStream) {
-            Log.d("PS", "Wifi lock on");
             wifiLock.acquire();
         } else {
-            Log.d("PS", "Wifi lock off");
             wifiLock.release();
         }
     }
 
     private void updateRunInForeground() {
         //if (action == RadioPlayer.ACTION_PLAY) {
-            Log.d("PS", "Run in foreground " + RadioPlayer.getActionName(action));
+            //Log.d("PS", "Run in foreground " + RadioPlayer.getActionName(action));
             // When running in the foreground, the service also must provide a status bar notification
             // to ensure that users are aware of the running service and allow them to open an activity that can interact with the service.
 
@@ -675,6 +678,10 @@ public class RadioPlayerService extends Service implements
     }
 
     public  boolean isLiveUrl(final String url) {
+        if(url == null)
+        {
+            return false;
+        }
         return (url.equals(getString(R.string.url_live_radio)));
     }
 

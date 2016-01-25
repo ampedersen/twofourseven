@@ -15,6 +15,9 @@ import android.widget.TabHost;
 import android.widget.TabWidget;
 import android.widget.TextView;
 
+import com.molamil.radio24syv.managers.LiveContentUpdater;
+import com.molamil.radio24syv.player.RadioPlayer;
+
 import org.w3c.dom.Text;
 
 import java.lang.reflect.Field;
@@ -123,6 +126,14 @@ public class MainFragment extends Fragment {
             throw new ClassCastException(context.toString()
                     + " must implement OnMainFragmentInteractionListener");
         }
+
+        try {
+            RadioPlayer.RadioPlayerProvider radioPlayerProvider = (RadioPlayer.RadioPlayerProvider) context;
+            LiveContentUpdater.getInstance().setRadioPlayerProvider(radioPlayerProvider);
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString()
+                    + " must implement PlayerFragment.RadioPlayerProvider");
+        }
     }
 
     @Override
@@ -139,6 +150,21 @@ public class MainFragment extends Fragment {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+    }
+
+    @Override
+    public void onPause()
+    {
+        super.onPause();
+
+        LiveContentUpdater.getInstance().stop();
+    }
+
+    @Override
+    public void onResume()
+    {
+        super.onResume();
+        LiveContentUpdater.getInstance().start();
     }
 
     private void addTab(LayoutInflater inflater, String tag, int textId, int iconId, Class<?> fragment) {

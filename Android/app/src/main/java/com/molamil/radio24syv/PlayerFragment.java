@@ -1,6 +1,7 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
@@ -12,13 +13,18 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
+import com.molamil.radio24syv.api.CancelableCallback;
+import com.molamil.radio24syv.api.RestClient;
+import com.molamil.radio24syv.api.model.Broadcast;
 import com.molamil.radio24syv.components.OnSwipeTouchListener;
 import com.molamil.radio24syv.components.TimeLine;
 import com.molamil.radio24syv.components.TimeLineSeekBar;
+import com.molamil.radio24syv.managers.LiveContentUpdater;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
 import com.molamil.radio24syv.storage.model.TopicInfo;
+import com.molamil.radio24syv.util.DateUtils;
 import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.RadioPlayerButton;
 
@@ -26,6 +32,9 @@ import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
+
+import retrofit.Response;
 
 
 /**
@@ -36,7 +45,9 @@ import java.util.Date;
  * Use the {@link PlayerFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackListener {
+public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackListener, LiveContentUpdater.OnUpdateListener {
+
+
     public enum PlayerSize { NONE, SMALL, BIG };
 
     // Fragment parameters
@@ -58,6 +69,9 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
     private TextView startTimeLabel;
     private TextView endTimeLabel;
+
+    //private Boolean isLoadingNewContent = false;
+    //private CancelableCallback liveReloadCallback;
 
     private long timelineUpdateInterval = 900;
     private Handler timelineHandler = new Handler(); //Refactor to player service and let it update all necesary timelines
@@ -120,7 +134,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         timeLineSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
             @Override
             public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                //Log.i("PS", progress+", "+fromUser);
+
                 if (fromUser) {
                     RadioPlayer player = radioPlayerProvider.getRadioPlayer();
                     player.seekTo(progress / 100.0f);
@@ -164,20 +178,22 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     }
 
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    public void onAttach(Context context) {
+        super.onAttach(context);
         try {
-            mListener = (OnFragmentInteractionListener) activity;
+            mListener = (OnFragmentInteractionListener) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement OnFragmentInteractionListener");
         }
         try {
-            radioPlayerProvider = (RadioPlayer.RadioPlayerProvider) activity;
+            radioPlayerProvider = (RadioPlayer.RadioPlayerProvider) context;
         } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
+            throw new ClassCastException(context.toString()
                     + " must implement PlayerFragment.RadioPlayerProvider");
         }
+
+        LiveContentUpdater.getInstance().addListener(this);
     }
 
     @Override
@@ -211,6 +227,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+
+        LiveContentUpdater.getInstance().removeListener(this);
     }
 
     @Override
@@ -332,6 +350,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     }
 
     public void updatePlayer() {
+
         RadioPlayer player = radioPlayerProvider.getRadioPlayer();
         programInfo.setName(player.getTitle());
         programInfo.setDescription(player.getDescription());
@@ -340,9 +359,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         programInfo.setStartTime(player.getStartTime());
         programInfo.setEndTime(player.getEndTime());
 
-        //Start end time
-
-        //TODO: Handle Program title vs podcast title too.
+        //TODO: Handle Program title vs podcast title.
         //programInfo.setName(player.getProgramTitle());
 
         View v = getView();
@@ -447,8 +464,6 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     //HACK. Using formatted time strings HH:mm to calculate progress. Should use dates
     private void UpdateTimeLines(RadioPlayer player)
     {
-        Log.i("PS", "UpdateTimeLines");
-
         String start = player.getStartTime();
         String end = player.getEndTime();
 
@@ -481,10 +496,10 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
         Date now = new Date();
         SimpleDateFormat sdfr = new SimpleDateFormat("HH:mm");
-        Date curr = timeStringToDate(sdfr.format( now ));
+        Date curr = DateUtils.timeStringToDate(sdfr.format(now));
 
-        Date startDate = timeStringToDate(start);
-        Date endDate = timeStringToDate(end);
+        Date startDate = DateUtils.timeStringToDate(start);
+        Date endDate = DateUtils.timeStringToDate(end);
 
         startTimeLabel.setText(start);
         endTimeLabel.setText(end);
@@ -509,7 +524,18 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             float pct = time/duration;
 
             //TODO: If we've reached pct = 1 (or something like 0.9999), then start checking for new live content
-            Log.i("PS", "UpdateTimeLines, pct: "+pct);
+            //Log.i("PS", "UpdateTimeLines, pct: "+pct);
+            /*
+            if(player.isLive())
+            {
+                Log.i("PS","Live radio @ "+pct);
+                if(pct >= 1.0 && liveReloadCallback == null)//!isLoadingNewContent)
+                {
+                    //isLoadingNewContent = true;//Set to false on backend respons IF content is updated
+                    reloadBroadcastData();
+                }
+            }
+            */
 
             timeline.setProgress(pct);
             smallTimeLine.setProgress(pct);
@@ -517,27 +543,9 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         }
     }
 
-    //HACK. Use date objects instead of just the time strings?
-    private Date timeStringToDate(String timeStr)
+    @Override
+    public void OnUpdate(Broadcast broadcast)
     {
-        if(timeStr == null)
-        {
-            return null;
-        }
-
-        SimpleDateFormat formatter = new SimpleDateFormat("HH:mm");
-        Date date = null;
-        try {
-
-            date = formatter.parse(timeStr);
-            System.out.println(date);
-            System.out.println(formatter.format(date));
-
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-
-        return date;
+        Log.i("PS", "update content in player view");
     }
-
 }

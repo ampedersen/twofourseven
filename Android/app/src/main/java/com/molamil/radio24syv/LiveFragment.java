@@ -12,9 +12,12 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
+import com.molamil.radio24syv.api.RestApi;
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Broadcast;
 import com.molamil.radio24syv.components.TimeLine;
+import com.molamil.radio24syv.managers.LiveContentUpdater;
+import com.molamil.radio24syv.managers.LiveContentUpdater.OnUpdateListener;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.view.RadioPlayerButton;
 
@@ -36,7 +39,7 @@ import retrofit.Response;
  * Use the {@link LiveFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
-public class LiveFragment extends PageFragment {
+public class LiveFragment extends PageFragment implements OnUpdateListener {
 
     private OnFragmentInteractionListener listener;
     private PlayerFragment.OnFragmentInteractionListener playerListener;
@@ -45,9 +48,16 @@ public class LiveFragment extends PageFragment {
     private TimeLine timeline;
 
     private Button expandButton;
-    private TextView desctiptionTv;
     private boolean expanded = false;
     private String fullDescription = "";
+
+    private TextView titleTv;
+    //private TextView topicTv;
+    private TextView beginTimeTv;
+    private TextView endTimeTv;
+    private TextView desctiptionTv;
+
+    private RadioPlayerButton playButton;
 
     public LiveFragment() {
         // Required empty public constructor
@@ -60,6 +70,12 @@ public class LiveFragment extends PageFragment {
         timeline = (TimeLine) v.findViewById(R.id.player_progress);
         timeline.setProgress(0);
         desctiptionTv = ((TextView) v.findViewById(R.id.program_description));
+        titleTv = ((TextView) v.findViewById(R.id.program_title));
+        //topicTv = ((TextView) v.findViewById(R.id.program_description));
+        beginTimeTv = ((TextView) v.findViewById(R.id.program_time_begin));
+        endTimeTv = ((TextView) v.findViewById(R.id.program_time_end));
+
+        playButton = (RadioPlayerButton) v.findViewById(R.id.play_button);
 
         Button scheduleButton = (Button)v.findViewById(R.id.schedule_button);
         scheduleButton.setOnClickListener(new View.OnClickListener() {
@@ -86,8 +102,7 @@ public class LiveFragment extends PageFragment {
                 if (listener != null) {
                     listener.onError(null);
                 }
-                if(response == null)
-                {
+                if (response == null) {
                     return;
                 }
                 List<Broadcast> body = response.body();
@@ -97,16 +112,19 @@ public class LiveFragment extends PageFragment {
 
                     if (v == null)
                         return; // We are still assigned as a callback to the previous instance of the fragment. TODO store the call in a variable, cancel it in onDestroy to getInstance rid of callbacks.
-                    ((TextView) v.findViewById(R.id.program_title)).setText(b.getProgramName());
-                    ((TextView) v.findViewById(R.id.program_time_begin)).setText(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
-                    ((TextView) v.findViewById(R.id.program_time_end)).setText(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
-                    //((TextView) v.findViewById(R.id.program_category)).setText(b.getTopic());
+
+                    //TODO: Pass data to populate function
+                    populateView(b.getProgramName(), b.getDescriptionText(), b.getBroadcastTime().getStart(), b.getBroadcastTime().getEnd(), b.getTopic());
+
+                    /*
+                    titleTv.setText(b.getProgramName());
+                    beginTimeTv.setText(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
+                    endTimeTv.setText(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
+                    //topicTv.setText(b.getTopic());
                     expanded = false;
                     fullDescription = b.getDescriptionText();
                     updateExpandedState();
 
-
-                    RadioPlayerButton playButton = (RadioPlayerButton) v.findViewById(R.id.play_button);
                     playButton.setTitle(b.getProgramName());
                     playButton.setDescription(b.getDescriptionText());
                     playButton.setProgramTitle(b.getProgramName());
@@ -115,10 +133,11 @@ public class LiveFragment extends PageFragment {
                     playButton.setEndTime(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
 
                     //Update timeline
-                    DateTime start =  new DateTime(b.getBroadcastTime().getStart());
-                    DateTime end =  new DateTime(b.getBroadcastTime().getEnd());
+                    DateTime start = new DateTime(b.getBroadcastTime().getStart());
+                    DateTime end = new DateTime(b.getBroadcastTime().getEnd());
                     timeline.setProgress(start, end);
 
+                    */
                     //TODO get audio URL playButton.setUrl(b.get);
                 } else {
                     if (listener != null) {
@@ -140,6 +159,29 @@ public class LiveFragment extends PageFragment {
         return v;
     }
 
+    private void populateView(String title, String description, String startTime, String endTime, String topic)
+    {
+        titleTv.setText(title);
+        beginTimeTv.setText(RestClient.getLocalTime(startTime));
+        endTimeTv.setText(RestClient.getLocalTime(endTime));
+        //topicTv.setText(b.getTopic());
+        expanded = false;
+        fullDescription = description;
+        updateExpandedState();
+
+        playButton.setTitle(title);
+        playButton.setDescription(description);
+        playButton.setProgramTitle(title);
+        playButton.setTopic(topic);
+        playButton.setStartTime(RestClient.getLocalTime(startTime));
+        playButton.setEndTime(RestClient.getLocalTime(endTime));
+
+        //Update timeline
+        DateTime start = new DateTime(startTime);
+        DateTime end = new DateTime(endTime);
+        timeline.setProgress(start, end);
+    }
+
     @Override
     public void onActivityCreated(Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
@@ -150,6 +192,9 @@ public class LiveFragment extends PageFragment {
 
     @Override
     public void onAttach(Activity activity) {
+
+        //getMainActivity().getRadioPlayer()
+
         super.onAttach(activity);
         try {
             listener = (OnFragmentInteractionListener) activity;
@@ -169,6 +214,9 @@ public class LiveFragment extends PageFragment {
             throw new ClassCastException(activity.toString()
                     + " must implement PlayerFragment.RadioPlayerProvider");
         }
+
+        LiveContentUpdater.getInstance().addListener(this);
+
     }
 
     @Override
@@ -187,6 +235,8 @@ public class LiveFragment extends PageFragment {
         } catch (IllegalAccessException e) {
             throw new RuntimeException(e);
         }
+
+        LiveContentUpdater.getInstance().removeListener(this);
     }
 
     //Description expand
@@ -204,22 +254,24 @@ public class LiveFragment extends PageFragment {
         desctiptionTv.setText(getDescription());
     }
 
-    private String getDescription()
-    {
-        if(expanded)
-        {
+    private String getDescription() {
+        if (expanded) {
             return fullDescription;
         }
 
         int stubCutoffLimit = 150;
         int stubLength = 100;
-        if(fullDescription.length() < stubCutoffLimit)
-        {
+        if (fullDescription.length() < stubCutoffLimit) {
             expandButton.setVisibility(View.GONE);
             return fullDescription;
         }
 
-        return fullDescription.substring(0,stubLength)+"...";
+        return fullDescription.substring(0, stubLength) + "...";
     }
 
+    @Override
+    public void OnUpdate(Broadcast broadcast)
+    {
+        Log.i("PS", "update content in live view");
+    }
 }

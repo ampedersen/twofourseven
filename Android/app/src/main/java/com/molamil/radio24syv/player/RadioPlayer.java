@@ -11,11 +11,15 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.molamil.radio24syv.R;
+import com.molamil.radio24syv.api.model.Broadcast;
 import com.molamil.radio24syv.api.model.Podcast;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 import java.util.Map;
 
@@ -32,6 +36,7 @@ public class RadioPlayer {
     public final static int ACTION_PAUSE = 2;
     public final static int ACTION_NEXT = 3;
     public final static int ACTION_PREVIOUS = 4;
+    public final static int ACTION_UPDATE_DATA_ONLY = 5;
 
     public final static int PLAYLIST_NONE = -1;
     public final static int PLAYLIST_PODCAST = 0;
@@ -243,6 +248,15 @@ public class RadioPlayer {
         }
     }
 
+    public boolean isLive()
+    {
+        if (isBoundToService) {
+            return service.isLiveUrl(service.getUrl());
+        } else {
+            return false;
+        }
+    }
+
     public void addListener(OnPlaybackListener listener) {
         if (!listenerList.contains(listener)) {
             listenerList.add(listener);
@@ -288,6 +302,21 @@ public class RadioPlayer {
 
     public static boolean isLocalUrl(final String url) {
         return (url == RadioPlayer.URL_UNASSIGNED) || (!url.startsWith("http://"));
+    }
+
+    public void updateData(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId) {
+        this.url = url;
+        this.title = title;
+        this.description = description;
+        this.programTitle = programTitle;
+        this.topic = topic;
+        this.startTime = startTime;
+        this.endTime = endTime;
+        this.playlistType = playlistType;
+        this.programId = programId;
+
+
+        setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_UPDATE_DATA_ONLY);
     }
 
     public void play(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId) {
