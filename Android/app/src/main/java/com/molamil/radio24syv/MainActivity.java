@@ -146,6 +146,7 @@ public class MainActivity extends FragmentActivity implements
             }
 
         }
+
     }
 
     @Override
@@ -168,7 +169,6 @@ public class MainActivity extends FragmentActivity implements
 
         //Update Program notifications
         UpdateProgramNotifications();
-
 
         // Hockeyapp
         checkForCrashes();
@@ -631,8 +631,9 @@ public class MainActivity extends FragmentActivity implements
                         if (body != null) {
                             Broadcast broadcast = body.get(0);
                             //TODO: videoProgramId is sometimes null. Should use slug here instead?
-                            addToPlayerHistory(broadcast.getVideoProgramId()); // Add program ID to player history
-
+                            if(broadcast.getVideoProgramId() != null) {
+                                addToPlayerHistory(broadcast.getVideoProgramId()); // Add program ID to player history
+                            }
                             PlayerFragment playerFragment = (PlayerFragment)mainFragment.getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
                             if (playerFragment != null) {
                                 /*

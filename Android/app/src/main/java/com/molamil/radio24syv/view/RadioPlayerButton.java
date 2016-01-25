@@ -242,6 +242,15 @@ public class RadioPlayerButton extends Button implements
 
     public void clickAction()
     {
+        //Redundant, both checks are done in onClick?
+        if (player == null) {
+            return;
+        }
+
+        if (!isAvailable()) {
+            return; // Return, cannot click button
+        }
+
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
                 player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic(), getStartTime(), getEndTime(), getPlayListType(), getProgramId());

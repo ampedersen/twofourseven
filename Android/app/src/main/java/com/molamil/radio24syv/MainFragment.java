@@ -109,16 +109,10 @@ public class MainFragment extends Fragment {
             }
 
         }
-        //if(!playerFragment.isAdded() && getActivity() != null)
-        //{
 
-        // BUG: This is causing a crash when reopening app after it has been closed while the player is playing (podcast, not sure abt live)
+        // BUG: This is causing a crash when reopening app after it has been closed while the player is playing (podcast, live and news works fine)
         // java.lang.IllegalStateException: Activity has been destroyed
-        //}
-
         getChildFragmentManager().beginTransaction().replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
-
-
 
     }
 
@@ -140,7 +134,6 @@ public class MainFragment extends Fragment {
                     + " must implement OnMainFragmentInteractionListener");
         }
     }
-
 
     @Override
     public void onDetach() {
