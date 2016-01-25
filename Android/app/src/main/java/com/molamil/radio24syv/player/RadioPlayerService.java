@@ -1,6 +1,7 @@
 package com.molamil.radio24syv.player;
 
 import android.app.Notification;
+import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.Service;
 import android.content.ComponentName;
@@ -387,6 +388,7 @@ public class RadioPlayerService extends Service implements
                     .setSmallIcon(smallIconId)
                     .setContentTitle(title)
                     .setContentText(description)
+                    .setAutoCancel(true)
                     .setContentIntent(intent);
 
             //Style. Depends on state of player
@@ -406,7 +408,11 @@ public class RadioPlayerService extends Service implements
             builder.addAction(getPrevious() == null ? R.drawable.next_button_disabled : R.drawable.next_button, "prev", getPlaybackAction(ACTION_PREVIOUS));
 
             Notification notification = builder.build();
-            startForeground(NOTIFICATION_ID, notification);
+            notification.flags = Notification.FLAG_AUTO_CANCEL;
+            //startForeground(NOTIFICATION_ID, notification); //Causes non-swipeable notification
+
+            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager.notify(NOTIFICATION_ID, notification);
 
         /*
         } else {
