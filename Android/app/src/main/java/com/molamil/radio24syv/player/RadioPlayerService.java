@@ -400,8 +400,11 @@ public class RadioPlayerService extends Service implements
             //Prev action
             builder.addAction(getPrevious() == null ? R.drawable.prev_button_disabled : R.drawable.prev_button, "prev", getPlaybackAction(ACTION_PREVIOUS));
 
-            //Play/pause/stop action.TODO: Stop button whith live content
             int playBtnDrawable = action == RadioPlayer.ACTION_PLAY ? R.drawable.button_pause_program : R.drawable.button_play_program;
+            if(isLiveUrl(getUrl()))
+            {
+                playBtnDrawable = action == RadioPlayer.ACTION_PLAY ? R.drawable.button_stop_program : R.drawable.button_play_program;
+            }
             builder.addAction(playBtnDrawable, "pause", getPlaybackAction(ACTION_TOGGLE_PLAYBACK));
 
             //next action
@@ -409,6 +412,7 @@ public class RadioPlayerService extends Service implements
 
             Notification notification = builder.build();
             notification.flags = Notification.FLAG_AUTO_CANCEL;
+
             //startForeground(NOTIFICATION_ID, notification); //Causes non-swipeable notification
 
             NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
