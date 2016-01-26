@@ -39,6 +39,7 @@ android {
             // Hockeyapp
             buildConfigField "String", "HOCKEYAPP_APP_ID", "\"d1b33bd456905d94da471cb4599e8c10\""
             buildConfigField "boolean", "HOCKEYAPP_UPDATES_ENABLED", "true"
+            //buildConfigField "String", "GA_TRACKING_ID", "UA-72905518-1"
 
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -48,6 +49,7 @@ android {
             // TODO different HOCKEYAPP_APP_ID for release
             buildConfigField "String", "HOCKEYAPP_APP_ID", "\"d1b33bd456905d94da471cb4599e8c10\""
             buildConfigField "boolean", "HOCKEYAPP_UPDATES_ENABLED", "false"
+            //buildConfigField "String", "GA_TRACKING_ID", "UA-72905518-1"
 
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -79,5 +81,6 @@ dependencies {
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta1'
     compile 'joda-time:joda-time:2.8.2'
     compile 'com.nostra13.universalimageloader:universal-image-loader:1.9.4'
+    compile 'com.google.android.gms:play-services-analytics:8.4.0'
 }
-
+//apply plugin: 'com.google.gms.google-services'

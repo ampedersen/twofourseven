@@ -197,6 +197,12 @@ public class NewsFragment extends Fragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Radio24syvApp.getInstance().trackScreenView("News Screen");
+    }
+
     public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {
     }
 

@@ -85,6 +85,12 @@ public class IntroActivity extends FragmentActivity {
         returningUserCheck();
     }
 
+    @Override
+    protected void onResume() {
+        super.onResume();
+        //Radio24syvApp.getInstance().trackScreenView("Intro Screen");
+    }
+
     private void startMainActivity() {
         Intent i = new Intent(this, MainActivity.class);
         startActivity(i);
@@ -117,6 +123,9 @@ public class IntroActivity extends FragmentActivity {
 
         cleanupVideo(previousPage);
         updateUI(currentPage);
+
+
+        Radio24syvApp.getInstance().trackScreenView("Intro Screen "+currentPage);
 
         if(currentPage == 0)
         {

@@ -258,6 +258,12 @@ public class ProgramSearchFragment extends PageFragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Radio24syvApp.getInstance().trackScreenView("Podcast Search Screen");
+    }
+
     public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {
         public void onProgramSelected(ProgramInfo program);
     }

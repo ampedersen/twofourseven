@@ -154,6 +154,12 @@ public class ScheduleFragment extends PageFragment {
         buttonListener = null;
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Radio24syvApp.getInstance().trackScreenView("Schedule Screen");
+    }
+
     public interface OnFragmentInteractionListener extends PageFragment.OnFragmentInteractionListener {
     }
 

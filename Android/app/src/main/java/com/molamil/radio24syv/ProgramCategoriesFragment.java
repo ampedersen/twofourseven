@@ -133,6 +133,12 @@ public class ProgramCategoriesFragment extends PageFragment {
         }
     }
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        Radio24syvApp.getInstance().trackScreenView("Podcast Categories Screen");
+    }
+
     public interface OnFragmentInteractionListener {
         void OnProgramCategorySelected(int categoryId, TopicInfo topic);
     }

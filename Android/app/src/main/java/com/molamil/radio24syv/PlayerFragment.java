@@ -265,6 +265,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         timelineHandler.removeCallbacks(timelineRunnable);
     }
 
+
+
     private void setupPlaybackButtons(RadioPlayer player, View parentView) {
         // Link all buttons to always show current playback status
         setupButton(player, parentView, R.id.small_play_button);
@@ -324,12 +326,14 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         if (size == PlayerSize.NONE) {
             parentView.setVisibility(View.GONE);
         } else {
+
             parentView.setVisibility(View.VISIBLE);
             View bigPlayer = parentView.findViewById(R.id.big_player);
             View smallPlayer = parentView.findViewById(R.id.small_player);
             ImageButton expandButton = (ImageButton) parentView.findViewById(R.id.size_button);
             int targetColorId;
             if (size == PlayerSize.BIG) {
+                Radio24syvApp.getInstance().trackScreenView("Player Screen Big");
                 bigPlayer.setVisibility(View.VISIBLE);
                 smallPlayer.setVisibility(View.GONE);
                 expandButton.setImageResource(R.drawable.collapse_player_button);
@@ -337,6 +341,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
                 //Remove fling gesture
             } else {
+                Radio24syvApp.getInstance().trackScreenView("Player Screen Small");
                 bigPlayer.setVisibility(View.GONE);
                 smallPlayer.setVisibility(View.VISIBLE);
                 expandButton.setImageResource(R.drawable.expand_player_button);

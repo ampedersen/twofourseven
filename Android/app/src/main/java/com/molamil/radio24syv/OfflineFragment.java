@@ -118,4 +118,12 @@ public class OfflineFragment extends PageFragment {
         public void onFragmentInteraction(Uri uri);
     }
 
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Radio24syvApp.getInstance().trackScreenView("Offline Screen");
+    }
+
+
 }

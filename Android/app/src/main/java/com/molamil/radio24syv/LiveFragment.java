@@ -32,7 +32,6 @@ import java.util.List;
 import retrofit.Callback;
 import retrofit.Response;
 
-
 /**
  * A simple {@link Fragment} subclass.
  * Activities that contain this fragment must implement the
@@ -239,6 +238,12 @@ public class LiveFragment extends PageFragment implements OnUpdateListener {
         }
 
         LiveContentUpdater.getInstance().removeListener(this);
+    }
+
+    @Override
+    public void onResume() {
+        super.onResume();
+        Radio24syvApp.getInstance().trackScreenView("Live Screen");
     }
 
     //Description expand

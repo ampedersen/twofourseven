@@ -392,6 +392,12 @@ public class ProgramDetailsFragment extends PageFragment implements
     }
 
     @Override
+    public void onResume() {
+        super.onResume();
+        Radio24syvApp.getInstance().trackScreenView("Podcast Details Screen");
+    }
+
+    @Override
     public void onPodcastEpisodeViewSizeChanged(PodcastEpisodeView view, PodcastEpisodeView.Size size) {
         if (size == PodcastEpisodeView.Size.EXPANDED) {
             View oldExpandedView = expandedView;
