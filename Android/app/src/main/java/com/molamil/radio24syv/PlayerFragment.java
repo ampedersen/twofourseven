@@ -360,7 +360,6 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         programInfo.setName(player.getTitle());
         programInfo.setDescription(player.getDescription());
         programInfo.setTopic(player.getTopic());
-        programInfo.setTopic(player.getTopic());
         programInfo.setStartTime(player.getStartTime());
         programInfo.setEndTime(player.getEndTime());
 
@@ -382,6 +381,35 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         UpdateTimeLines(player);
     }
 
+    /*
+    //TODO: FIX Duplicate code
+    public void updatePlayer(Broadcast b) {
+
+        RadioPlayer player = radioPlayerProvider.getRadioPlayer();
+        programInfo.setName(b.getProgramName());
+        programInfo.setDescription(b.getDescriptionText());
+        programInfo.setTopic(b.getTopic());
+        programInfo.setStartTime(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
+        programInfo.setEndTime(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
+
+        //TODO: Handle Program title vs podcast title.
+        //programInfo.setName(player.getProgramTitle());
+
+        View v = getView();
+        if (v == null) {
+            return;
+        }
+        View bigPlayer = v.findViewById(R.id.big_player);
+        View smallPlayer = v.findViewById(R.id.small_player);
+        if (size == PlayerSize.BIG) {
+            updateBigPlayer(bigPlayer, programInfo);
+        } else {
+            updateSmallPlayer(smallPlayer, programInfo);
+        }
+
+        UpdateTimeLines(player);
+    }
+*/
     public void setImageUrl(String imageUrl) {
         programInfo.setImageUrl(imageUrl);
         updatePlayer();
@@ -552,5 +580,6 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     public void OnUpdate(Broadcast broadcast)
     {
         updatePlayer();
+        //updatePlayer(broadcast);
     }
 }

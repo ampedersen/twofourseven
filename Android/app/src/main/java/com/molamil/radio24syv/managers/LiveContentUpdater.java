@@ -117,12 +117,6 @@ public class LiveContentUpdater
                 {
                     Broadcast b = body.get(0);
 
-                    //Update even if there's no change
-                    for (OnUpdateListener l : listenerList)
-                    {
-                        l.OnUpdate(b);
-                    }
-
                     //Update player data. Updated data will stop manager from trying to reload new content since progress will get reset
                     player.updateData(
                             player.getUrl(),
@@ -134,6 +128,12 @@ public class LiveContentUpdater
                             RestClient.getLocalTime(b.getBroadcastTime().getEnd()),
                             -1,
                             player.getProgramId());
+                    
+                    //Update even if there's no change
+                    for (OnUpdateListener l : listenerList)
+                    {
+                        l.OnUpdate(b);
+                    }
 
                 }
 
