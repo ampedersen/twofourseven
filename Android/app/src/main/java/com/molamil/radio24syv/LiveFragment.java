@@ -9,6 +9,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 
@@ -19,6 +20,7 @@ import com.molamil.radio24syv.components.TimeLine;
 import com.molamil.radio24syv.managers.LiveContentUpdater;
 import com.molamil.radio24syv.managers.LiveContentUpdater.OnUpdateListener;
 import com.molamil.radio24syv.player.RadioPlayer;
+import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.RadioPlayerButton;
 
 import org.joda.time.DateTime;
@@ -56,6 +58,7 @@ public class LiveFragment extends PageFragment implements OnUpdateListener {
     private TextView beginTimeTv;
     private TextView endTimeTv;
     private TextView desctiptionTv;
+    private ProgramImageView coverIv;
 
     private RadioPlayerButton playButton;
 
@@ -76,6 +79,8 @@ public class LiveFragment extends PageFragment implements OnUpdateListener {
         endTimeTv = ((TextView) v.findViewById(R.id.program_time_end));
 
         playButton = (RadioPlayerButton) v.findViewById(R.id.play_button);
+
+        coverIv = (ProgramImageView) v.findViewById(R.id.image_cover);
 
         Button scheduleButton = (Button)v.findViewById(R.id.schedule_button);
         scheduleButton.setOnClickListener(new View.OnClickListener() {
@@ -113,31 +118,8 @@ public class LiveFragment extends PageFragment implements OnUpdateListener {
                     if (v == null)
                         return; // We are still assigned as a callback to the previous instance of the fragment. TODO store the call in a variable, cancel it in onDestroy to getInstance rid of callbacks.
 
-                    //TODO: Pass data to populate function
                     populateView(b);
-                    /*
-                    titleTv.setText(b.getProgramName());
-                    beginTimeTv.setText(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
-                    endTimeTv.setText(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
-                    //topicTv.setText(b.getTopic());
-                    expanded = false;
-                    fullDescription = b.getDescriptionText();
-                    updateExpandedState();
 
-                    playButton.setTitle(b.getProgramName());
-                    playButton.setDescription(b.getDescriptionText());
-                    playButton.setProgramTitle(b.getProgramName());
-                    playButton.setTopic(b.getTopic());
-                    playButton.setStartTime(RestClient.getLocalTime(b.getBroadcastTime().getStart()));
-                    playButton.setEndTime(RestClient.getLocalTime(b.getBroadcastTime().getEnd()));
-
-                    //Update timeline
-                    DateTime start = new DateTime(b.getBroadcastTime().getStart());
-                    DateTime end = new DateTime(b.getBroadcastTime().getEnd());
-                    timeline.setProgress(start, end);
-
-                    */
-                    //TODO get audio URL playButton.setUrl(b.get);
                 } else {
                     if (listener != null) {
                         listener.onError(response.message());
@@ -186,6 +168,20 @@ public class LiveFragment extends PageFragment implements OnUpdateListener {
         DateTime start = new DateTime(startTime);
         DateTime end = new DateTime(endTime);
         timeline.setProgress(start, end);
+
+        if(coverIv != null)
+        {
+            if(b.getAppImages().getLive() != null && !b.getAppImages().getLive().isEmpty()) {
+                coverIv.setVisibility(View.VISIBLE);
+                coverIv.setImageUrl(b.getAppImages().getLive()); //This is set to player url externally so it will be correct
+                coverIv.setTintColor(0xffffff);
+            }
+            else
+            {
+                coverIv.setVisibility(View.GONE);
+            }
+        }
+
     }
 
     @Override
