@@ -9,10 +9,18 @@ import android.view.KeyEvent;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.player.RadioPlayerService;
 
+import java.util.logging.Logger;
+
 public class RemoteControlReceiver extends BroadcastReceiver {
 
     @Override
     public void onReceive(Context context, Intent intent) {
+
+        /*
+        Log.d("PS", "RemoteControlReceiver.onReceive:");
+        Log.d("PS", context.getPackageName());
+        Log.d("PS", intent.getPackage());
+        */
         if (intent.getAction().equals(android.media.AudioManager.ACTION_AUDIO_BECOMING_NOISY)) {
 
             //Log.d("PS", "Headphones unplugged");

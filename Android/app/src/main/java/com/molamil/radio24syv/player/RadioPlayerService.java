@@ -418,12 +418,11 @@ public class RadioPlayerService extends Service implements
             NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NOTIFICATION_ID, notification);
 
-        /*
-        } else {
-            Log.d("PS", "Run in background " + RadioPlayer.getActionName(action));
+
+        //} else {
+        //    //Log.d("PS", "Run in background " + RadioPlayer.getActionName(action));
             stopForeground(true); // TODO keep notification if paused?
-        }
-        */
+        //}
     }
 
     public String getUrl() {
@@ -545,16 +544,43 @@ public class RadioPlayerService extends Service implements
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS:
+                //TODO: FIX THIS: setAction causing us to get focus again? All we need to do is stop audio, and update state?
                 Log.d("PS", "Audio focus lost");
-                AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-                //mAudioManager.unregisterMediaButtonEventReceiver(new ComponentName(getPackageName(), RemoteControlReceiver.class.getName()));
+                Log.d("PS", "action: " + action);
 
-                // Lost focus for an unbounded amount of time
                 if (action == RadioPlayer.ACTION_PLAY) {
-                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PAUSE);
-                } else {
-                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_STOP);
+                    if(isLiveUrl(url))
+                    {
+                        if (player != null) {
+                            if (player.isPlaying()) {
+                                player.stop();
+                            }
+                            player.release();
+                            player = null;
+                            state = RadioPlayer.STATE_STOPPED;
+                            sendMessage();
+                        }
+                    }
+                    else
+                    {
+                        if (player != null) {
+                            player.pause();
+                        }
+                        state = RadioPlayer.STATE_PAUSED;
+                        sendMessage();
+                    }
                 }
+
+                //TODO: MAKE UPDATING LOCK SCREEN CONTROLS WORK. Currently they don't update if other app gains audio focus.
+                if(updateLockScreenControls(false))
+                {
+                    //updateRunInForeground(); //Causing notification to reappear if it was swiped away and other app gains audio focus
+                }
+
+                //TODO: Remove remote listeners?
+                //am.unregisterMediaButtonEventReceiver(RemoteControlReceiver);
+                //am.abandonAudioFocus(afChangeListener);
+
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
@@ -753,24 +779,31 @@ public class RadioPlayerService extends Service implements
 
     MediaSessionCompat mSession;
 
-    private boolean updateLockScreenControls()
+    public boolean updateLockScreenControls()
     {
+        return updateLockScreenControls(true);
+    }
+
+    public boolean updateLockScreenControls(boolean requestAudioFocus)
+    {
+
         AudioManager mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-        int result = mAudioManager.requestAudioFocus(this,AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
-        if (result != AudioManager.AUDIOFOCUS_GAIN) {
-            return false; //Failed to gain audio focus
+
+        if(requestAudioFocus) {
+            int result = mAudioManager.requestAudioFocus(this, AudioManager.STREAM_MUSIC, AudioManager.AUDIOFOCUS_GAIN);
+            if (result != AudioManager.AUDIOFOCUS_GAIN) {
+                return false; //Failed to gain audio focus
+            }
         }
 
         ComponentName mRemoteControlResponder = new ComponentName(getPackageName(), RemoteControlReceiver.class.getName());
         final Intent mediaButtonIntent = new Intent(Intent.ACTION_MEDIA_BUTTON);
         mediaButtonIntent.setComponent(mRemoteControlResponder);
 
-        //Log.i("PS", "getApplication(): " + getApplication());
-        //Log.i("PS", "mRemoteControlResponder: "+mRemoteControlResponder);
-
-        mSession = new MediaSessionCompat(getApplication(), "Radio24syv", mRemoteControlResponder, null);
-        mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
-
+        if(mSession == null) {
+            mSession = new MediaSessionCompat(getApplication(), "Radio24syv", mRemoteControlResponder, null);
+            mSession.setFlags(MediaSessionCompat.FLAG_HANDLES_MEDIA_BUTTONS | MediaSessionCompat.FLAG_HANDLES_TRANSPORT_CONTROLS);
+        }
         PlaybackStateCompat playbackStateCompat = new PlaybackStateCompat.Builder()
                 .setActions(
                                 PlaybackStateCompat.ACTION_PLAY_PAUSE |
