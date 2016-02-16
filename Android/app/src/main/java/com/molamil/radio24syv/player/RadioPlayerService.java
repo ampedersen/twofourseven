@@ -18,8 +18,10 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Binder;
+import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
+import android.service.notification.StatusBarNotification;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -266,8 +268,7 @@ public class RadioPlayerService extends Service implements
                         player.start();
                         setState(RadioPlayer.STATE_STARTED);
                     }
-                }
-                else {
+                } else {
                     if (task != null) {
                         task.cancel(true);
                     }
@@ -320,7 +321,7 @@ public class RadioPlayerService extends Service implements
         if(url != null) {
             if(updateLockScreenControls())
             {
-                updateRunInForeground();
+                updateRunInForeground(); //Used on lollipop?
             }
         }
     }
@@ -421,7 +422,7 @@ public class RadioPlayerService extends Service implements
 
         //} else {
         //    //Log.d("PS", "Run in background " + RadioPlayer.getActionName(action));
-            stopForeground(true); // TODO keep notification if paused?
+        //    stopForeground(true); // TODO keep notification if paused?
         //}
     }
 
@@ -544,9 +545,7 @@ public class RadioPlayerService extends Service implements
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS:
-                //TODO: FIX THIS: setAction causing us to get focus again? All we need to do is stop audio, and update state?
                 Log.d("PS", "Audio focus lost");
-                Log.d("PS", "action: " + action);
 
                 if (action == RadioPlayer.ACTION_PLAY) {
                     if(isLiveUrl(url))
@@ -558,6 +557,7 @@ public class RadioPlayerService extends Service implements
                             player.release();
                             player = null;
                             state = RadioPlayer.STATE_STOPPED;
+                            action = RadioPlayer.ACTION_STOP;//Manually set action for notification
                             sendMessage();
                         }
                     }
@@ -567,19 +567,35 @@ public class RadioPlayerService extends Service implements
                             player.pause();
                         }
                         state = RadioPlayer.STATE_PAUSED;
+                        action = RadioPlayer.ACTION_PAUSE;//Manually set action for notification
                         sendMessage();
                     }
-                }
 
-                //TODO: MAKE UPDATING LOCK SCREEN CONTROLS WORK. Currently they don't update if other app gains audio focus.
-                if(updateLockScreenControls(false))
-                {
-                    //updateRunInForeground(); //Causing notification to reappear if it was swiped away and other app gains audio focus
-                }
 
-                //TODO: Remove remote listeners?
-                //am.unregisterMediaButtonEventReceiver(RemoteControlReceiver);
-                //am.abandonAudioFocus(afChangeListener);
+
+                    //if (mSession != null) { mSession.setActive(true); }
+
+                    //TODO: MAKE UPDATING LOCK SCREEN CONTROLS WORK. Currently they don't update if other app gains audio focus.
+                    if(updateLockScreenControls(false))
+                    {
+                        updateRunInForeground();//Not working?
+                        /*
+                        if(myNotification != null)
+                        {
+                            Log.d("PS", "myNotification: "+myNotification);
+                            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+                            notificationManager.notify(NOTIFICATION_ID, myNotification);
+                        }
+                        */
+
+                    }
+
+                    //if (mSession != null) { mSession.setActive(false); }
+
+                    //TODO: Remove remote listeners?
+                    //am.unregisterMediaButtonEventReceiver(RemoteControlReceiver);
+                    //am.abandonAudioFocus(afChangeListener);
+                }
 
                 break;
 
@@ -823,7 +839,7 @@ public class RadioPlayerService extends Service implements
         mSession.setActive(true);
         updateMediaSessionMetaData();
 
-        //TODO: Purpose?
+        //Purpose?
        // mTransportController = mSession.getController().getTransportControls();
 
         return true;
