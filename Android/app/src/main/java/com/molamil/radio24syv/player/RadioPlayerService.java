@@ -378,6 +378,9 @@ public class RadioPlayerService extends Service implements
                 e.printStackTrace();
             }
 
+            boolean playing = action == RadioPlayer.ACTION_PLAY;
+            Log.d("PS", "Update notification");
+
             NotificationCompat.Builder builder =  new NotificationCompat.Builder(getApplicationContext());
 
             builder.setOngoing(true)
@@ -389,7 +392,7 @@ public class RadioPlayerService extends Service implements
                     .setSmallIcon(smallIconId)
                     .setContentTitle(title)
                     .setContentText(description)
-                    .setAutoCancel(true)
+                    .setOngoing(playing) //swipeable toggle
                     .setContentIntent(intent);
 
             //Style. Depends on state of player
@@ -412,9 +415,11 @@ public class RadioPlayerService extends Service implements
             builder.addAction(getPrevious() == null ? R.drawable.next_button_disabled : R.drawable.next_button, "prev", getPlaybackAction(ACTION_PREVIOUS));
 
             Notification notification = builder.build();
-            notification.flags = Notification.FLAG_AUTO_CANCEL;
 
-            //startForeground(NOTIFICATION_ID, notification); //Causes non-swipeable notification
+            //enable/disable swipeable notification
+            if(playing) {
+                notification.flags = Notification.FLAG_ONGOING_EVENT;
+            }
 
             NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NOTIFICATION_ID, notification);
