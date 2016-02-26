@@ -252,6 +252,7 @@ public class RadioPlayerService extends Service implements
             return; // Return, action needs internet connection
         }
 
+        boolean newUrl = this.url == null ? false : !this.url.equalsIgnoreCase(url);
         this.url = url;
         this.title = title;
         this.description = description;
@@ -263,7 +264,7 @@ public class RadioPlayerService extends Service implements
         switch (newAction) {
 
             case RadioPlayer.ACTION_PLAY:
-                if (action == RadioPlayer.ACTION_PAUSE) {
+                if (action == RadioPlayer.ACTION_PAUSE && !newUrl) {
                     if (player != null) {
                         player.start();
                         setState(RadioPlayer.STATE_STARTED);
