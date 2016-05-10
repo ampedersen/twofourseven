@@ -26,7 +26,7 @@ public class RadioViewPager extends ViewPager {
         // This works, except for crash-bug in Android's ViewPager...
         //return this.isPagingEnabled && super.onTouchEvent(event);
 
-        // ..so have to do it like this: https://github.com/chrisbanes/PhotoView/issues/31#issuecomment-19803926
+        // ..so have to do it like this: https://github.com/chrisbanes/PhotoView/issues/31
         if (!this.isPagingEnabled) {
             return false;
         } else {

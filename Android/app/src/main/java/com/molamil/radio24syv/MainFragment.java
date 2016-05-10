@@ -106,7 +106,7 @@ public class MainFragment extends Fragment {
         // BUG: This is causing a crash when reopening app after it has been closed while the player is playing downloaded episode (podcast, live and news works fine)
         // java.lang.IllegalStateException: Activity has been destroyed
         // JJJ: Reproduce = Start app, play podcast (downloaded), exit with physical back button, crashes when relaunched
-        getChildFragmentManager().beginTransaction(). replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
+        getChildFragmentManager().beginTransaction(). replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commitAllowingStateLoss();
     }
 
     @Override
