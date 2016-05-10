@@ -144,7 +144,6 @@ public class MainActivity extends FragmentActivity implements
             if (radioPlayer != null) {
                 radioPlayer.cleanup();
             }
-
         }
 
     }
@@ -180,7 +179,6 @@ public class MainActivity extends FragmentActivity implements
         if(mainFragment.getPlayerFragment() != null)
         {
             if(mainFragment.getPlayerFragment().getSize() == PlayerFragment.PlayerSize.BIG) {
-
                 mainFragment.getPlayerFragment().setSize(PlayerFragment.PlayerSize.SMALL);
                 return;
             }
@@ -190,22 +188,20 @@ public class MainActivity extends FragmentActivity implements
         if (isSidePageInteractionEnabled) {
             boolean isViewingMainPage = (pager.getCurrentItem() == mainPagePosition);
             if (isViewingMainPage) {
-                super.onBackPressed(); // Return to system
+                //super.onBackPressed(); // Return to system
+                moveTaskToBack(true); // Workaround for IllegalStateException in MainFragment.setupPlayerFragment() bug. Works like a press on Home button to avoid destruction of MainActivity which somehow causes the exception to be thrown when app is relaunched after having exited using physical back button.
+                return;
             } else {
                 pager.setCurrentItem(mainPagePosition); // Back to main page
             }
         } else {
             ProgramsFragment f = (ProgramsFragment) mainFragment.getChildFragmentManager().findFragmentByTag(MainFragment.TAG_TAB_PROGRAMS);
-            if (f == null) {
-                Log.d("JJJ", "OMG no programs fragment");
-                super.onBackPressed(); // Return to system
-                return;
-            }
-
-            if (f.isShowingDetails()) {
+            if ((f != null) && f.isShowingDetails()) {
                 f.showList(); // Back to list page
             } else {
-                super.onBackPressed(); // Return to system
+                //super.onBackPressed(); // Return to system
+                moveTaskToBack(true); // Workaround for IllegalStateException in MainFragment.setupPlayerFragment() bug. Works like a press on Home button to avoid destruction of MainActivity which somehow causes the exception to be thrown when app is relaunched after having exited using physical back button.
+                return;
             }
         }
     }
