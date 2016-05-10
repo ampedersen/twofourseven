@@ -153,7 +153,7 @@ public class RadioLibrary {
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         Cursor c = manager.query(q);
 
-        if (c.moveToFirst()) {
+        if ((c != null) && c.moveToFirst()) {
             int statusValue = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
             float progress = c.getFloat(c.getColumnIndex(DownloadManager.COLUMN_BYTES_DOWNLOADED_SO_FAR));
             float total = c.getFloat(c.getColumnIndex(DownloadManager.COLUMN_TOTAL_SIZE_BYTES));
@@ -288,7 +288,7 @@ public class RadioLibrary {
 
         DownloadManager manager = (DownloadManager) context.getSystemService(Context.DOWNLOAD_SERVICE);
         Cursor c = manager.query(new DownloadManager.Query().setFilterById(downloadId));
-        if (c.moveToFirst()) {
+        if ((c != null) && c.moveToFirst()) {
             int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
 
             if (status == DownloadManager.STATUS_SUCCESSFUL) {
