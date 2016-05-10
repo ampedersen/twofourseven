@@ -549,14 +549,16 @@ public class RadioPlayer {
             return null;
         }
 
-        int i=0;
-        for(PodcastInfo p: playlist)
-        {
-            if(i<playlist.size()-2 && getUrl().toLowerCase().contains(p.getAudioUrl().toLowerCase()))
-            {
-                return playlist.get(i+1);
+        String audioUrl = getUrl();
+        if (audioUrl != null) {
+            audioUrl = audioUrl.toLowerCase();
+            int i = 0;
+            for (PodcastInfo p : playlist) {
+                if (i < playlist.size() - 2 && audioUrl.contains(p.getAudioUrl().toLowerCase())) {
+                    return playlist.get(i + 1);
+                }
+                i++;
             }
-            i++;
         }
         return null;
     }
@@ -569,15 +571,17 @@ public class RadioPlayer {
             return null;
         }
 
-        int i=0;
-        for(PodcastInfo p: playlist)
-        {
-            //if(p.getAudioUrl() == getUrl() && i>0)
-            if(i>0 && getUrl().toLowerCase().contains(p.getAudioUrl().toLowerCase()))
-            {
-                return playlist.get(i-1);
+        String audioUrl = getUrl();
+        if (audioUrl != null) {
+            audioUrl = audioUrl.toLowerCase();
+            int i = 0;
+            for (PodcastInfo p : playlist) {
+                //if(p.getAudioUrl() == getUrl() && i>0)
+                if (i > 0 && audioUrl.contains(p.getAudioUrl().toLowerCase())) {
+                    return playlist.get(i - 1);
+                }
+                i++;
             }
-            i++;
         }
         return null;
     }
