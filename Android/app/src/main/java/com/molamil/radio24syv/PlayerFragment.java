@@ -446,15 +446,14 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         enableNextPrevButton(prevButton, player.hasPrevious());
         enableNextPrevButton(nextButton, player.hasNext());
 
-        if(player.getUrl() != getString(R.string.url_live_radio))
-        {
-            timeline.setVisibility(View.GONE);
-            timeLineSeekBar.setVisibility(View.VISIBLE);
-        }
-        else
-        {
-            timeline.setVisibility(View.VISIBLE);
-            timeLineSeekBar.setVisibility(View.GONE);
+        if (isAdded()) {
+            if (player.getUrl() != getString(R.string.url_live_radio)) {
+                timeline.setVisibility(View.GONE);
+                timeLineSeekBar.setVisibility(View.VISIBLE);
+            } else {
+                timeline.setVisibility(View.VISIBLE);
+                timeLineSeekBar.setVisibility(View.GONE);
+            }
         }
     }
 
@@ -501,30 +500,31 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         String end = player.getEndTime();
 
         //Not live, playing mp3 file. Calc progress from file progress instead
-        if(player.getUrl() != getString(R.string.url_live_radio))
-        {
-            float pct = player.getProgress();
-            int duration = player.getDuration();
-            timeline.setProgress(pct);
-            smallTimeLine.setProgress(pct);
-            timeLineSeekBar.setProgress(pct);
+        if (isAdded()) {
+            if (player.getUrl() != getString(R.string.url_live_radio)) {
+                float pct = player.getProgress();
+                int duration = player.getDuration();
+                timeline.setProgress(pct);
+                smallTimeLine.setProgress(pct);
+                timeLineSeekBar.setProgress(pct);
 
-            //start and end times
-            int past = (int)(pct*duration);
-            int left = duration - past;
+                //start and end times
+                int past = (int) (pct * duration);
+                int left = duration - past;
 
-            int s0 = (int) (past / 1000) % 60 ;
-            int m0 = (int) ((past / (1000*60)) % 60);
-            int s1 = (int) (left / 1000) % 60 ;
-            int m1 = (int) ((left / (1000*60)) % 60);
+                int s0 = (int) (past / 1000) % 60;
+                int m0 = (int) ((past / (1000 * 60)) % 60);
+                int s1 = (int) (left / 1000) % 60;
+                int m1 = (int) ((left / (1000 * 60)) % 60);
 
-            String elapsed = String.format("%02d", m0)+":"+ String.format("%02d", s0);
-            String remaining = "-"+String.format("%02d", m1)+":"+ String.format("%02d", s1);
+                String elapsed = String.format("%02d", m0) + ":" + String.format("%02d", s0);
+                String remaining = "-" + String.format("%02d", m1) + ":" + String.format("%02d", s1);
 
-            startTimeLabel.setText( elapsed );
-            endTimeLabel.setText( remaining );
+                startTimeLabel.setText(elapsed);
+                endTimeLabel.setText(remaining);
 
-            return;
+                return;
+            }
         }
 
         Date now = new Date();
