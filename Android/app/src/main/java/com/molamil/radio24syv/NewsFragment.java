@@ -58,7 +58,7 @@ public class NewsFragment extends Fragment {
         final View v = inflater.inflate(R.layout.fragment_news, container, false);
 
         progressBar = (ProgressBar)v.findViewById(R.id.activity_indicator);
-        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.MULTIPLY);
+        progressBar.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.SRC_ATOP); // SRC_ATOP works on Android 5, MULTIPLY makes the spinner invisible for some reason
 
         showActivityIndicator(v, true);
 

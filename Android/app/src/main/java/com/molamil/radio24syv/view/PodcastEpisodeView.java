@@ -151,7 +151,7 @@ public class PodcastEpisodeView extends LinearLayout implements
 
         ProgressBar activity = (ProgressBar) findViewById(R.id.download_activity_indicator);
         activity.setVisibility(playable ? GONE : VISIBLE);
-        activity.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.MULTIPLY);
+        activity.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.SRC_ATOP); // SRC_ATOP works on Android 5, MULTIPLY makes the spinner invisible for some reason
 
     }
 

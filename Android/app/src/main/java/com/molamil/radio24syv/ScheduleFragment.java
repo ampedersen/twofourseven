@@ -53,7 +53,7 @@ public class ScheduleFragment extends PageFragment {
         final View v = inflater.inflate(R.layout.fragment_schedule, container, false);
 
         progressSpinner = (ProgressBar) v.findViewById(R.id.activity_indicator);
-        progressSpinner.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.MULTIPLY);
+        progressSpinner.getIndeterminateDrawable().setColorFilter(getResources().getColor(R.color.radio_red), android.graphics.PorterDuff.Mode.SRC_ATOP); // SRC_ATOP works on Android 5, MULTIPLY makes the spinner invisible for some reason
 
         RestClient.getApi().getNextBroadcasts(20, 0).enqueue(new Callback<List<Broadcast>>() {
             @Override
