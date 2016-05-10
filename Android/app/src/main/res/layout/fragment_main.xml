@@ -4,7 +4,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context="com.molamil.radio24syv.MainFragment"
-    android:background="@color/radio_gray_dark"
+    android:background="@color/player_background"
     >
 
     <LinearLayout
@@ -33,15 +33,17 @@
                 android:alpha="0"
                 />
 
-            <TextView
+            <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
                 android:id="@+id/error_text"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:background="@color/radio_gray_dark"
-                android:textColor="@color/radio_yellow"
+                android:background="@color/player_background"
+                android:textColor="@color/radio_red"
                 android:layout_gravity="bottom|center_horizontal"
                 android:gravity="center"
                 android:visibility="gone"
+                android:textSize="12sp"
+                style="@style/BaseButton"
                 />
 
         </FrameLayout>
