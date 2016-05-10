@@ -27,7 +27,7 @@
     <string name="tab_programs">Podcasts</string>
     <string name="tab_news">Seneste nyt</string>
     <string name="tab_offline">Downloadede</string>
-    <string name="error_generic">Kunne ikke få forbindelse, beklager.</string>
+    <string name="error_generic">Ingen forbindelse til Radio24syv, beklager.</string>
     <string name="loading">Indlæser...</string>
 
     <!-- Player -->
