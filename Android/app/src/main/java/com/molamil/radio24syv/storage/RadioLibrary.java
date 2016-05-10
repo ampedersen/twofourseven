@@ -188,7 +188,9 @@ public class RadioLibrary {
             Log.d("JJJ", "Unable to query downloadmanager about downloadId " + downloadId);
         }
 
-        c.close();
+        if (c != null) {
+            c.close();
+        }
 
         return status;
     }
@@ -290,6 +292,7 @@ public class RadioLibrary {
         Cursor c = manager.query(new DownloadManager.Query().setFilterById(downloadId));
         if ((c != null) && c.moveToFirst()) {
             int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
+            c.close();
 
             if (status == DownloadManager.STATUS_SUCCESSFUL) {
                 return true; // Download is valid, celebrate
@@ -299,6 +302,11 @@ public class RadioLibrary {
                 return false;
             }
         }
+
+        if (c != null) {
+            c.close();
+        }
+
         return false;
     }
 
