@@ -23,12 +23,38 @@ public class RadioViewPager extends ViewPager {
 
     @Override
     public boolean onTouchEvent(MotionEvent event) {
-        return this.isPagingEnabled && super.onTouchEvent(event);
+        // This works, except for crash-bug in Android's ViewPager...
+        //return this.isPagingEnabled && super.onTouchEvent(event);
+
+        // ..so have to do it like this: https://github.com/chrisbanes/PhotoView/issues/31#issuecomment-19803926
+        if (!this.isPagingEnabled) {
+            return false;
+        } else {
+            try {
+                return super.onTouchEvent(event);
+            } catch (IllegalArgumentException ex) {
+                ex.printStackTrace(); // Catch "IllegalArgumentException: pointerIndex out of range" MotionEvent.nativeGetAxisValue
+            }
+            return false;
+        }
     }
 
     @Override
     public boolean onInterceptTouchEvent(MotionEvent event) {
-        return this.isPagingEnabled && super.onInterceptTouchEvent(event);
+        // This works, except for crash-bug in Android's ViewPager...
+        //return this.isPagingEnabled && super.onInterceptTouchEvent(event);
+
+        // ..so have to do it like this: https://github.com/chrisbanes/PhotoView/issues/31#issuecomment-19803926
+        if (!this.isPagingEnabled) {
+            return false;
+        } else {
+            try {
+                return super.onInterceptTouchEvent(event);
+            } catch (IllegalArgumentException ex) {
+                ex.printStackTrace(); // Catch "IllegalArgumentException: pointerIndex out of range" MotionEvent.nativeGetAxisValue
+            }
+            return false;
+        }
     }
 
     public void setPagingEnabled(boolean b) {
