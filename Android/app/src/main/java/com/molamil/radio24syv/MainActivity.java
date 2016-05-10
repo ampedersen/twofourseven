@@ -88,7 +88,7 @@ public class MainActivity extends FragmentActivity implements
             if (state == TelephonyManager.CALL_STATE_RINGING) {
                 if(radioPlayer != null)
                 {
-                    radioPlayer.stop();
+                    radioPlayer.pause();
                 }
             } else if(state == TelephonyManager.CALL_STATE_IDLE) {
 
