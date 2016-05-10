@@ -1,10 +1,12 @@
 package com.molamil.radio24syv;
 
 import android.app.Activity;
+import android.app.FragmentManager;
 import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTabHost;
+import android.support.v4.app.FragmentTransaction;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -92,30 +94,20 @@ public class MainFragment extends Fragment {
         return v;
     }
 
-    private void setupPlayerFragment(Bundle savedInstanceState)
-    {
+    private void setupPlayerFragment(Bundle savedInstanceState) {
         if (savedInstanceState != null) {
             playerFragment = (PlayerFragment) getChildFragmentManager().findFragmentByTag(PlayerFragment.class.getName());
         } else {
             if (playerFragment == null) {
                 playerFragment = new PlayerFragment();
             }
-
         }
 
-        // BUG: This is causing a crash when reopening app after it has been closed while the player is playing (podcast, live and news works fine)
+        // BUG: This is causing a crash when reopening app after it has been closed while the player is playing downloaded episode (podcast, live and news works fine)
         // java.lang.IllegalStateException: Activity has been destroyed
-        getChildFragmentManager().beginTransaction().replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
-
+        // JJJ: Reproduce = Start app, play podcast (downloaded), exit with physical back button, crashes when relaunched
+        getChildFragmentManager().beginTransaction(). replace(R.id.player_fragment_container, playerFragment, PlayerFragment.class.getName()).commit();
     }
-
-//    @Override
-//    public void onSaveInstanceState(Bundle savedInstanceState) {
-//
-//        super.onSaveInstanceState(savedInstanceState);
-//        getChildFragmentManager()
-//                .putFragment(savedInstanceState, PlayerFragment.class.getName(), playerFragment);
-//    }
 
     @Override
     public void onAttach(Context context) {
