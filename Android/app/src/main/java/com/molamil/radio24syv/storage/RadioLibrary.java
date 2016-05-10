@@ -292,7 +292,6 @@ public class RadioLibrary {
         Cursor c = manager.query(new DownloadManager.Query().setFilterById(downloadId));
         if ((c != null) && c.moveToFirst()) {
             int status = c.getInt(c.getColumnIndex(DownloadManager.COLUMN_STATUS));
-            c.close();
 
             if (status == DownloadManager.STATUS_SUCCESSFUL) {
                 return true; // Download is valid, celebrate
