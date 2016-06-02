@@ -81,6 +81,14 @@ public class RadioPlayerService extends Service implements
 
     private final IBinder binder = new RadioPlayerServiceBinder(); // Binder given to clients
 
+    /*PS.
+        * OnAudioFocusChangeListener pauses playback when audiofocus is lost. When focus is gained it restarts if state is paused.
+        * It should only restart if playback was paused by gain loss, not if it was by user action.
+        * This flag is used to track that. It might be possible to track using difference between action and state but this was easier to handle
+        * without potential side effects
+    */
+    private boolean playbackPausedByAudioFocusLoss = false;
+
     private int state = RadioPlayer.STATE_STOPPED;
     private String url = RadioPlayer.URL_UNASSIGNED;
     private String title;
@@ -251,6 +259,8 @@ public class RadioPlayerService extends Service implements
             Log.d("JJJ", "Unable to perform action " + newAction + " because it requires internet connection");
             return; // Return, action needs internet connection
         }
+
+        playbackPausedByAudioFocusLoss = false;
 
         boolean newUrl = this.url == null ? false : !this.url.equalsIgnoreCase(url);
         this.url = url;
@@ -538,11 +548,17 @@ public class RadioPlayerService extends Service implements
     }
 
     public void onAudioFocusChange(int focusChange) {
+        Log.d("AudioFocusChange:", "AudioFocusChange ...");
+        Log.d("AudioFocusChange:", "focusChange: "+focusChange);
+        Log.d("AudioFocusChange:", "action: "+action);
+        Log.d("AudioFocusChange:", "state: "+state);
+
         switch (focusChange) {
             case AudioManager.AUDIOFOCUS_GAIN:
-                Log.d("PS", "Audio focus gained");
-                // Resume playback
-                if (action == RadioPlayer.ACTION_PAUSE) {
+                Log.d("AudioFocusChange:", "Audio focus gained");
+
+                // Resume playback?
+                if (action == RadioPlayer.ACTION_PAUSE && playbackPausedByAudioFocusLoss) {
                     setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PLAY);
                 }
                 if (player != null) {
@@ -551,7 +567,7 @@ public class RadioPlayerService extends Service implements
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS:
-                Log.d("PS", "Audio focus lost");
+                Log.d("AudioFocusChange", "Audio focus lost");
 
                 if (action == RadioPlayer.ACTION_PLAY) {
                     if(isLiveUrl(url))
@@ -606,13 +622,17 @@ public class RadioPlayerService extends Service implements
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT:
-                Log.d("PS", "Audio focus lost temporarily");
-                // Lost focus for a short time, but we have to stop playback. Playback is likely to resume.
-                setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PAUSE);
+                Log.d("AudioFocusChange", "Audio focus lost temporarily");
+
+                //if (state == RadioPlayer.STATE_STARTED) {
+                if (action == RadioPlayer.ACTION_PLAY) {
+                    setAction(url, title, description, programTitle, topic, startTime, endTime, programId, RadioPlayer.ACTION_PAUSE);
+                    playbackPausedByAudioFocusLoss = true;
+                }
                 break;
 
             case AudioManager.AUDIOFOCUS_LOSS_TRANSIENT_CAN_DUCK:
-                Log.d("PS", "Audio focus duck");
+                Log.d("AudioFocusChange", "Audio focus duck");
                 // Lost focus for a short time, but it's ok to keep playing at an attenuated level
                 if (player != null) {
                     player.setVolume(0.2f, 0.2f);
