@@ -127,7 +127,9 @@ public class LiveContentUpdater
                             RestClient.getLocalTime(b.getBroadcastTime().getStart()),
                             RestClient.getLocalTime(b.getBroadcastTime().getEnd()),
                             -1,
-                            player.getProgramId());
+                            player.getProgramId(),
+                            player.getPodcastId(),
+                            player.getRating());
                     
                     //Update even if there's no change
                     for (OnUpdateListener l : listenerList)

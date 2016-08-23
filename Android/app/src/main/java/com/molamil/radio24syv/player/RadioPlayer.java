@@ -79,9 +79,12 @@ public class RadioPlayer {
     private String programTitle = null;
     private String startTime = null;
     private String endTime = null;
+
+    private String rating = null;
     private int playlistType = PLAYLIST_NONE;
 
     private int programId = -1;
+    private int podcastId = -1;
     private Context context;
     private RadioPlayerService service = null;
     private boolean isBoundToService;
@@ -136,6 +139,10 @@ public class RadioPlayer {
 //            return Storage.PROGRAM_ID_UNKNOWN;
 //        }
 //    }
+
+    public int getPodcastId() {
+        return podcastId;
+    }
 
     public String getUrl() {
         if (isBoundToService) {
@@ -248,6 +255,18 @@ public class RadioPlayer {
         }
     }
 
+    public String getRating() {
+        return rating;
+    }
+
+    public Float getRatingFloat() {
+        try {
+            Float result = Float.parseFloat(getRating());
+            return result;
+        } catch (Exception exception) {}
+        return 0.0f;
+    }
+
     public boolean isLive()
     {
         if (isBoundToService) {
@@ -304,7 +323,7 @@ public class RadioPlayer {
         return (url == RadioPlayer.URL_UNASSIGNED) || (!url.startsWith("http://"));
     }
 
-    public void updateData(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId) {
+    public void updateData(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId, int podcastId, String rating) {
         this.url = url;
         this.title = title;
         this.description = description;
@@ -314,12 +333,14 @@ public class RadioPlayer {
         this.endTime = endTime;
         this.playlistType = playlistType;
         this.programId = programId;
+        this.podcastId = podcastId;
+        this.rating = rating;
 
 
         setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_UPDATE_DATA_ONLY);
     }
 
-    public void play(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId) {
+    public void play(String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId, int podcastId, String rating) {
         this.url = url;
         this.title = title;
         this.description = description;
@@ -329,6 +350,8 @@ public class RadioPlayer {
         this.endTime = endTime;
         this.playlistType = playlistType;
         this.programId = programId;
+        this.podcastId = podcastId;
+        this.rating = rating;
 
         setAction(url, title, description, programTitle, topic, startTime, endTime, playlistType, programId, ACTION_PLAY);
     }
@@ -355,7 +378,7 @@ public class RadioPlayer {
             nextUrl = context.getString(R.string.url_offline_radio) + nextUrl;
         }
         //TODO: Update times
-        play(nextUrl, next.getTitle(), next.getDescription(), programTitle, topic, startTime, endTime, playlistType, programId);
+        play(nextUrl, next.getTitle(), next.getDescription(), programTitle, topic, startTime, endTime, playlistType, programId, next.getPodcastId(), next.getRating());
     }
 
     public void previous() {
@@ -373,7 +396,7 @@ public class RadioPlayer {
         }
 
         //TODO: Update times
-        play(previousUrl, previous.getTitle(), previous.getDescription(), programTitle, topic, startTime, endTime, playlistType, programId);
+        play(previousUrl, previous.getTitle(), previous.getDescription(), programTitle, topic, startTime, endTime, playlistType, programId, previous.getPodcastId(), previous.getRating());
     }
 
     private void setAction(final String url, String title, String description, String programTitle, String topic, String startTime, String endTime, int playlistType, int programId, int action) {

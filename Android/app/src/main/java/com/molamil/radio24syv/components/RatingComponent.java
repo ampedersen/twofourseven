@@ -13,6 +13,12 @@ import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
+import com.molamil.radio24syv.api.RestClient;
+
+import java.util.HashMap;
+
+import retrofit.Callback;
+import retrofit.Response;
 
 import static android.graphics.Typeface.DEFAULT;
 
@@ -24,6 +30,11 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
     private LinearLayout initLayout, activeLayout, receiptLayout;
     private FrameLayout divider;
     private TextView first, second, third, fourth, fifth, currentRatingView, ratingEndString;
+
+    public void setPodcastId(int podcastId) {
+        this.podcastId = podcastId;
+    }
+
     private int podcastId;
     private float currentRating;
 
@@ -52,7 +63,13 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
 
     public RatingComponent(Context context) {
         super(context);
+        initializeViews(context);
 
+    }
+
+    private void initializeViews(final Context context)
+    {
+        initializeViews(context, -1);
     }
 
     private void initializeViews(final Context context, int podcastId) {
@@ -164,11 +181,13 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
     // Method to handle completing the rating flow.
     // It does some "animation", writes the rating to the users RatedPodcasts and submits the actual rating
 
-    private void finishRating(int podcastId, final float vote) {
-        final Handler receipt = new Handler();
-        receipt.postDelayed(new Runnable() {
+    private void finishRating(final int podcastId, final float vote) {
+        Log.i("PS", "rate");
+        String data = podcastId+"/"+(vote/5.0f);
+        RestClient.getApi().ratePodcast(podcastId, vote/5.0f).enqueue(new Callback<HashMap<String, String>>() {
+
             @Override
-            public void run() {
+            public void onResponse(Response<HashMap<String, String>> response) {
                 activeLayout.setVisibility(GONE);
                 divider.setBackgroundColor(getResources().getColor(R.color.radio_gray_darker));
                 initLayout.setVisibility(GONE);
@@ -176,30 +195,39 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
                 currentRatingView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
                 currentRatingView.setTextColor(getResources().getColor(R.color.white));
                 ratingEndString.setText(R.string.rating_receipt_text);
-                updateRating(vote/5);
 
+                if (response.body() == null) {
+                    return;
+                }
+
+                String id = response.body().get("videoPodcastId");
+                String ratingText = response.body().get("rating");
+                if(id.equalsIgnoreCase(String.valueOf(podcastId)))
+                {
+                    try
+                    {
+                        Float rating = Float.parseFloat(ratingText);
+                        updateRating(rating);
+                    } catch (Exception e) {}
+                }
+
+                SharedPreferences.Editor editor;
+                editor = ratedPodcasts.edit();
+                editor.putFloat(String.valueOf(podcastId), vote);
+                editor.apply();
             }
-        }, 2000);
 
-        final Handler end = new Handler();
-        end.postDelayed(new Runnable() {
             @Override
-            public void run() {
-                currentRatingView.setTextColor(getResources().getColor(R.color.radio_gray_dark));
-
+            public void onFailure(Throwable t) {
+                activeLayout.setVisibility(GONE);
+                divider.setBackgroundColor(getResources().getColor(R.color.radio_gray_darker));
+                initLayout.setVisibility(GONE);
+                receiptLayout.setVisibility(VISIBLE);
+                currentRatingView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                currentRatingView.setTextColor(getResources().getColor(R.color.white));
+                ratingEndString.setText(R.string.rating_receipt_text);
             }
-        }, 4000);
-
-        SharedPreferences.Editor editor;
-        editor = ratedPodcasts.edit();
-        editor.putFloat(String.valueOf(podcastId), vote);
-        editor.apply();
-
-
-        Log.i("Test", "I made it here! And this is my podcastId:" + podcastId);
-
-
-
+        });
     }
 
     public boolean isRated(int podcastId) {

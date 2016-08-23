@@ -140,6 +140,7 @@ public class PodcastEpisodeView extends LinearLayout implements
         playButton.setDescription(podcast.getDescription());
         playButton.setPlayListType(RadioPlayer.PLAYLIST_PODCAST);
         playButton.setProgramId(podcast.getProgramId());
+        playButton.setPodcastId(podcast.getPodcastId());
         playButton.setRating(podcast.getRating());
 
 
@@ -150,7 +151,7 @@ public class PodcastEpisodeView extends LinearLayout implements
         if(podcast.getRating() == "" || podcast.getRating() == null){
             ratingComponent.updateRating(0);
             } else {
-                ratingComponent.updateRating(Float.parseFloat(podcast.getRating()));
+                ratingComponent.updateRating(podcast.getRatingFloat());
             }
         ratingContainer.addView(ratingComponent);
 
@@ -176,9 +177,7 @@ public class PodcastEpisodeView extends LinearLayout implements
     }
 
     public void setSize(Size size) {
-        Log.i("PS", "setSize "+size);
         if (this.size == size) {
-            Log.i("PS", "same size, return");
             return; // Return, same value
         }
 
@@ -187,11 +186,9 @@ public class PodcastEpisodeView extends LinearLayout implements
         View contractedLayout = findViewById(R.id.contracted_layout);
         View expandedLayout = findViewById(R.id.expanded_layout);
         if (size == Size.CONTRACTED) {
-            Log.i("PS", "contract");
             contractedLayout.setVisibility(View.VISIBLE);
             expandedLayout.setVisibility(View.GONE);
         } else {
-            Log.i("PS", "expand");
             contractedLayout.setVisibility(View.GONE);
             expandedLayout.setVisibility(View.VISIBLE);
         }

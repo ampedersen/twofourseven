@@ -27,6 +27,7 @@ public class RadioPlayerButton extends Button implements
     private String topic;
     private String programTitle;
     private int programId;
+    private int podcastId = -1;
     private String description;
     private String startTime;
     private String endTime;
@@ -173,6 +174,14 @@ public class RadioPlayerButton extends Button implements
         this.programId = programId;
     }
 
+    public int getPodcastId() {
+        return podcastId;
+    }
+
+    public void setPodcastId(int podcastId) {
+        this.podcastId = podcastId;
+    }
+
     public String getStartTime() {
         return startTime;
     }
@@ -260,7 +269,7 @@ public class RadioPlayerButton extends Button implements
 
         switch (action) {
             case RadioPlayer.ACTION_PLAY:
-                player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic(), getStartTime(), getEndTime(), getPlayListType(), getProgramId());
+                player.play(getUrl(), getTitle(), getDescription(), getProgramTitle(), getTopic(), getStartTime(), getEndTime(), getPlayListType(), getProgramId(), getPodcastId(), getRating());
                 break;
             case RadioPlayer.ACTION_STOP:
                 player.stop();

@@ -9,6 +9,7 @@ import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.api.model.Search;
 import com.molamil.radio24syv.api.model.TopicColors;
 
+import java.util.HashMap;
 import java.util.List;
 
 import retrofit.Call;
@@ -20,6 +21,15 @@ import retrofit.http.Query;
  * Created by jens on 18/09/15.
  */
 public interface RestApi {
+
+    // Ratings
+
+    @GET("/podcasts/rate/{id}/{rating}")
+    Call<HashMap<String, String>> ratePodcast(@Path("id") Integer podcastId, @Path("rating") Float rating);
+
+    //@GET("/podcasts/rate/{data}")
+    //Call<HashMap<String, String>> ratePodcast(@Path("data") String data);
+
 
     // Broadcasts
 

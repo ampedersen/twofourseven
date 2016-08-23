@@ -4,15 +4,18 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageButton;
+import android.widget.LinearLayout;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.api.model.Broadcast;
 import com.molamil.radio24syv.components.OnSwipeTouchListener;
+import com.molamil.radio24syv.components.RatingComponent;
 import com.molamil.radio24syv.components.TimeLine;
 import com.molamil.radio24syv.components.TimeLineSeekBar;
 import com.molamil.radio24syv.managers.LiveContentUpdater;
@@ -62,6 +65,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     private TextView startTimeLabel;
     private TextView endTimeLabel;
 
+    private RatingComponent ratingComponent;
 
     private long timelineUpdateInterval = 900;
     private Handler timelineHandler = new Handler(); //Refactor to player service and let it update all necesary timelines
@@ -156,6 +160,13 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
                 setSize(PlayerSize.SMALL);
             }
         });
+
+        ratingComponent = new RatingComponent(getContext());
+
+        LinearLayout ratingContainer = (LinearLayout) v.findViewById(R.id.rating_container);
+
+        ratingContainer.addView(ratingComponent);
+        ratingComponent.setVisibility(View.GONE);
 
         return v;
     }
@@ -370,6 +381,18 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
             updateSmallPlayer(smallPlayer, programInfo);
         }
 
+        /*
+        //Ratings
+        if (player.getRating() != null) {
+            //Log.i("PS", "Show ratings component");
+        } else {
+
+        }
+        */
+        ratingComponent.setVisibility(player.getRating() != null ? View.VISIBLE : View.GONE);
+        ratingComponent.setPodcastId(player.getPodcastId());
+        ratingComponent.updateRating(player.getRatingFloat());
+        //ratingComponent.setPodcastId(player.get);
         UpdateTimeLines(player);
     }
 

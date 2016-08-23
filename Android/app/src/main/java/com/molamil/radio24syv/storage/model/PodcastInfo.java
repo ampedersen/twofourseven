@@ -39,7 +39,7 @@ public class PodcastInfo implements Serializable {
         try {
             Float result = Float.parseFloat(getRating());
             return result;
-        } catch (NumberFormatException exception) {}
+        } catch (Exception exception) {}
         return 0.0f;
     }
 
