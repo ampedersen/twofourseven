@@ -468,7 +468,6 @@ public class ProgramDetailsFragment extends PageFragment implements
 
     @Override
     public void onPodcastEpisodeViewSizeChanged(PodcastEpisodeView view, PodcastEpisodeView.Size size) {
-        Log.i("PS", "ProgramDetailsFragmen: onPodcastEpisodeViewSizeChanged");
         if (size == PodcastEpisodeView.Size.EXPANDED) {
             View oldExpandedView = expandedView;
             if (expandedView != null) {

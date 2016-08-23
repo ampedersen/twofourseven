@@ -140,6 +140,7 @@ public class PodcastEpisodeView extends LinearLayout implements
         playButton.setDescription(podcast.getDescription());
         playButton.setPlayListType(RadioPlayer.PLAYLIST_PODCAST);
         playButton.setProgramId(podcast.getProgramId());
+        playButton.setRating(podcast.getRating());
 
 
         // Connect to layout, initialize rating component, update rating and finally addView to the

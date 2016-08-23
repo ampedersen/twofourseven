@@ -42,6 +42,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static final String KEY_TITLE = "title";
     private static final String KEY_DATE = "date";
     private static final String KEY_AUDIO_URL = "audio_url";
+    private static final String KEY_RATING = "rating";
     private static final String KEY_COLOR = "color";
     private static final String KEY_PROGRAM_ID_RELATED = "program_id_related";
     private static final String KEY_PROGRAM_SLUG = "program_slug";
@@ -71,7 +72,8 @@ public class StorageDatabase extends SQLiteOpenHelper {
             + KEY_TITLE + " TEXT, "
             + KEY_DESCRIPTION + " TEXT, "
             + KEY_AUDIO_URL + " TEXT, "
-            + KEY_DATE + " TEXT" // "DATE" type is not supported by Cursor so have to use "TEXT" for KEY_DATE, yay
+            + KEY_DATE + " TEXT, " // "DATE" type is not supported by Cursor so have to use "TEXT" for KEY_DATE, yay
+            + KEY_RATING + " TEXT"
             + ")";
 
     private static final String SQL_CREATE_TABLE_TOPIC = "CREATE TABLE " + TABLE_TOPIC + "("
@@ -103,7 +105,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
     private static final String SQL_DROP_TABLE = "DROP TABLE IF EXISTS ";
 
     // If you change the database schema, you must increment the database version.
-    private static final int DATABASE_VERSION = 6;
+    private static final int DATABASE_VERSION = 7;
     private static final String DATABASE_NAME = "Storage.db";
 
     public StorageDatabase(Context context) {
@@ -117,6 +119,11 @@ public class StorageDatabase extends SQLiteOpenHelper {
 
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        String upgradeQuery = "ALTER TABLE "+TABLE_PODCAST+" ADD COLUMN "+KEY_RATING+" TEXT";
+        if (oldVersion == 6 && newVersion == 6) {
+            db.execSQL(upgradeQuery);
+            return;
+        }
         // Upgrade existing table to new format if table version is upgraded in a later app version.
         // For now, discard the data and start over.
         //Log.d("JJJ", "Upgrading database to version " + newVersion + " (was version " + oldVersion + ")");
@@ -774,6 +781,7 @@ public class StorageDatabase extends SQLiteOpenHelper {
         values.put(KEY_DESCRIPTION, podcast.getDescription());
         values.put(KEY_DATE, podcast.getDate());
         values.put(KEY_AUDIO_URL, podcast.getAudioUrl());
+        values.put(KEY_RATING, podcast.getRating());
         db.replace(TABLE_PODCAST, null, values);
     }
 
@@ -785,6 +793,13 @@ public class StorageDatabase extends SQLiteOpenHelper {
         podcast.setDescriptionText(c.getString(c.getColumnIndex(KEY_DESCRIPTION)));
         podcast.setDate(c.getString(c.getColumnIndex(KEY_DATE)));
         podcast.setAudioUrl(c.getString(c.getColumnIndex(KEY_AUDIO_URL)));
+
+        try {
+            podcast.setRating(c.getString(c.getColumnIndex(KEY_RATING)));
+        } catch(IllegalArgumentException exception) {
+            podcast.setRating("");
+        }
+
         return podcast;
     }
 

@@ -41,6 +41,9 @@ public class RadioPlayerButton extends Button implements
     private int stopIcon;
     private int pauseIcon;
 
+
+    private String rating;
+
     private OnRadioPlayerButtonListener radioPlayButtonListener;
 
     public RadioPlayerButton(Context context, AttributeSet attrs) {
@@ -73,6 +76,10 @@ public class RadioPlayerButton extends Button implements
 
         setOnClickListener(this);
     }
+
+    public String getRating() { return rating; }
+
+    public void setRating(String rating) { this.rating = rating; }
 
     public int getAction() {
         return action;
