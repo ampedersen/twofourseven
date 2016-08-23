@@ -1,0 +1,108 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:orientation="horizontal"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    >
+
+    <TextView
+        android:id="@+id/current_rating"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="--"
+        android:paddingRight="8dp"
+        android:textColor="@color/radio_gray_dark"/>
+
+    <FrameLayout
+        android:id="@+id/rating_divider"
+        android:layout_width="2dp"
+        android:layout_height="16dp"
+
+        android:layout_gravity="center"
+        android:background="@color/radio_gray_darker">
+    </FrameLayout>
+
+    <LinearLayout
+        android:paddingLeft="8dp"
+        android:id="@+id/init_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content">
+
+        <TextView
+            android:id="@+id/rating_start_string"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/radio_gray_dark"
+            android:text="Rate programmet"/>
+
+
+    </LinearLayout>
+
+    <LinearLayout
+
+        android:id="@+id/active_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/vote_1_string"
+            android:text="1"
+            android:paddingLeft="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/radio_gray_dark"/>
+
+        <TextView
+            android:id="@+id/vote_2_string"
+            android:text="2"
+            android:paddingLeft="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/radio_gray_dark"/>
+
+        <TextView
+            android:id="@+id/vote_3_string"
+            android:text="3"
+            android:paddingLeft="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/radio_gray_dark"/>
+
+        <TextView
+            android:id="@+id/vote_4_string"
+            android:text="4"
+            android:paddingLeft="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/radio_gray_dark"/>
+
+        <TextView
+            android:id="@+id/vote_5_string"
+            android:text="5"
+            android:paddingLeft="8dp"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/radio_gray_dark"/>
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:paddingLeft="8dp"
+        android:id="@+id/receipt_layout"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone">
+
+        <TextView
+            android:id="@+id/rating_end_string"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:textColor="@color/radio_gray_dark"
+            android:text="Tak for din rating"/>
+
+
+    </LinearLayout>
+
+
+</LinearLayout>

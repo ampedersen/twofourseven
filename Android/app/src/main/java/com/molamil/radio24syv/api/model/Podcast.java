@@ -1,10 +1,12 @@
 
 package com.molamil.radio24syv.api.model;
 
+import com.google.gson.annotations.Expose;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.annotation.Generated;
-import com.google.gson.annotations.Expose;
 
 @Generated("org.jsonschema2pojo")
 public class Podcast {
@@ -29,6 +31,10 @@ public class Podcast {
     private AudioInfo audioInfo;
     @Expose
     private List<String> tags = new ArrayList<String>();
+    @Expose
+    private String rating;
+
+
 
     /**
      * 
@@ -129,6 +135,10 @@ public class Podcast {
         return description;
     }
 
+    public String getRating() {
+        return rating;
+    }
+
     /**
      * 
      * @param description
@@ -182,6 +192,8 @@ public class Podcast {
     public AudioInfo getAudioInfo() {
         return audioInfo;
     }
+
+
 
     /**
      * 

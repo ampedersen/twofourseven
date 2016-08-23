@@ -86,6 +86,16 @@
         android:visibility="visible"
         >
 
+        <LinearLayout
+            android:id="@+id/rating_container"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal"
+            android:layout_alignParentTop="true"
+            android:gravity="center_horizontal"
+            android:paddingTop="8dp" />
+
+
         <ImageButton
             android:id="@+id/cast_button"
             android:layout_width="wrap_content"

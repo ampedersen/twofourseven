@@ -96,4 +96,9 @@
     <string name="onboarding_skip">Skip</string>
     <string name="onboarding_done">Færdig</string>
 
+    <!-- Ratings -->
+    <string name="rating_end_text">Du har allerede rated programmet</string>
+    <string name="rating_receipt_text">Tak for din rating</string>
+
+
 </resources>
