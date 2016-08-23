@@ -2,6 +2,7 @@ package com.molamil.radio24syv.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -174,7 +175,9 @@ public class PodcastEpisodeView extends LinearLayout implements
     }
 
     public void setSize(Size size) {
+        Log.i("PS", "setSize "+size);
         if (this.size == size) {
+            Log.i("PS", "same size, return");
             return; // Return, same value
         }
 
@@ -183,9 +186,11 @@ public class PodcastEpisodeView extends LinearLayout implements
         View contractedLayout = findViewById(R.id.contracted_layout);
         View expandedLayout = findViewById(R.id.expanded_layout);
         if (size == Size.CONTRACTED) {
+            Log.i("PS", "contract");
             contractedLayout.setVisibility(View.VISIBLE);
             expandedLayout.setVisibility(View.GONE);
         } else {
+            Log.i("PS", "expand");
             contractedLayout.setVisibility(View.GONE);
             expandedLayout.setVisibility(View.VISIBLE);
         }

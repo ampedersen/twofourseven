@@ -32,10 +32,14 @@ import com.molamil.radio24syv.view.ProgramImageView;
 import org.joda.time.DateTime;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 import retrofit.Callback;
 import retrofit.Response;
@@ -54,7 +58,8 @@ public class ProgramDetailsFragment extends PageFragment implements
     private ProgramInfo program;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
     private HashMap<Integer, PodcastInfo> podcastById = new HashMap<>();
-    private HashMap<Float, PodcastInfo> podcastByRating = new HashMap<>();
+    //private HashMap<Integer, PodcastInfo> podcastByRating = new HashMap<>();
+    private List<PodcastInfo> podcastByRating = new ArrayList<PodcastInfo>();
 
     private ProgressBar progressSpinner;
 
@@ -64,6 +69,12 @@ public class ProgramDetailsFragment extends PageFragment implements
 
     CheckBox notificationButton;
     private OnProgramNotificationToggleListener notificationListener;
+
+    private enum Sorting
+    {
+        DATE, RATING
+    }
+    private Sorting currentSorting = Sorting.DATE;
 
     public static ProgramDetailsFragment newInstance(ProgramInfo program) {
         ProgramDetailsFragment fragment = new ProgramDetailsFragment();
@@ -159,7 +170,7 @@ public class ProgramDetailsFragment extends PageFragment implements
         final ViewGroup content = (ViewGroup) v.findViewById(R.id.content);
 
         //DEV
-        getPodcastsByDate(content, BATCH_SIZE, 1);
+        getPodcasts(content, BATCH_SIZE, 1);
         getDetails(v);
 
         final TextView sort_by_date = (TextView) v.findViewById(R.id.sort_by_date);
@@ -168,20 +179,20 @@ public class ProgramDetailsFragment extends PageFragment implements
         sort_by_date.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                getPodcastsByDate(content, BATCH_SIZE, 1);
+                currentSorting = Sorting.DATE;
+                populatePodcastList();
                 sort_by_date.setTextColor(getResources().getColor(R.color.white));
                 sort_by_pop.setTextColor(getResources().getColor(R.color.radio_gray_dark));
-                Log.i("Test", String.valueOf(podcastById));
             }
         });
 
         sort_by_pop.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View v) {
-                getPodcastsByPop(content, BATCH_SIZE, 1);
+                currentSorting = Sorting.RATING;
+                populatePodcastList();
                 sort_by_pop.setTextColor(getResources().getColor(R.color.white));
                 sort_by_date.setTextColor(getResources().getColor(R.color.radio_gray_dark));
-                Log.i("Test", String.valueOf(podcastByRating));
             }
         });
 
@@ -286,7 +297,7 @@ public class ProgramDetailsFragment extends PageFragment implements
         });
     }
 
-    private void getPodcastsByDate(final ViewGroup content, final int amount, final int batch) {
+    private void getPodcasts(final ViewGroup content, final int amount, final int batch) {
         final ViewGroup parent = (ViewGroup) content.getParent();
         progressSpinner.setVisibility(View.VISIBLE);
         final Button loadButton = (Button) parent.findViewById(R.id.load_button);
@@ -303,17 +314,73 @@ public class ProgramDetailsFragment extends PageFragment implements
                     return;
                 }
 
-                PodcastEpisodeView prevView = null;
+                //PodcastEpisodeView prevView = null;
 
                 for (int i = 0; i < response.body().size(); i++) {
                     PodcastInfo p = new PodcastInfo(response.body().get(i));
                     podcastById.put(p.getPodcastId(), p);
 
+                    Storage.get().addPodcast(p);
+                }
+
+                podcastByRating = new ArrayList<PodcastInfo>(podcastById.values());
+                Collections.sort(podcastByRating, new Comparator<PodcastInfo>() {
+                    public int compare(PodcastInfo o1, PodcastInfo o2) {
+                        return o2.getRatingFloat().compareTo(o1.getRatingFloat());
+                    }
+                });
+
+                boolean isBatchFull = (response.body().size() == amount);
+                if (isBatchFull) {
+                    loadButton.setVisibility(View.VISIBLE);
+                    loadButton.setOnClickListener(new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            getPodcasts(content, BATCH_SIZE, batch + 1); // Load next batch
+                        }
+                    });
+                }
+
+                progressSpinner.setVisibility(View.GONE);
+
+                populatePodcastList();
+            }
+
+            @Override
+            public void onFailure(Throwable t) {
+                if (listener != null) {
+                    listener.onError(t.getLocalizedMessage());
+                }
+                progressSpinner.setVisibility(View.GONE);
+                Log.d("JJJ", "fail " + t.getMessage());
+                t.printStackTrace();
+            }
+        });
+    }
+
+    private void populatePodcastList()
+    {
+        populatePodcastList(true);
+    }
+
+    private void populatePodcastList(Boolean clear)
+    {
+        final ViewGroup content = (ViewGroup) getView().findViewById(R.id.content);
+        PodcastEpisodeView prevView = null;
+
+        if(clear == true)
+        {
+            content.removeAllViews();
+        }
+
+        switch (currentSorting) {
+            case DATE:
+                for (Map.Entry<Integer, PodcastInfo> entry : podcastById.entrySet()) {
+                    PodcastInfo p = entry.getValue();
                     DateTime date = DateTime.parse(p.getDate());
                     boolean isNewMonth = (lastPodcastDate == null) || (!date.monthOfYear().equals(lastPodcastDate.monthOfYear())) || (!date.year().equals(lastPodcastDate.year()));
                     if (isNewMonth) {
-                        if(prevView != null)
-                        {
+                        if (prevView != null) {
                             prevView.findViewById(R.id.divider).setVisibility(View.GONE);
                         }
                         lastPodcastDate = date;
@@ -330,107 +397,26 @@ public class ProgramDetailsFragment extends PageFragment implements
                     v.setOnPodcastEpisodeViewUpdatedListener(ProgramDetailsFragment.this);
                     content.addView(v);
 
-
-
-                    /*
                     //TODO: Handle load more. This hidden divider might need to be shown when more results are loaded
-                    if(i == response.body().size()-1)
-                    {
-                        v.findViewById(R.id.divider).setVisibility(View.GONE);
-                    }
-                    */
+                    //if(i == response.body().size()-1)
+                    //{
+                    //    v.findViewById(R.id.divider).setVisibility(View.GONE);
+                    //}
 
-                    prevView = v;
-
-                    Storage.get().addPodcast(p);
                 }
-
-                boolean isBatchFull = (response.body().size() == amount);
-                if (isBatchFull) {
-                    loadButton.setVisibility(View.VISIBLE);
-                    loadButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            getPodcastsByDate(content, BATCH_SIZE, batch + 1); // Load next batch
-                        }
-                    });
-                }
-
-                progressSpinner.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                if (listener != null) {
-                    listener.onError(t.getLocalizedMessage());
-                }
-                progressSpinner.setVisibility(View.GONE);
-                Log.d("JJJ", "fail " + t.getMessage());
-                t.printStackTrace();
-            }
-        });
-    }
-
-    private void getPodcastsByPop(final ViewGroup content, final int amount, final int batch) {
-        final ViewGroup parent = (ViewGroup) content.getParent();
-        progressSpinner.setVisibility(View.VISIBLE);
-        final Button loadButton = (Button) parent.findViewById(R.id.load_button);
-        loadButton.setVisibility(View.GONE);
-        content.removeAllViews();
-
-        RestClient.getApi().getPodcasts(program.getProgramId(), amount, batch).enqueue(new Callback<List<Podcast>>() {
-            @Override
-            public void onResponse(Response<List<Podcast>> response) {
-                if (listener != null) {
-                    listener.onError(null);
-                }
-                if (response.body() == null) {
-                    return;
-                }
-
-                for (int i = 0; i < response.body().size(); i++) {
-                    PodcastInfo p = new PodcastInfo(response.body().get(i));
-                    float zero = 0;
-                    if(p.getRating().isEmpty()){
-                        podcastByRating.put(zero, p);
-                    } else {
-                        podcastByRating.put(Float.parseFloat(p.getRating()), p);
-                        Log.i("Test", "" + p.getRating());
-                    }
-
+                break;
+            case RATING:
+                for (PodcastInfo p : podcastByRating)
+                {
                     PodcastEpisodeView v = new PodcastEpisodeView(content.getContext());
                     v.setPodcast(p);
                     v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
                     v.setOnPodcastEpisodeViewUpdatedListener(ProgramDetailsFragment.this);
                     content.addView(v);
-
-                    Storage.get().addPodcast(p);
                 }
+                break;
+        }
 
-                boolean isBatchFull = (response.body().size() == amount);
-                if (isBatchFull) {
-                    loadButton.setVisibility(View.VISIBLE);
-                    loadButton.setOnClickListener(new View.OnClickListener() {
-                        @Override
-                        public void onClick(View v) {
-                            getPodcastsByPop(content, BATCH_SIZE, batch + 1); // Load next batch
-                        }
-                    });
-                }
-
-                progressSpinner.setVisibility(View.GONE);
-            }
-
-            @Override
-            public void onFailure(Throwable t) {
-                if (listener != null) {
-                    listener.onError(t.getLocalizedMessage());
-                }
-                progressSpinner.setVisibility(View.GONE);
-                Log.d("JJJ", "fail " + t.getMessage());
-                t.printStackTrace();
-            }
-        });
     }
 
     @Override
@@ -482,6 +468,7 @@ public class ProgramDetailsFragment extends PageFragment implements
 
     @Override
     public void onPodcastEpisodeViewSizeChanged(PodcastEpisodeView view, PodcastEpisodeView.Size size) {
+        Log.i("PS", "ProgramDetailsFragmen: onPodcastEpisodeViewSizeChanged");
         if (size == PodcastEpisodeView.Size.EXPANDED) {
             View oldExpandedView = expandedView;
             if (expandedView != null) {

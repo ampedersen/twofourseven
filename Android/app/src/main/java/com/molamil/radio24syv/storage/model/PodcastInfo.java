@@ -35,6 +35,14 @@ public class PodcastInfo implements Serializable {
         rating = podcast.getRating();
     }
 
+    public Float getRatingFloat() {
+        try {
+            Float result = Float.parseFloat(getRating());
+            return result;
+        } catch (NumberFormatException exception) {}
+        return 0.0f;
+    }
+
     public String getRating() {
         return rating;
     }
@@ -94,7 +102,5 @@ public class PodcastInfo implements Serializable {
     public void setAudioUrl(String audioUrl) {
         this.audioUrl = audioUrl;
     }
-
-
 
 }
