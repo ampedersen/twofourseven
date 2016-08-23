@@ -2,18 +2,16 @@ package com.molamil.radio24syv.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
-import com.molamil.radio24syv.storage.RadioLibrary;
 import com.molamil.radio24syv.player.RadioPlayer;
+import com.molamil.radio24syv.storage.RadioLibrary;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
@@ -137,6 +135,8 @@ public class PodcastProgramView extends LinearLayout implements
             v.setPlayable(status.getDownloadStatus() == RadioLibrary.DOWNLOAD_STATUS_SUCCESSFUL);
 
             expandedLayout.addView(v); // Add podcast as a child
+
+
         }
 
         updatePodcastCount(podcasts.size());

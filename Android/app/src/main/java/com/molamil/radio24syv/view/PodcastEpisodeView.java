@@ -2,7 +2,6 @@ package com.molamil.radio24syv.view;
 
 import android.content.Context;
 import android.util.AttributeSet;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.ImageView;
@@ -11,8 +10,9 @@ import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.R;
-import com.molamil.radio24syv.storage.RadioLibrary;
+import com.molamil.radio24syv.components.RatingComponent;
 import com.molamil.radio24syv.player.RadioPlayer;
+import com.molamil.radio24syv.storage.RadioLibrary;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 
 /**
@@ -25,8 +25,10 @@ public class PodcastEpisodeView extends LinearLayout implements
     private Size size = Size.UNASSIGNED;
     private OnPodcastEpisodeViewUpdatedListener listener = null;
 
-    private PodcastInfo podcast;
+    protected PodcastInfo podcast;
     private String podcastUrl;
+
+
 
     public PodcastEpisodeView(Context context) {
         super(context);
@@ -47,14 +49,6 @@ public class PodcastEpisodeView extends LinearLayout implements
         LayoutInflater inflater = (LayoutInflater) context.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
         inflater.inflate(R.layout.view_podcast_episode, this);
 
-//        View expandButton = findViewById(R.id.contracted_layout);
-//        expandButton.setOnClickListener(new OnClickListener() {
-//            @Override
-//            public void onClick(View v) {
-//                setSize(Size.EXPANDED);
-//            }
-//        });
-//
         View topLayout = findViewById(R.id.top_layout);
         topLayout.setOnClickListener(new OnClickListener() {
             @Override
@@ -67,6 +61,7 @@ public class PodcastEpisodeView extends LinearLayout implements
             }
         });
 
+
         View contractedLayout = findViewById(R.id.contracted_layout);
         contractedLayout.setOnClickListener(new OnClickListener() {
             @Override
@@ -74,6 +69,7 @@ public class PodcastEpisodeView extends LinearLayout implements
                 setSize(Size.EXPANDED);
             }
         });
+
 
         // Download button is a child of this and the clicks interfere with each other if expanded_layout is assigned a click handler. Instead assign one for each of expanded_layout's other children.
 //        View expandedLayout = findViewById(R.id.expanded_layout);
@@ -130,10 +126,13 @@ public class PodcastEpisodeView extends LinearLayout implements
         this.podcast = podcast;
         this.podcastUrl = RadioLibrary.getUrl(getContext(), podcast.getAudioUrl());
 
+
         TextView titleText = (TextView) findViewById(R.id.name_text);
         titleText.setText(podcast.getTitle());
         TextView descriptionText = (TextView) findViewById(R.id.description_text);
         descriptionText.setText(podcast.getDescription());
+        TextView currentRatingTv = (TextView) findViewById(R.id.current_rating);
+
         RadioPlayerButton playButton = (RadioPlayerButton) findViewById(R.id.play_button);
         playButton.setUrl(podcast.getAudioUrl());
         playButton.setTitle(podcast.getTitle());
@@ -141,7 +140,21 @@ public class PodcastEpisodeView extends LinearLayout implements
         playButton.setPlayListType(RadioPlayer.PLAYLIST_PODCAST);
         playButton.setProgramId(podcast.getProgramId());
 
-        RadioLibrary.getInstance().addListener(getContext(), podcast.getPodcastId(), this); // Listen for download updates for this podcast ID
+
+        // Connect to layout, initialize rating component, update rating and finally addView to the
+        // container.
+        LinearLayout ratingContainer = (LinearLayout) findViewById(R.id.rating_container);
+        RatingComponent ratingComponent = new RatingComponent(getContext(), podcast.getPodcastId());
+        if(podcast.getRating() == "" || podcast.getRating() == null){
+            ratingComponent.updateRating(0);
+            } else {
+                ratingComponent.updateRating(Float.parseFloat(podcast.getRating()));
+            }
+        ratingContainer.addView(ratingComponent);
+
+
+        // Listen for download updates for this podcast ID
+        RadioLibrary.getInstance().addListener(getContext(), podcast.getPodcastId(), this);
     }
 
     public void setPlayable(boolean playable)

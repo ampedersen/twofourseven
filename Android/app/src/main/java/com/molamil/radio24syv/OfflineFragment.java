@@ -4,14 +4,13 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.molamil.radio24syv.player.RadioPlayer;
-import com.molamil.radio24syv.storage.ImageLibrary;
-import com.molamil.radio24syv.storage.RadioLibrary;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
@@ -64,7 +63,10 @@ public class OfflineFragment extends PageFragment {
                 podcasts.add(podcast); // Only show podcasts that known by the download manager
             }
             p.setPodcasts(podcasts);
+
+
             content.addView(p);
+
         }
 
         return v;

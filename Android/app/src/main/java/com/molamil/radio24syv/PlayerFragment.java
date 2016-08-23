@@ -1,11 +1,9 @@
 package com.molamil.radio24syv;
 
-import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,8 +11,6 @@ import android.widget.ImageButton;
 import android.widget.SeekBar;
 import android.widget.TextView;
 
-import com.molamil.radio24syv.api.CancelableCallback;
-import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Broadcast;
 import com.molamil.radio24syv.components.OnSwipeTouchListener;
 import com.molamil.radio24syv.components.TimeLine;
@@ -29,12 +25,8 @@ import com.molamil.radio24syv.view.ProgramImageView;
 import com.molamil.radio24syv.view.RadioPlayerButton;
 
 import java.lang.reflect.Field;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import java.util.List;
-
-import retrofit.Response;
 
 
 /**
@@ -70,8 +62,6 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     private TextView startTimeLabel;
     private TextView endTimeLabel;
 
-    //private Boolean isLoadingNewContent = false;
-    //private CancelableCallback liveReloadCallback;
 
     private long timelineUpdateInterval = 900;
     private Handler timelineHandler = new Handler(); //Refactor to player service and let it update all necesary timelines
@@ -127,6 +117,8 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
         startTimeLabel = (TextView) v.findViewById(R.id.time_start_text);
         endTimeLabel = (TextView) v.findViewById(R.id.time_end_text);
+
+
 
         timeline = (TimeLine) v.findViewById(R.id.player_progress);
         smallTimeLine = (TimeLine) v.findViewById(R.id.small_player_progress);
@@ -425,6 +417,9 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         //TODO: Set podcast title when available, else program title
         ((TextView) v.findViewById(R.id.podcast_name_text)).setText(p.getName());
 
+
+        // INJECT RATING HERE SOMEWHERE - WE DO NOT HAVE THE PODCAST ID
+
         titleText.setTextColor(0xffffffff);
         if(p.getTopic() != null)
         {
@@ -448,8 +443,10 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
 
         if (isAdded()) {
             if (player.getUrl() != getString(R.string.url_live_radio)) {
+
                 timeline.setVisibility(View.GONE);
                 timeLineSeekBar.setVisibility(View.VISIBLE);
+
             } else {
                 timeline.setVisibility(View.VISIBLE);
                 timeLineSeekBar.setVisibility(View.GONE);

@@ -17,6 +17,10 @@ public class PodcastInfo implements Serializable {
     private String description;
     private String date;
     private String audioUrl;
+    private String rating;
+
+
+   // private boolean isRated;
 
     public PodcastInfo() {
     }
@@ -28,6 +32,15 @@ public class PodcastInfo implements Serializable {
         setDescriptionHtml(podcast.getDescription().getHtml());
         date = podcast.getPublishInfo().getCreatedAt();
         audioUrl = podcast.getAudioInfo().getUrl();
+        rating = podcast.getRating();
+    }
+
+    public String getRating() {
+        return rating;
+    }
+
+    public void setRating(String rating) {
+        this.rating = rating;
     }
 
     public int getPodcastId() {
@@ -81,4 +94,7 @@ public class PodcastInfo implements Serializable {
     public void setAudioUrl(String audioUrl) {
         this.audioUrl = audioUrl;
     }
+
+
+
 }

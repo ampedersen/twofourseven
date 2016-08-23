@@ -104,14 +104,6 @@
                     />
 
 
-                <!--
-                <TextView
-                    android:id="@+id/topic_text"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    />
-                -->
-
                 <com.molamil.radio24syv.components.TextViewNeueHaasGrotesk55Rg
                     android:id="@+id/description_text"
                     android:layout_width="wrap_content"
@@ -132,6 +124,48 @@
                     android:drawableRight="@drawable/button_expand"
                     style="@style/BaseButton"
                     />
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="16dp"
+                    android:paddingRight="8dp"
+                    android:textColor="@color/radio_gray_dark"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="@dimen/app_margin_half25"
+                    android:text="Sortér efter:"
+                    />
+
+                <TextView
+                    android:id="@+id/sort_by_date"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="16dp"
+                    android:paddingRight="8dp"
+                    android:textColor="@color/white"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="@dimen/app_margin_half25"
+                    android:text="Dato"
+                    />
+
+                <TextView
+                    android:id="@+id/sort_by_pop"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:paddingTop="16dp"
+                    android:paddingRight="8dp"
+                    android:textColor="@color/radio_gray_dark"
+                    android:textSize="13sp"
+                    android:layout_marginBottom="@dimen/app_margin_half25"
+                    android:text="Populære"
+                    />
+
+                </LinearLayout>
 
                 <LinearLayout
                     android:id="@+id/content"

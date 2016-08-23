@@ -5,6 +5,7 @@ import android.app.AlarmManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -19,7 +20,6 @@ import android.util.Log;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.CheckBox;
-import android.widget.TextView;
 
 import com.molamil.radio24syv.api.RestClient;
 import com.molamil.radio24syv.api.model.Broadcast;
@@ -27,13 +27,13 @@ import com.molamil.radio24syv.api.model.Program;
 import com.molamil.radio24syv.api.model.RelatedProgram;
 import com.molamil.radio24syv.player.RadioPlayer;
 import com.molamil.radio24syv.receiver.AlarmNotificationReceiver;
+import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
 import com.molamil.radio24syv.storage.ImageLibrary;
 import com.molamil.radio24syv.storage.RadioLibrary;
 import com.molamil.radio24syv.storage.Storage;
 import com.molamil.radio24syv.storage.model.BroadcastInfo;
 import com.molamil.radio24syv.storage.model.PodcastInfo;
 import com.molamil.radio24syv.storage.model.ProgramInfo;
-import com.molamil.radio24syv.receiver.DownloadNotificationReceiver;
 import com.molamil.radio24syv.storage.model.TopicInfo;
 import com.molamil.radio24syv.view.ProgramScheduleButton;
 import com.molamil.radio24syv.view.RadioViewPager;
@@ -72,6 +72,12 @@ public class MainActivity extends FragmentActivity implements
     private static final int NOTIFICATION_ALARM_MILLISECONDS = 1000 * 60 * NOTIFICATION_ALARM_MINUTES;
     private static final int NOTIFICATION_TOOLTIP_DURATION_MILLISECONDS = 4000; // How many milliseconds the tooltip should be visible when setting an alarm
 
+
+    public static final String PREFERENCES = "PodcastsRated" ;
+    SharedPreferences podcastsRated;
+
+
+
     RadioViewPager pager; // The pager widget, which handles animation and allows swiping horizontally to access side screens
     SidePageTransformer pageTransformer;
     MainFragment mainFragment; // Keep the same main fragment across different page adapters
@@ -103,6 +109,8 @@ public class MainActivity extends FragmentActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        podcastsRated = getSharedPreferences(PREFERENCES, Context.MODE_PRIVATE);
 
         mainFragment = new MainFragment();
 
