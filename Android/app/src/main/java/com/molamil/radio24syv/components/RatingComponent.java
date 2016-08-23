@@ -38,6 +38,17 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
     private int podcastId;
     private float currentRating;
 
+
+    public OnRatingUpdatedListener getListener() {
+        return listener;
+    }
+
+    public void setListener(OnRatingUpdatedListener listener) {
+        this.listener = listener;
+    }
+
+    private OnRatingUpdatedListener listener = null;
+
     SharedPreferences ratedPodcasts = getContext().getSharedPreferences(String.valueOf(podcastId), 0);
 
     public RatingComponent(Context context, int podcastId) {
@@ -208,6 +219,11 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
                     {
                         Float rating = Float.parseFloat(ratingText);
                         updateRating(rating);
+
+                        if(listener != null)
+                        {
+                            listener.onRatingUpdated(podcastId, rating);
+                        }
                     } catch (Exception e) {}
                 }
 
@@ -248,5 +264,26 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
         } else if (currentRating != 0) {
             currentRatingView.setText("" + String.valueOf(cr * 5));
         }
+    }
+
+    public void updateState()
+    {
+        if(isRated(podcastId)) {
+            initLayout.setVisibility(GONE);
+            activeLayout.setVisibility(GONE);
+            ratingEndString.setText(R.string.rating_end_text);
+            receiptLayout.setVisibility(VISIBLE);
+        }
+        else
+        {
+            initLayout.setVisibility(VISIBLE);
+            activeLayout.setVisibility(GONE);
+            ratingEndString.setText(R.string.rating_end_text);
+            receiptLayout.setVisibility(GONE);
+        }
+    }
+
+    public interface OnRatingUpdatedListener {
+        void onRatingUpdated(int podcastId, float rating);
     }
 }

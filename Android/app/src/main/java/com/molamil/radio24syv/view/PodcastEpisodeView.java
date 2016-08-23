@@ -20,7 +20,9 @@ import com.molamil.radio24syv.storage.model.PodcastInfo;
  * Created by jens on 21/09/15.
  */
 public class PodcastEpisodeView extends LinearLayout implements
-    RadioLibrary.OnRadioLibraryStatusUpdatedListener {
+    RadioLibrary.OnRadioLibraryStatusUpdatedListener, RatingComponent.OnRatingUpdatedListener {
+
+
 
     public enum Size { UNASSIGNED, CONTRACTED, EXPANDED }
     private Size size = Size.UNASSIGNED;
@@ -148,6 +150,7 @@ public class PodcastEpisodeView extends LinearLayout implements
         // container.
         LinearLayout ratingContainer = (LinearLayout) findViewById(R.id.rating_container);
         RatingComponent ratingComponent = new RatingComponent(getContext(), podcast.getPodcastId());
+        ratingComponent.setListener(this);
         if(podcast.getRating() == "" || podcast.getRating() == null){
             ratingComponent.updateRating(0);
             } else {
@@ -298,5 +301,12 @@ public class PodcastEpisodeView extends LinearLayout implements
         void onPodcastEpisodeViewSizeChanged(PodcastEpisodeView view, Size size);
         void onPodcastEpisodeViewDownloadClicked(PodcastEpisodeView view, int podcastId);
         void onPodcastEpisodeViewRemoveClicked(PodcastEpisodeView view, PodcastInfo podcast);
+    }
+
+    @Override
+    public void onRatingUpdated(int podcastId, float rating)
+    {
+        RadioPlayerButton button = (RadioPlayerButton) findViewById(R.id.play_button);
+        button.setRating(String.valueOf(rating));
     }
 }

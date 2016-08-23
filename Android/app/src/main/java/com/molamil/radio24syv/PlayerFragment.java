@@ -392,6 +392,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         ratingComponent.setVisibility(player.getRating() != null ? View.VISIBLE : View.GONE);
         ratingComponent.setPodcastId(player.getPodcastId());
         ratingComponent.updateRating(player.getRatingFloat());
+        ratingComponent.updateState();
         //ratingComponent.setPodcastId(player.get);
         UpdateTimeLines(player);
     }
