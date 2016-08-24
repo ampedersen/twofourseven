@@ -58,8 +58,8 @@ public class ProgramDetailsFragment extends PageFragment implements
     private ProgramInfo program;
     private RadioPlayer.RadioPlayerProvider radioPlayerProvider;
     private HashMap<Integer, PodcastInfo> podcastById = new HashMap<>();
-    //private HashMap<Integer, PodcastInfo> podcastByRating = new HashMap<>();
     private List<PodcastInfo> podcastByRating = new ArrayList<PodcastInfo>();
+    private List<PodcastInfo> podcastByDate = new ArrayList<PodcastInfo>();
 
     private ProgressBar progressSpinner;
 
@@ -302,7 +302,8 @@ public class ProgramDetailsFragment extends PageFragment implements
         progressSpinner.setVisibility(View.VISIBLE);
         final Button loadButton = (Button) parent.findViewById(R.id.load_button);
         loadButton.setVisibility(View.GONE);
-        content.removeAllViews();
+        //
+        // ();
 
         RestClient.getApi().getPodcasts(program.getProgramId(), amount, batch).enqueue(new Callback<List<Podcast>>() {
             @Override
@@ -318,6 +319,7 @@ public class ProgramDetailsFragment extends PageFragment implements
 
                 for (int i = 0; i < response.body().size(); i++) {
                     PodcastInfo p = new PodcastInfo(response.body().get(i));
+                    Log.i("PS", "id in response: "+p.getPodcastId());
                     podcastById.put(p.getPodcastId(), p);
 
                     Storage.get().addPodcast(p);
@@ -327,6 +329,13 @@ public class ProgramDetailsFragment extends PageFragment implements
                 Collections.sort(podcastByRating, new Comparator<PodcastInfo>() {
                     public int compare(PodcastInfo o1, PodcastInfo o2) {
                         return o2.getRatingFloat().compareTo(o1.getRatingFloat());
+                    }
+                });
+
+                podcastByDate = new ArrayList<PodcastInfo>(podcastById.values());
+                Collections.sort(podcastByDate, new Comparator<PodcastInfo>() {
+                    public int compare(PodcastInfo o1, PodcastInfo o2) {
+                        return new Integer(o2.getPodcastId()).compareTo(new Integer(o1.getPodcastId()));
                     }
                 });
 
@@ -375,8 +384,32 @@ public class ProgramDetailsFragment extends PageFragment implements
 
         switch (currentSorting) {
             case DATE:
+                for (PodcastInfo p : podcastByDate)
+                {
+                    DateTime date = DateTime.parse(p.getDate());
+                    boolean isNewMonth = (lastPodcastDate == null) || (!date.monthOfYear().equals(lastPodcastDate.monthOfYear())) || (!date.year().equals(lastPodcastDate.year()));
+                    if (isNewMonth) {
+                        if (prevView != null) {
+                            prevView.findViewById(R.id.divider).setVisibility(View.GONE);
+                        }
+                        lastPodcastDate = date;
+                        DateLineView separator = new DateLineView(content.getContext());
+                        Locale locale = new Locale("da", "DK");
+                        //separator.setDate(date.monthOfYear().getAsText(Locale.getDefault()), date.year().getAsText(Locale.getDefault()));
+                        separator.setDate(date.monthOfYear().getAsText(locale), date.year().getAsText(locale));
+                        content.addView(separator);
+                    }
+
+                    PodcastEpisodeView v = new PodcastEpisodeView(content.getContext());
+                    v.setPodcast(p);
+                    v.setRadioPlayer(radioPlayerProvider.getRadioPlayer());
+                    v.setOnPodcastEpisodeViewUpdatedListener(ProgramDetailsFragment.this);
+                    content.addView(v);
+                }
+                /*
                 for (Map.Entry<Integer, PodcastInfo> entry : podcastById.entrySet()) {
                     PodcastInfo p = entry.getValue();
+                    Log.i("PS", "id when populating: "+p.getPodcastId());
                     DateTime date = DateTime.parse(p.getDate());
                     boolean isNewMonth = (lastPodcastDate == null) || (!date.monthOfYear().equals(lastPodcastDate.monthOfYear())) || (!date.year().equals(lastPodcastDate.year()));
                     if (isNewMonth) {
@@ -404,6 +437,7 @@ public class ProgramDetailsFragment extends PageFragment implements
                     //}
 
                 }
+                */
                 break;
             case RATING:
                 for (PodcastInfo p : podcastByRating)

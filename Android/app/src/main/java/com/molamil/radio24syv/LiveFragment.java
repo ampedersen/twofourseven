@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -141,9 +142,8 @@ public class LiveFragment extends PageFragment implements OnUpdateListener {
 
     private void populateView(Broadcast b)
     {
-
         String title = b.getProgramName();
-        String description = b.getDescriptionText();
+        String description = Html.fromHtml(b.getDescriptionText()).toString();
         String startTime = b.getBroadcastTime().getStart();
         String endTime = b.getBroadcastTime().getEnd();
         String topic = b.getTopic();
