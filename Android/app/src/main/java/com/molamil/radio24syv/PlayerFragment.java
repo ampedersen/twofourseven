@@ -4,7 +4,6 @@ import android.content.Context;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.Fragment;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,6 +65,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
     private TextView endTimeLabel;
 
     private RatingComponent ratingComponent;
+    private View blackBox;
 
     private long timelineUpdateInterval = 900;
     private Handler timelineHandler = new Handler(); //Refactor to player service and let it update all necesary timelines
@@ -122,6 +122,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         startTimeLabel = (TextView) v.findViewById(R.id.time_start_text);
         endTimeLabel = (TextView) v.findViewById(R.id.time_end_text);
 
+        blackBox = v.findViewById(R.id.black_box);
 
 
         timeline = (TimeLine) v.findViewById(R.id.player_progress);
@@ -166,6 +167,7 @@ public class PlayerFragment extends Fragment implements RadioPlayer.OnPlaybackLi
         LinearLayout ratingContainer = (LinearLayout) v.findViewById(R.id.rating_container);
 
         ratingContainer.addView(ratingComponent);
+
         ratingComponent.setVisibility(View.GONE);
 
         return v;

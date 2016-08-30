@@ -1,13 +1,14 @@
 package com.molamil.radio24syv.components;
 
+import android.animation.ValueAnimator;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.graphics.Typeface;
-import android.os.Handler;
 import android.util.AttributeSet;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
 import android.widget.FrameLayout;
 import android.widget.LinearLayout;
 import android.widget.TextView;
@@ -30,6 +31,9 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
     private LinearLayout initLayout, activeLayout, receiptLayout;
     private FrameLayout divider;
     private TextView first, second, third, fourth, fifth, currentRatingView, ratingEndString;
+    private View blackBox;
+
+    private int activeLayoutWidth;
 
     public void setPodcastId(int podcastId) {
         this.podcastId = podcastId;
@@ -89,6 +93,13 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
 
         this.podcastId = podcastId;
 
+        Log.i("Test", "PodcastId " + this.podcastId);
+
+
+    //    if(this.podcastId == -1){
+    //        blackBox.setBackgroundColor(getResources().getColor(R.color.radio_gray_dark));
+    //    };
+
         currentRatingView = (TextView) findViewById(R.id.current_rating);
         ratingEndString = (TextView) findViewById(R.id.rating_end_string);
 
@@ -104,6 +115,7 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
         fifth.setOnClickListener(this);
 
         divider = (FrameLayout) findViewById(R.id.rating_divider);
+        blackBox = findViewById(R.id.black_box);
 
         initLayout = (LinearLayout) findViewById(R.id.init_layout);
         activeLayout = (LinearLayout) findViewById(R.id.active_layout);
@@ -139,8 +151,7 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
                 setUnclicked(third);
                 setUnclicked(fourth);
                 setUnclicked(fifth);
-                Log.i("Test", String.valueOf(this.podcastId));
-                finishRating(this.podcastId, 1);
+                finishRating(podcastId, 1);
                 break;
 
             case R.id.vote_2_string:
@@ -188,24 +199,19 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
         view.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
     }
 
+    public void setUnclicked(TextView view) {
+        view.setTextColor(getResources().getColor(R.color.radio_gray_dark));
+        view.setTypeface(DEFAULT);
+    }
 
-    // Method to handle completing the rating flow.
-    // It does some "animation", writes the rating to the users RatedPodcasts and submits the actual rating
+
 
     private void finishRating(final int podcastId, final float vote) {
-        Log.i("PS", "rate");
         String data = podcastId+"/"+(vote/5.0f);
         RestClient.getApi().ratePodcast(podcastId, vote/5.0f).enqueue(new Callback<HashMap<String, String>>() {
 
             @Override
             public void onResponse(Response<HashMap<String, String>> response) {
-                activeLayout.setVisibility(GONE);
-                divider.setBackgroundColor(getResources().getColor(R.color.radio_gray_darker));
-                initLayout.setVisibility(GONE);
-                receiptLayout.setVisibility(VISIBLE);
-                currentRatingView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                currentRatingView.setTextColor(getResources().getColor(R.color.white));
-                ratingEndString.setText(R.string.rating_receipt_text);
 
                 if (response.body() == null) {
                     return;
@@ -219,6 +225,7 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
                     {
                         Float rating = Float.parseFloat(ratingText);
                         updateRating(rating);
+                        doAnimation();
 
                         if(listener != null)
                         {
@@ -235,13 +242,7 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
 
             @Override
             public void onFailure(Throwable t) {
-                activeLayout.setVisibility(GONE);
-                divider.setBackgroundColor(getResources().getColor(R.color.radio_gray_darker));
-                initLayout.setVisibility(GONE);
-                receiptLayout.setVisibility(VISIBLE);
-                currentRatingView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
-                currentRatingView.setTextColor(getResources().getColor(R.color.white));
-                ratingEndString.setText(R.string.rating_receipt_text);
+                doAnimation();
             }
         });
     }
@@ -250,10 +251,47 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
         return ratedPodcasts.contains(String.valueOf(podcastId));
     }
 
-    public void setUnclicked(TextView view) {
-        view.setTextColor(getResources().getColor(R.color.radio_gray_dark));
-        view.setTypeface(DEFAULT);
+    public void doAnimation() {
+
+
+        activeLayoutWidth = activeLayout.getWidth();
+
+        ValueAnimator anim = ValueAnimator.ofInt(blackBox.getMeasuredWidth(),activeLayoutWidth+60);
+        anim.addUpdateListener(new ValueAnimator.AnimatorUpdateListener() {
+            @Override
+            public void onAnimationUpdate(ValueAnimator valueAnimator) {
+                int val = (Integer) valueAnimator.getAnimatedValue();
+                Log.i("Test", "Val" + val);
+                if(val >= activeLayoutWidth+55){
+                    activeLayout.setVisibility(GONE);
+                    initLayout.setVisibility(GONE);
+                    receiptLayout.setVisibility(VISIBLE);
+                    currentRatingView.setTypeface(Typeface.defaultFromStyle(Typeface.BOLD));
+                    currentRatingView.setTextColor(getResources().getColor(R.color.white));
+                    ratingEndString.setText(R.string.rating_receipt_text);
+                }
+                ViewGroup.LayoutParams layoutParams = blackBox.getLayoutParams();
+                layoutParams.width= val;
+                blackBox.setLayoutParams(layoutParams);
+            }
+        });
+        anim.setDuration(500);
+        anim.setRepeatCount(1);
+        anim.setRepeatMode(2);
+        anim.start();
+
+
+
+
+
+
+     //   divider.setBackgroundColor(getResources().getColor(R.color.radio_gray_darker));
+
+
+
     }
+
+
 
 
     public void updateRating(float cr) {
@@ -268,6 +306,7 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
 
     public void updateState()
     {
+        blackBox.setBackgroundColor(getResources().getColor(R.color.player_background));
         if(isRated(podcastId)) {
             initLayout.setVisibility(GONE);
             activeLayout.setVisibility(GONE);
@@ -286,4 +325,6 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
     public interface OnRatingUpdatedListener {
         void onRatingUpdated(int podcastId, float rating);
     }
+
+
 }

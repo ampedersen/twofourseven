@@ -26,8 +26,8 @@ android {
         applicationId "dk.radio24syv.android"
         minSdkVersion 15
         targetSdkVersion 22
-        versionCode 255
-        versionName "3.0.3"
+        versionCode 260
+        versionName "3.0.4"
         signingConfig signingConfigs.release
     }
 
