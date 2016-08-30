@@ -307,6 +307,8 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
     public void updateState()
     {
         blackBox.setBackgroundColor(getResources().getColor(R.color.player_background));
+
+
         if(isRated(podcastId)) {
             initLayout.setVisibility(GONE);
             activeLayout.setVisibility(GONE);
@@ -315,6 +317,7 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
         }
         else
         {
+            divider.setBackgroundColor(getResources().getColor(R.color.radio_gray_darker));
             initLayout.setVisibility(VISIBLE);
             activeLayout.setVisibility(GONE);
             ratingEndString.setText(R.string.rating_end_text);
