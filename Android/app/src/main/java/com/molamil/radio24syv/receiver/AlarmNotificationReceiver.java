@@ -5,13 +5,13 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
+import android.support.v4.content.ContextCompat;
 import android.util.Log;
 
 import com.molamil.radio24syv.MainActivity;
@@ -37,6 +37,9 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 PendingIntent.FLAG_UPDATE_CURRENT);
 
         // Get app icon as resource ID
+
+        /*
+
         int smallIconId;
         String packageName = context.getApplicationContext().getPackageName();
         try {
@@ -45,6 +48,10 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
         } catch (PackageManager.NameNotFoundException e) {
             smallIconId = 0;
         }
+
+        */
+
+        int smallIconId = R.drawable.icon_bell_white;
 
         // Get app icon as bitmap
         Bitmap largeIcon;
@@ -71,6 +78,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 .setContentText(message)
                 .setSmallIcon(smallIconId)
                 .setLargeIcon(largeIcon)
+                .setColor(ContextCompat.getColor(context, R.color.radio_black))
                 .setVisibility(Notification.VISIBILITY_PUBLIC) // Show everywhere
                 .setPriority(Notification.PRIORITY_MAX) // Show in top of list
                 .setContentIntent(intent)

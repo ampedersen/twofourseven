@@ -126,6 +126,7 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
             public void onClick(View v) {
                 initLayout.setVisibility(GONE);
                 divider.setBackgroundColor(getResources().getColor(R.color.radio_red));
+
                 activeLayout.setVisibility(VISIBLE);
             }
         });
@@ -320,7 +321,11 @@ public class RatingComponent extends LinearLayout implements View.OnClickListene
             divider.setBackgroundColor(getResources().getColor(R.color.radio_gray_darker));
             initLayout.setVisibility(VISIBLE);
             activeLayout.setVisibility(GONE);
-            ratingEndString.setText(R.string.rating_end_text);
+            first.setTypeface(Typeface.DEFAULT);
+            second.setTypeface(Typeface.DEFAULT);
+            third.setTypeface(Typeface.DEFAULT);
+            fourth.setTypeface(Typeface.DEFAULT);
+            fifth.setTypeface(Typeface.DEFAULT);
             receiptLayout.setVisibility(GONE);
         }
     }
