@@ -78,7 +78,7 @@ public class AlarmNotificationReceiver extends BroadcastReceiver {
                 .setContentText(message)
                 .setSmallIcon(smallIconId)
                 .setLargeIcon(largeIcon)
-                .setColor(ContextCompat.getColor(context, R.color.radio_black))
+                .setColor(ContextCompat.getColor(context, R.color.radio_gray_dark))
                 .setVisibility(Notification.VISIBILITY_PUBLIC) // Show everywhere
                 .setPriority(Notification.PRIORITY_MAX) // Show in top of list
                 .setContentIntent(intent)
