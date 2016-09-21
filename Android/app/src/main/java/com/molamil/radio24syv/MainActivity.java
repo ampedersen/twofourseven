@@ -151,6 +151,7 @@ public class MainActivity extends FragmentActivity implements
         if (isFinishing()) {
             if (radioPlayer != null) {
                 radioPlayer.cleanup();
+
             }
         }
 
@@ -161,6 +162,7 @@ public class MainActivity extends FragmentActivity implements
         super.onPause();
 
         RadioLibrary.getInstance().disableDownloadReceiver();
+
 
         // Hockeyapp
         if (BuildConfig.HOCKEYAPP_UPDATES_ENABLED) {

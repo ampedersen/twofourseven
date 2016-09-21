@@ -18,10 +18,8 @@ import android.net.NetworkInfo;
 import android.net.wifi.WifiManager;
 import android.os.AsyncTask;
 import android.os.Binder;
-import android.os.Build;
 import android.os.IBinder;
 import android.os.PowerManager;
-import android.service.notification.StatusBarNotification;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.media.MediaMetadataCompat;
 import android.support.v4.media.session.MediaSessionCompat;
@@ -103,6 +101,8 @@ public class RadioPlayerService extends Service implements
     private int action = RadioPlayer.ACTION_STOP;
     private PlayUrlTask task = null;
     private WifiManager.WifiLock wifiLock; // Used to keep wifi running while streaming
+
+    private NotificationManager notificationManager;
 
     /*
     private MediaSessionManager mManager;
@@ -206,6 +206,12 @@ public class RadioPlayerService extends Service implements
 //        setAction(url, RadioPlayer.ACTION_STOP);
 //        cleanup();
         return super.onUnbind(intent);
+    }
+
+    @Override
+    public void onTaskRemoved(Intent rootIntent) {
+        super.onTaskRemoved(rootIntent);
+        notificationManager.cancelAll();
     }
 
     @Override
@@ -432,7 +438,7 @@ public class RadioPlayerService extends Service implements
                 notification.flags = Notification.FLAG_ONGOING_EVENT;
             }
 
-            NotificationManager notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
+            notificationManager = (NotificationManager) getApplicationContext().getSystemService(Context.NOTIFICATION_SERVICE);
             notificationManager.notify(NOTIFICATION_ID, notification);
 
 
