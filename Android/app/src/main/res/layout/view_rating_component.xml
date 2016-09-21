@@ -34,12 +34,14 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:paddingLeft="16dp">
+                android:paddingLeft="16dp"
+                android:paddingStart="16dp">
 
                 <TextView
                     android:id="@+id/vote_1_string"
                     android:text="1"
                     android:paddingRight="8dp"
+                    android:paddingEnd="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/radio_gray_dark"/>
@@ -48,6 +50,7 @@
                     android:id="@+id/vote_2_string"
                     android:text="2"
                     android:paddingRight="8dp"
+                    android:paddingEnd="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/radio_gray_dark"/>
@@ -56,6 +59,7 @@
                     android:id="@+id/vote_3_string"
                     android:text="3"
                     android:paddingRight="8dp"
+                    android:paddingEnd="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/radio_gray_dark"/>
@@ -64,6 +68,7 @@
                     android:id="@+id/vote_4_string"
                     android:text="4"
                     android:paddingRight="8dp"
+                    android:paddingEnd="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/radio_gray_dark"/>
@@ -72,6 +77,7 @@
                     android:id="@+id/vote_5_string"
                     android:text="5"
                     android:paddingRight="8dp"
+                    android:paddingEnd="8dp"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/radio_gray_dark"/>
@@ -86,20 +92,22 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:visibility="gone"
-                android:paddingLeft="16dp">
+                android:paddingLeft="16dp"
+                android:paddingStart="16dp">
 
                 <TextView
                     android:id="@+id/rating_end_string"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/radio_gray_dark"
-                    android:text="Tak for din rating"/>
+                    android:text="@string/tak_for_din_rating"/>
 
 
             </LinearLayout>
 
             <LinearLayout
                 android:paddingLeft="16dp"
+                android:paddingStart="16dp"
                 android:id="@+id/init_layout"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
@@ -110,7 +118,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:textColor="@color/radio_gray_dark"
-                    android:text="Rate programmet"
+                    android:text="@string/bed_m_podcast"
                     android:gravity="center_vertical"/>
 
 
@@ -131,6 +139,7 @@
 
             <FrameLayout
                 android:layout_toRightOf="@id/black_box"
+                android:layout_toEndOf="@+id/black_box"
                 android:id="@+id/rating_divider"
                 android:layout_width="2dp"
                 android:layout_height="18dp"

@@ -99,6 +99,8 @@
     <!-- Ratings -->
     <string name="rating_end_text">Du har allerede rated programmet</string>
     <string name="rating_receipt_text">Tak for din rating</string>
+    <string name="bed_m_podcast">Bedøm podcast</string>
+    <string name="tak_for_din_rating">Tak for din rating</string>
 
 
 </resources>
